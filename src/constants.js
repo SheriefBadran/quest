@@ -1,0 +1,15 @@
+module.exports = {
+	NAME: "%NAME%",
+	MAX_NAME_LENGTH: 8,
+	MIN_NAME_LENGTH: 3,
+
+	// Input constants
+	DISABLED: "DISABLED",
+	EXPECTING_NAME: "EXPECTING_NAME",
+	EXPECTING_CONF: "EXPECTING_CONF",
+
+	// Dispatch constants
+	SHOW_MESSAGE: "SEND_MESSAGE",
+	SET_NAME: "SET_NAME",
+	SET_INPUT: "SET_INPUT"
+};

@@ -40468,6 +40468,21 @@ function pick(obj, fn) {
 
 module.exports = exports["default"];
 },{}],475:[function(require,module,exports){
+var constants = require("./constants");
+
+module.exports = {
+	showMessage: function (message) {
+		return { type: constants.SHOW_MESSAGE, message: message };
+	},
+	setName: function (name) {
+		return { type: constants.SET_NAME, name: name };
+	},
+	setInputExpected: function (inputType) {
+		return { type: constants.SET_INPUT, input: inputType };
+	}
+};
+
+},{"./constants":483}],476:[function(require,module,exports){
 var React = require("react"),
     proptypes = React.PropTypes,
     Row = require("react-bootstrap").Row,
@@ -40505,11 +40520,12 @@ var Dialogue = React.createClass({
 
 module.exports = Dialogue;
 
-},{"react":464,"react-bootstrap":98}],476:[function(require,module,exports){
+},{"react":464,"react-bootstrap":98}],477:[function(require,module,exports){
 var React = require("react"),
     ReactDOM = require("react-dom"),
+    ReactRedux = require("react-redux"),
+    proptypes = React.PropTypes,
     Panel = require("react-bootstrap").Panel,
-    Input = require("react-bootstrap").Input,
     Grid = require("react-bootstrap").Grid,
     Row = require("react-bootstrap").Row,
     Col = require("react-bootstrap").Col,
@@ -40517,6 +40533,10 @@ var React = require("react"),
 
 var Log = React.createClass({
 	displayName: "Log",
+	propTypes: {
+		name: proptypes.string.isRequired,
+		messages: proptypes.array.isRequired
+	},
 	componentDidMount: function () {
 		var node = ReactDOM.findDOMNode(this.logpanel);
 		node.scrollTop = node.scrollHeight;
@@ -40526,8 +40546,12 @@ var Log = React.createClass({
 		node.scrollTop = node.scrollHeight;
 	},
 	render: function () {
+		var lines = [];
 
-		var testLine = "Insert long expositionary line";
+		this.props.messages.forEach((function (message, id) {
+			var line = message.line.replace(/%NAME%/g, this.props.name);
+			lines.push(React.createElement(Dialogue, { speaker: message.speaker, line: line, key: id }));
+		}).bind(this));
 
 		return React.createElement(
 			Panel,
@@ -40535,40 +40559,43 @@ var Log = React.createClass({
 			React.createElement(
 				Grid,
 				{ fluid: true },
-				React.createElement(Dialogue, { speaker: "Wizard", line: testLine }),
-				React.createElement(Dialogue, { speaker: "Player", line: "Ohohohohoho" }),
-				React.createElement(Dialogue, { speaker: "Narrator", line: "What will you do?" }),
-				React.createElement(Dialogue, { speaker: "Narrator", line: "What will you do?" }),
-				React.createElement(Dialogue, { speaker: "Narrator", line: "What will you do?" }),
-				React.createElement(Dialogue, { speaker: "Narrator", line: "What will you do?" }),
-				React.createElement(Dialogue, { speaker: "Narrator", line: "What will you do?" }),
-				React.createElement(Dialogue, { speaker: "Narrator", line: "What will you do?" }),
-				React.createElement(Dialogue, { speaker: "Narrator", line: "What will you do?" }),
-				React.createElement(Dialogue, { speaker: "Narrator", line: "What will you do?" }),
-				React.createElement(Dialogue, { speaker: "Narrator", line: "What will you do?" }),
-				React.createElement(Dialogue, { speaker: "Narrator", line: "What will you do?" }),
-				React.createElement(Dialogue, { speaker: "Narrator", line: "What will you do?" }),
-				React.createElement(Dialogue, { speaker: "Narrator", line: "What will you do?" }),
-				React.createElement(Dialogue, { speaker: "Narrator", line: "What will you do?" }),
-				React.createElement(Dialogue, { speaker: "Narrator", line: "What will you do?" }),
-				React.createElement(Dialogue, { speaker: "Narrator", line: "What will you do?" }),
-				React.createElement(Dialogue, { speaker: "Narrator", line: "What will you do?" }),
-				React.createElement(Dialogue, { speaker: "Narrator", line: "What will you do?" }),
-				React.createElement(Dialogue, { speaker: "Narrator", line: "What will you do?" }),
-				React.createElement(Dialogue, { speaker: "Narrator", line: "What will you do?" }),
-				React.createElement(Dialogue, { speaker: "Narrator", line: "What will you do?" }),
-				React.createElement(Dialogue, { speaker: "Narrator", line: "What will you do?" }),
-				React.createElement(Dialogue, { speaker: "Narrator", line: "What will you do?" }),
-				React.createElement(Dialogue, { speaker: "Narrator", line: "What will you do?" }),
-				React.createElement(Dialogue, { speaker: "Narrator", line: "What will you do?" })
+				lines
 			)
 		);
 	}
 });
 
-module.exports = Log;
+var mapStateToProps = function (state) {
+	return { name: state.player.name, messages: state.log.messages };
+};
 
-},{"./dialogue":475,"react":464,"react-bootstrap":98,"react-dom":271}],477:[function(require,module,exports){
+module.exports = ReactRedux.connect(mapStateToProps)(Log);
+
+},{"./dialogue":476,"react":464,"react-bootstrap":98,"react-dom":271,"react-redux":274}],478:[function(require,module,exports){
+var constants = require("./../constants");
+
+module.exports = {
+	getConfirmMessage: function (prevInput) {
+		switch (prevInput) {
+			case constants.EXPECTING_NAME:
+				return { speaker: "Wizard", line: "Great! Then I'll call you %NAME% from now on." };
+		}
+	},
+	getDenyMessage: function (prevInput) {
+		switch (prevInput) {
+			case constants.EXPECTING_NAME:
+				return { speaker: "Wizard", line: "Alright, how about we try this again. What is your name?" };
+		}
+	},
+	getFailMessage: function (prevInput) {
+		switch (prevInput) {
+			case constants.EXPECTING_NAME:
+				return { speaker: "Wizard", line: "I'm sorry, I have no idea what you're trying to say... It's a yes or no question!" };
+		}
+	}
+};
+
+},{"./../constants":483}],479:[function(require,module,exports){
 var React = require("react"),
     LinkContainer = require("react-router-bootstrap").LinkContainer,
     IndexLinkContainer = require("react-router-bootstrap").IndexLinkContainer,
@@ -40607,35 +40634,127 @@ var Navigation = React.createClass({
 
 module.exports = Navigation;
 
-},{"react":464,"react-bootstrap":98,"react-router-bootstrap":283}],478:[function(require,module,exports){
+},{"react":464,"react-bootstrap":98,"react-router-bootstrap":283}],480:[function(require,module,exports){
 var React = require("react"),
     ReactDOM = require("react-dom"),
-    Panel = require("react-bootstrap").Panel,
-    Input = require("react-bootstrap").Input,
-    Grid = require("react-bootstrap").Grid,
-    Row = require("react-bootstrap").Row,
-    Col = require("react-bootstrap").Col,
-    Dialogue = require("./dialogue"),
-    Log = require("./log");
+    ReactRedux = require("react-redux"),
+    actions = require("./../actions"),
+    constants = require("./../constants"),
+    messageGen = require("./messagegen"),
+    proptypes = React.PropTypes,
+    Input = require("react-bootstrap").Input;
 
-var Quest = React.createClass({
-	displayName: "Quest",
+var PlayerBar = React.createClass({
+	displayName: "PlayerBar",
+	propTypes: {
+		input: proptypes.string.isRequired,
+		prevInput: proptypes.string.isRequired,
+		showMessage: proptypes.func.isRequired,
+		setName: proptypes.func.isRequired,
+		setInputExpected: proptypes.func.isRequired
+	},
 	componentDidMount: function () {
 		this.input.getInputDOMNode().focus();
 	},
+	getInitialState: function () {
+		return { text: "" };
+	},
+	handleChange: function (event) {
+		this.setState({ text: event.target.value });
+	},
+	handleSubmit: function (event) {
+		if (event.keyCode == 13) {
+			// If it's enter key
+			if (this.state.text) {
+				this.validateAndSendInput(this.state.text);
+				this.setState({ text: "" });
+			}
+		}
+	},
+	validateAndSendInput: function (input) {
+		switch (this.props.input) {
+			case constants.DISABLED:
+				break; // Should not be doing anything
+			case constants.EXPECTING_NAME:
+				// Validate the length of the name
+				var message;
+				if (input.length > constants.MAX_NAME_LENGTH || input.length < constants.MIN_NAME_LENGTH) {
+					message = { speaker: "Wizard", line: "Hmmm... are you sure about that? Around here, names are usually between " + constants.MIN_NAME_LENGTH + " and " + constants.MAX_NAME_LENGTH + " characters in length! How about trying again?" };
+				} else {
+					message = { speaker: "Wizard", line: constants.NAME + " you say? Weird name... are you sure about that?" };
+					this.props.setName(input);
+					this.props.setInputExpected(constants.EXPECTING_CONF);
+				}
+				this.props.showMessage(message); // Display the message
+				break;
+			case constants.EXPECTING_CONF:
+				var message;
+				if (input.toUpperCase() === "YES" || input.toUpperCase() === "Y") {
+					message = messageGen.getConfirmMessage(this.props.prevInput);
+					switch (this.props.prevInput) {
+						// TODO
+						default:
+							this.props.setInputExpected(constants.DISABLED);
+							break;
+					}
+				} else if (input.toUpperCase() === "NO" || input.toUpperCase() === "N") {
+					message = messageGen.getDenyMessage(this.props.prevInput);
+					this.props.setInputExpected(this.props.prevInput);
+				} else {
+					message = messageGen.getFailMessage(this.props.prevInput);
+				}
+				this.props.showMessage(message); // Display the message
+				break;
+			default:
+				break;;
+		}
+	},
+	render: function () {
+		return React.createElement(Input, { type: "text", placeholder: "Type here!", ref: ref => this.input = ref, disabled: this.props.input === constants.DISABLED,
+			value: this.state.text, onChange: this.handleChange, onKeyDown: this.handleSubmit });
+	}
+});
+
+var mapStateToProps = function (state) {
+	return { input: state.input.awaiting, prevInput: state.input.previous };
+};
+
+var mapDispatchToProps = function (dispatch) {
+	return {
+		showMessage: function (message) {
+			dispatch(actions.showMessage(message));
+		},
+		setName: function (name) {
+			dispatch(actions.setName(name));
+		},
+		setInputExpected: function (inputType) {
+			dispatch(actions.setInputExpected(inputType));
+		}
+	};
+};
+
+module.exports = ReactRedux.connect(mapStateToProps, mapDispatchToProps)(PlayerBar);
+
+},{"./../actions":475,"./../constants":483,"./messagegen":478,"react":464,"react-bootstrap":98,"react-dom":271,"react-redux":274}],481:[function(require,module,exports){
+var React = require("react"),
+    Log = require("./log"),
+    PlayerBar = require("./playerbar");
+
+var Quest = React.createClass({
+	displayName: "Quest",
 	render: function () {
 		return React.createElement(
 			"div",
 			null,
 			React.createElement(Log, null),
-			React.createElement(Input, { disabled: true, type: "text", placeholder: "Type here!", ref: ref => this.input = ref })
-		);
+			React.createElement(PlayerBar, null)
+		); // Probably should move the Input to its own component
 	}
 });
 
 module.exports = Quest;
 
-},{"./dialogue":475,"./log":476,"react":464,"react-bootstrap":98,"react-dom":271}],479:[function(require,module,exports){
+},{"./log":477,"./playerbar":480,"react":464}],482:[function(require,module,exports){
 var React = require('react'),
     Navigation = require("./navigation"),
     Panel = require("react-bootstrap").Panel,
@@ -40681,7 +40800,24 @@ var Wrapper = React.createClass({
 
 module.exports = Wrapper;
 
-},{"./navigation":477,"react":464,"react-bootstrap":98}],480:[function(require,module,exports){
+},{"./navigation":479,"react":464,"react-bootstrap":98}],483:[function(require,module,exports){
+module.exports = {
+	NAME: "%NAME%",
+	MAX_NAME_LENGTH: 8,
+	MIN_NAME_LENGTH: 3,
+
+	// Input constants
+	DISABLED: "DISABLED",
+	EXPECTING_NAME: "EXPECTING_NAME",
+	EXPECTING_CONF: "EXPECTING_CONF",
+
+	// Dispatch constants
+	SHOW_MESSAGE: "SEND_MESSAGE",
+	SET_NAME: "SET_NAME",
+	SET_INPUT: "SET_INPUT"
+};
+
+},{}],484:[function(require,module,exports){
 /*
 This is the entry point for the app! From here we merely import our routes definitions,
 then use React and React-DOM to render it.
@@ -40701,17 +40837,71 @@ ReactDOM.render(React.createElement(
 	React.createElement(Router, { routes: routes })
 ), document.getElementById("root"));
 
-},{"./routes":482,"./store":483,"react":464,"react-dom":271,"react-redux":274,"react-router":303}],481:[function(require,module,exports){
+},{"./routes":489,"./store":490,"react":464,"react-dom":271,"react-redux":274,"react-router":303}],485:[function(require,module,exports){
+var constants = require("./constants");
+
 module.exports = function () {
 	// Returns a function so it can't be modified accidentally
 	return {
+		input: {
+			awaiting: constants.EXPECTING_NAME,
+			previous: constants.EXPECTING_NAME
+		},
+		log: {
+			messages: [{ speaker: "Wizard", line: "Hey you there... yes you! The one with the funny... well everything! You're finally awake? Can you speak? Tell me your name." }]
+		},
 		player: {
 			name: ""
 		}
 	};
 };
 
-},{}],482:[function(require,module,exports){
+},{"./constants":483}],486:[function(require,module,exports){
+var initialState = require("./../initialstate"),
+    constants = require("./../constants");
+
+module.exports = function (state, action) {
+	var newState = Object.assign({}, state); // Copy to a new state so we don't screw up the old one
+	switch (action.type) {
+		case constants.SET_INPUT:
+			newState.previous = newState.awaiting;
+			newState.awaiting = action.input;
+			return newState;
+		default:
+			return state || initialState().input;
+	}
+};
+
+},{"./../constants":483,"./../initialstate":485}],487:[function(require,module,exports){
+var initialState = require("./../initialstate"),
+    constants = require("./../constants");
+
+module.exports = function (state, action) {
+	var newState = Object.assign({}, state); // Copy to a new state so we don't screw up the old one
+	switch (action.type) {
+		case constants.SHOW_MESSAGE:
+			newState.messages = [...newState.messages, action.message];
+			return newState;
+		default:
+			return state || initialState().log;
+	}
+};
+
+},{"./../constants":483,"./../initialstate":485}],488:[function(require,module,exports){
+var initialState = require("./../initialstate");
+
+module.exports = function (state, action) {
+	var newState = Object.assign({}, state); // Copy to a new state so we don't screw up the old one
+	switch (action.type) {
+		case "SET_NAME":
+			newState.name = action.name;
+			return newState;
+		default:
+			return state || initialState().player;
+	}
+};
+
+},{"./../initialstate":485}],489:[function(require,module,exports){
 var React = require('react'),
     ReactRouter = require('react-router'),
     Route = ReactRouter.Route,
@@ -40725,19 +40915,24 @@ module.exports = React.createElement(
     React.createElement(IndexRoute, { component: quest })
 );
 
-},{"./components/quest":478,"./components/wrapper":479,"react":464,"react-router":303}],483:[function(require,module,exports){
+},{"./components/quest":481,"./components/wrapper":482,"react":464,"react-router":303}],490:[function(require,module,exports){
 /*
 Redux Store
 */
 
 var Redux = require("redux"),
     initialState = require("./initialstate"),
-    thunk = require("redux-thunk"); // for asynch actions
+    messageReducer = require("./reducers/messageReducer"),
+    playerReducer = require("./reducers/playerReducer"),
+    inputReducer = require("./reducers/inputReducer");
+thunk = require("redux-thunk"); // for asynch actions
 
 var rootReducer = Redux.combineReducers({
-	//counter: counterReducer   // this means counterReducer will operate on appState.counter
+	log: messageReducer,
+	player: playerReducer,
+	input: inputReducer
 });
 
 module.exports = Redux.applyMiddleware(thunk)(Redux.createStore)(rootReducer, initialState());
 
-},{"./initialstate":481,"redux":467,"redux-thunk":465}]},{},[480]);
+},{"./initialstate":485,"./reducers/inputReducer":486,"./reducers/messageReducer":487,"./reducers/playerReducer":488,"redux":467,"redux-thunk":465}]},{},[484]);
