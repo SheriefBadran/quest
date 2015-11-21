@@ -12,7 +12,7 @@ module.exports = function() { // Returns a function so it can't be modified acci
 			]
 		},
 		player: {
-			name: ""
+			name: "???"
 		}
 	}
 };

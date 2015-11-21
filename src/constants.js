@@ -1,5 +1,4 @@
 module.exports = {
-	NAME: "%NAME%",
 	MAX_NAME_LENGTH: 8,
 	MIN_NAME_LENGTH: 3,
 

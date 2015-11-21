@@ -40484,6 +40484,7 @@ module.exports = {
 
 },{"./constants":483}],476:[function(require,module,exports){
 var React = require("react"),
+    ReactRedux = require("react-redux"),
     proptypes = React.PropTypes,
     Row = require("react-bootstrap").Row,
     Col = require("react-bootstrap").Col;
@@ -40492,13 +40493,13 @@ var Dialogue = React.createClass({
 	displayName: "Dialogue",
 	propTypes: {
 		speaker: proptypes.string.isRequired,
-		line: proptypes.string.isRequired
+		line: proptypes.string.isRequired,
+		name: proptypes.string.isRequired
 	},
 	render: function () {
 		var name = this.props.speaker;
 		if (name === "Player") {
-			// Actually get the player's name
-			name = "You!";
+			name = this.props.name;
 		}
 
 		return React.createElement(
@@ -40518,9 +40519,13 @@ var Dialogue = React.createClass({
 	}
 });
 
-module.exports = Dialogue;
+var mapStateToProps = function (state) {
+	return { name: state.player.name };
+};
 
-},{"react":464,"react-bootstrap":98}],477:[function(require,module,exports){
+module.exports = ReactRedux.connect(mapStateToProps)(Dialogue);
+
+},{"react":464,"react-bootstrap":98,"react-redux":274}],477:[function(require,module,exports){
 var React = require("react"),
     ReactDOM = require("react-dom"),
     ReactRedux = require("react-redux"),
@@ -40549,8 +40554,7 @@ var Log = React.createClass({
 		var lines = [];
 
 		this.props.messages.forEach((function (message, id) {
-			var line = message.line.replace(/%NAME%/g, this.props.name);
-			lines.push(React.createElement(Dialogue, { speaker: message.speaker, line: line, key: id }));
+			lines.push(React.createElement(Dialogue, { speaker: message.speaker, line: message.line, key: id }));
 		}).bind(this));
 
 		return React.createElement(
@@ -40575,23 +40579,32 @@ module.exports = ReactRedux.connect(mapStateToProps)(Log);
 var constants = require("./../constants");
 
 module.exports = {
-	getConfirmMessage: function (prevInput) {
+	getConfirmMessage: function (prevInput, name) {
 		switch (prevInput) {
 			case constants.EXPECTING_NAME:
-				return { speaker: "Wizard", line: "Great! Then I'll call you %NAME% from now on." };
+				return { speaker: "Wizard", line: "Great! Then I'll call you " + name + " from now on." };
 		}
 	},
-	getDenyMessage: function (prevInput) {
+	getDenyMessage: function (prevInput, name) {
 		switch (prevInput) {
 			case constants.EXPECTING_NAME:
 				return { speaker: "Wizard", line: "Alright, how about we try this again. What is your name?" };
 		}
 	},
-	getFailMessage: function (prevInput) {
+	getFailMessage: function (prevInput, name) {
 		switch (prevInput) {
 			case constants.EXPECTING_NAME:
 				return { speaker: "Wizard", line: "I'm sorry, I have no idea what you're trying to say... It's a yes or no question!" };
 		}
+	},
+	getPlayerYes: function () {
+		return { speaker: "Player", line: "Yes." };
+	},
+	getPlayerNo: function () {
+		return { speaker: "Player", line: "No." };
+	},
+	getPlayerFail: function () {
+		return { speaker: "Player", line: "*incomprehensible garbling*" };
 	}
 };
 
@@ -40648,6 +40661,7 @@ var PlayerBar = React.createClass({
 	displayName: "PlayerBar",
 	propTypes: {
 		input: proptypes.string.isRequired,
+		name: proptypes.string.isRequired,
 		prevInput: proptypes.string.isRequired,
 		showMessage: proptypes.func.isRequired,
 		setName: proptypes.func.isRequired,
@@ -40681,28 +40695,36 @@ var PlayerBar = React.createClass({
 				if (input.length > constants.MAX_NAME_LENGTH || input.length < constants.MIN_NAME_LENGTH) {
 					message = { speaker: "Wizard", line: "Hmmm... are you sure about that? Around here, names are usually between " + constants.MIN_NAME_LENGTH + " and " + constants.MAX_NAME_LENGTH + " characters in length! How about trying again?" };
 				} else {
-					message = { speaker: "Wizard", line: constants.NAME + " you say? Weird name... are you sure about that?" };
+					message = { speaker: "Wizard", line: input + " you say? Weird name... are you sure about that?" };
 					this.props.setName(input);
 					this.props.setInputExpected(constants.EXPECTING_CONF);
 				}
+				this.props.showMessage({ speaker: "Player", line: "I'm " + input + "." });
 				this.props.showMessage(message); // Display the message
 				break;
 			case constants.EXPECTING_CONF:
+				var playerMessage;
 				var message;
 				if (input.toUpperCase() === "YES" || input.toUpperCase() === "Y") {
-					message = messageGen.getConfirmMessage(this.props.prevInput);
+					playerMessage = messageGen.getPlayerYes();
+					message = messageGen.getConfirmMessage(this.props.prevInput, this.props.name);
 					switch (this.props.prevInput) {
-						// TODO
+						case constants.EXPECTING_NAME:
+							// TODO
+							break;
 						default:
 							this.props.setInputExpected(constants.DISABLED);
 							break;
 					}
 				} else if (input.toUpperCase() === "NO" || input.toUpperCase() === "N") {
-					message = messageGen.getDenyMessage(this.props.prevInput);
+					playerMessage = messageGen.getPlayerNo();
+					message = messageGen.getDenyMessage(this.props.prevInput, this.props.name);
 					this.props.setInputExpected(this.props.prevInput);
 				} else {
-					message = messageGen.getFailMessage(this.props.prevInput);
+					playerMessage = messageGen.getPlayerFail();
+					message = messageGen.getFailMessage(this.props.prevInput, this.props.name);
 				}
+				this.props.showMessage(playerMessage);
 				this.props.showMessage(message); // Display the message
 				break;
 			default:
@@ -40716,7 +40738,7 @@ var PlayerBar = React.createClass({
 });
 
 var mapStateToProps = function (state) {
-	return { input: state.input.awaiting, prevInput: state.input.previous };
+	return { input: state.input.awaiting, prevInput: state.input.previous, name: state.player.name };
 };
 
 var mapDispatchToProps = function (dispatch) {
@@ -40802,7 +40824,6 @@ module.exports = Wrapper;
 
 },{"./navigation":479,"react":464,"react-bootstrap":98}],483:[function(require,module,exports){
 module.exports = {
-	NAME: "%NAME%",
 	MAX_NAME_LENGTH: 8,
 	MIN_NAME_LENGTH: 3,
 
@@ -40851,7 +40872,7 @@ module.exports = function () {
 			messages: [{ speaker: "Wizard", line: "Hey you there... yes you! The one with the funny... well everything! You're finally awake? Can you speak? Tell me your name." }]
 		},
 		player: {
-			name: ""
+			name: "???"
 		}
 	};
 };

@@ -1,4 +1,5 @@
 var React = require("react"),
+	ReactRedux = require("react-redux"),
 	proptypes = React.PropTypes,
 	Row = require("react-bootstrap").Row,
 	Col = require("react-bootstrap").Col;
@@ -7,13 +8,13 @@ var Dialogue = React.createClass({
 	displayName: "Dialogue",
 	propTypes: {
 		speaker: proptypes.string.isRequired,
-		line: proptypes.string.isRequired
+		line: proptypes.string.isRequired,
+		name: proptypes.string.isRequired
 	},
 	render: function() {
 		var name = this.props.speaker;
 		if (name === "Player") {
-			// Actually get the player's name
-			name = "You!"
+			name = this.props.name;
 		}
 
 		return (
@@ -29,4 +30,8 @@ var Dialogue = React.createClass({
 	}
 });
 
-module.exports = Dialogue;
+var mapStateToProps = function (state) {
+	return { name: state.player.name };
+};
+
+module.exports = ReactRedux.connect(mapStateToProps)(Dialogue);

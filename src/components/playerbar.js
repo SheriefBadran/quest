@@ -11,6 +11,7 @@ var PlayerBar = React.createClass({
 	displayName: "PlayerBar",
 	propTypes: {
 		input: proptypes.string.isRequired,
+		name: proptypes.string.isRequired,
 		prevInput: proptypes.string.isRequired,
 		showMessage: proptypes.func.isRequired,
 		setName: proptypes.func.isRequired,
@@ -44,28 +45,36 @@ var PlayerBar = React.createClass({
 					message = { speaker: "Wizard", line: "Hmmm... are you sure about that? Around here, names are usually between " + constants.MIN_NAME_LENGTH +
 						" and " + constants.MAX_NAME_LENGTH + " characters in length! How about trying again?" };
 				} else {
-					message = { speaker: "Wizard", line: constants.NAME + " you say? Weird name... are you sure about that?" };
+					message = { speaker: "Wizard", line: input + " you say? Weird name... are you sure about that?" };
 					this.props.setName(input);
 					this.props.setInputExpected(constants.EXPECTING_CONF);
 				}
+				this.props.showMessage({ speaker: "Player", line: "I'm " + input + "." });
 				this.props.showMessage(message); // Display the message
 				break;
 			case constants.EXPECTING_CONF:
+				var playerMessage;
 				var message;
 				if (input.toUpperCase() === "YES" || input.toUpperCase() === "Y") {
-					message = messageGen.getConfirmMessage(this.props.prevInput);
+					playerMessage = messageGen.getPlayerYes();
+					message = messageGen.getConfirmMessage(this.props.prevInput, this.props.name);
 					switch (this.props.prevInput) {
-						// TODO
+						case constants.EXPECTING_NAME:
+							// TODO
+							break;
 						default:
 							this.props.setInputExpected(constants.DISABLED);
 							break;
 					}
 				} else if (input.toUpperCase() === "NO" || input.toUpperCase() === "N") {
-					message = messageGen.getDenyMessage(this.props.prevInput);
+					playerMessage = messageGen.getPlayerNo();
+					message = messageGen.getDenyMessage(this.props.prevInput, this.props.name);
 					this.props.setInputExpected(this.props.prevInput);
 				} else {
-					message = messageGen.getFailMessage(this.props.prevInput);
+					playerMessage = messageGen.getPlayerFail();
+					message = messageGen.getFailMessage(this.props.prevInput, this.props.name);
 				}
+				this.props.showMessage(playerMessage);
 				this.props.showMessage(message); // Display the message
 				break;
 			default:
@@ -81,7 +90,7 @@ var PlayerBar = React.createClass({
 });
 
 var mapStateToProps = function (state) {
-	return { input: state.input.awaiting, prevInput: state.input.previous };
+	return { input: state.input.awaiting, prevInput: state.input.previous, name: state.player.name };
 };
 
 var mapDispatchToProps = function (dispatch) {

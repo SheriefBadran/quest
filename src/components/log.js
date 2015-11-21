@@ -26,8 +26,7 @@ var Log = React.createClass({
 		var lines = [];
 
 		this.props.messages.forEach(function(message, id) {
-			var line = message.line.replace(/%NAME%/g, this.props.name);
-			lines.push(<Dialogue speaker={message.speaker} line={line} key={id} />);
+			lines.push(<Dialogue speaker={message.speaker} line={message.line} key={id} />);
 		}.bind(this));
 
 		return (
