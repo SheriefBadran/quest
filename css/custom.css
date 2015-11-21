@@ -18,3 +18,11 @@
 .Narrator {
 	color: white;
 }
+
+.confirm {
+	color: green;
+}
+
+.deny {
+	color: red;
+}

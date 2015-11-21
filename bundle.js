@@ -40471,8 +40471,12 @@ module.exports = exports["default"];
 var constants = require("./constants");
 
 module.exports = {
-	showMessage: function (message) {
-		return { type: constants.SHOW_MESSAGE, message: message };
+	showMessage: function (message, timeout) {
+		return function (dispatch) {
+			setTimeout(function () {
+				dispatch({ type: constants.SHOW_MESSAGE, message: message });
+			}, timeout);
+		};
 	},
 	setName: function (name) {
 		return { type: constants.SET_NAME, name: name };
@@ -40493,7 +40497,7 @@ var Dialogue = React.createClass({
 	displayName: "Dialogue",
 	propTypes: {
 		speaker: proptypes.string.isRequired,
-		line: proptypes.string.isRequired,
+		line: proptypes.object.isRequired,
 		name: proptypes.string.isRequired
 	},
 	render: function () {
@@ -40576,39 +40580,80 @@ var mapStateToProps = function (state) {
 module.exports = ReactRedux.connect(mapStateToProps)(Log);
 
 },{"./dialogue":476,"react":464,"react-bootstrap":98,"react-dom":271,"react-redux":274}],478:[function(require,module,exports){
-var constants = require("./../constants");
+var constants = require("./../constants"),
+    React = require("react");
 
 module.exports = {
 	getConfirmMessage: function (prevInput, name) {
 		switch (prevInput) {
 			case constants.EXPECTING_NAME:
-				return { speaker: "Wizard", line: "Great! Then I'll call you " + name + " from now on." };
+				return { speaker: "Wizard", line: React.createElement(
+						"p",
+						null,
+						"Great! Then I'll call you ",
+						name,
+						" from now on."
+					) };
 		}
 	},
 	getDenyMessage: function (prevInput, name) {
 		switch (prevInput) {
 			case constants.EXPECTING_NAME:
-				return { speaker: "Wizard", line: "Alright, how about we try this again. What is your name?" };
+				return { speaker: "Wizard", line: React.createElement(
+						"p",
+						null,
+						"Alright, how about we try this again. What is your name?"
+					) };
 		}
 	},
 	getFailMessage: function (prevInput, name) {
 		switch (prevInput) {
 			case constants.EXPECTING_NAME:
-				return { speaker: "Wizard", line: "I'm sorry, I have no idea what you're trying to say... It's a yes or no question!" };
+				var yes = React.createElement(
+					"font",
+					{ className: "confirm" },
+					"yes"
+				);
+				var no = React.createElement(
+					"font",
+					{ className: "deny" },
+					"no"
+				);
+				return { speaker: "Wizard", line: React.createElement(
+						"p",
+						null,
+						"I'm sorry, I have no idea what you're trying to say... It's a ",
+						yes,
+						" or ",
+						no,
+						" question!"
+					) };
 		}
 	},
 	getPlayerYes: function () {
-		return { speaker: "Player", line: "Yes." };
+		return { speaker: "Player", line: React.createElement(
+				"p",
+				null,
+				"Yes."
+			) };
 	},
 	getPlayerNo: function () {
-		return { speaker: "Player", line: "No." };
+		return { speaker: "Player", line: React.createElement(
+				"p",
+				null,
+				"No."
+			) };
 	},
 	getPlayerFail: function () {
-		return { speaker: "Player", line: "*incomprehensible garbling*" };
+		return { speaker: "Player", line: React.createElement(
+				"p",
+				null,
+				"*incomprehensible garbling*"
+			) };
 	}
 };
 
-},{"./../constants":483}],479:[function(require,module,exports){
+},{"./../constants":483,"react":464}],479:[function(require,module,exports){
 var React = require("react"),
     LinkContainer = require("react-router-bootstrap").LinkContainer,
     IndexLinkContainer = require("react-router-bootstrap").IndexLinkContainer,
@@ -40693,14 +40738,33 @@ var PlayerBar = React.createClass({
 				// Validate the length of the name
 				var message;
 				if (input.length > constants.MAX_NAME_LENGTH || input.length < constants.MIN_NAME_LENGTH) {
-					message = { speaker: "Wizard", line: "Hmmm... are you sure about that? Around here, names are usually between " + constants.MIN_NAME_LENGTH + " and " + constants.MAX_NAME_LENGTH + " characters in length! How about trying again?" };
+					message = { speaker: "Wizard", line: React.createElement(
+							"p",
+							null,
+							"Hmmm... are you sure about that? Around here, names are usually between ",
+							constants.MIN_NAME_LENGTH,
+							" and ",
+							constants.MAX_NAME_LENGTH,
+							" characters in length! How about trying again?"
+						) };
 				} else {
-					message = { speaker: "Wizard", line: input + " you say? Weird name... are you sure about that?" };
+					message = { speaker: "Wizard", line: React.createElement(
+							"p",
+							null,
+							input,
+							" you say? Weird name... are you sure about that?"
+						) };
 					this.props.setName(input);
 					this.props.setInputExpected(constants.EXPECTING_CONF);
 				}
-				this.props.showMessage({ speaker: "Player", line: "I'm " + input + "." });
-				this.props.showMessage(message); // Display the message
+				this.props.showMessage({ speaker: "Player", line: React.createElement(
+						"p",
+						null,
+						"I'm ",
+						input,
+						"."
+					) }, 0);
+				this.props.showMessage(message, 1000); // Display the message
 				break;
 			case constants.EXPECTING_CONF:
 				var playerMessage;
@@ -40710,7 +40774,7 @@ var PlayerBar = React.createClass({
 					message = messageGen.getConfirmMessage(this.props.prevInput, this.props.name);
 					switch (this.props.prevInput) {
 						case constants.EXPECTING_NAME:
-							// TODO
+							this.props.setInputExpected(constants.DISABLED);
 							break;
 						default:
 							this.props.setInputExpected(constants.DISABLED);
@@ -40724,8 +40788,8 @@ var PlayerBar = React.createClass({
 					playerMessage = messageGen.getPlayerFail();
 					message = messageGen.getFailMessage(this.props.prevInput, this.props.name);
 				}
-				this.props.showMessage(playerMessage);
-				this.props.showMessage(message); // Display the message
+				this.props.showMessage(playerMessage, 0);
+				this.props.showMessage(message, 1000); // Display the message
 				break;
 			default:
 				break;;
@@ -40743,8 +40807,8 @@ var mapStateToProps = function (state) {
 
 var mapDispatchToProps = function (dispatch) {
 	return {
-		showMessage: function (message) {
-			dispatch(actions.showMessage(message));
+		showMessage: function (message, timeout) {
+			dispatch(actions.showMessage(message, timeout));
 		},
 		setName: function (name) {
 			dispatch(actions.setName(name));
@@ -40859,7 +40923,8 @@ ReactDOM.render(React.createElement(
 ), document.getElementById("root"));
 
 },{"./routes":489,"./store":490,"react":464,"react-dom":271,"react-redux":274,"react-router":303}],485:[function(require,module,exports){
-var constants = require("./constants");
+var constants = require("./constants"),
+    React = require("react");
 
 module.exports = function () {
 	// Returns a function so it can't be modified accidentally
@@ -40869,7 +40934,11 @@ module.exports = function () {
 			previous: constants.EXPECTING_NAME
 		},
 		log: {
-			messages: [{ speaker: "Wizard", line: "Hey you there... yes you! The one with the funny... well everything! You're finally awake? Can you speak? Tell me your name." }]
+			messages: [{ speaker: "Wizard", line: React.createElement(
+					"p",
+					null,
+					"Hey you there... yes you! The one with the funny... well everything! You're finally awake? Can you speak? Tell me your name."
+				) }]
 		},
 		player: {
 			name: "???"
@@ -40877,7 +40946,7 @@ module.exports = function () {
 	};
 };
 
-},{"./constants":483}],486:[function(require,module,exports){
+},{"./constants":483,"react":464}],486:[function(require,module,exports){
 var initialState = require("./../initialstate"),
     constants = require("./../constants");
 

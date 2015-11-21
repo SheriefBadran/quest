@@ -42,15 +42,14 @@ var PlayerBar = React.createClass({
 				// Validate the length of the name
 				var message;
 				if (input.length > constants.MAX_NAME_LENGTH || input.length < constants.MIN_NAME_LENGTH) {
-					message = { speaker: "Wizard", line: "Hmmm... are you sure about that? Around here, names are usually between " + constants.MIN_NAME_LENGTH +
-						" and " + constants.MAX_NAME_LENGTH + " characters in length! How about trying again?" };
+					message = { speaker: "Wizard", line: <p>Hmmm... are you sure about that? Around here, names are usually between {constants.MIN_NAME_LENGTH} and {constants.MAX_NAME_LENGTH} characters in length! How about trying again?</p> };
 				} else {
-					message = { speaker: "Wizard", line: input + " you say? Weird name... are you sure about that?" };
+					message = { speaker: "Wizard", line: <p>{input} you say? Weird name... are you sure about that?</p> };
 					this.props.setName(input);
 					this.props.setInputExpected(constants.EXPECTING_CONF);
 				}
-				this.props.showMessage({ speaker: "Player", line: "I'm " + input + "." });
-				this.props.showMessage(message); // Display the message
+				this.props.showMessage({ speaker: "Player", line: <p>I'm {input}.</p> }, 0);
+				this.props.showMessage(message, 1000); // Display the message
 				break;
 			case constants.EXPECTING_CONF:
 				var playerMessage;
@@ -60,7 +59,7 @@ var PlayerBar = React.createClass({
 					message = messageGen.getConfirmMessage(this.props.prevInput, this.props.name);
 					switch (this.props.prevInput) {
 						case constants.EXPECTING_NAME:
-							// TODO
+							this.props.setInputExpected(constants.DISABLED);
 							break;
 						default:
 							this.props.setInputExpected(constants.DISABLED);
@@ -74,8 +73,8 @@ var PlayerBar = React.createClass({
 					playerMessage = messageGen.getPlayerFail();
 					message = messageGen.getFailMessage(this.props.prevInput, this.props.name);
 				}
-				this.props.showMessage(playerMessage);
-				this.props.showMessage(message); // Display the message
+				this.props.showMessage(playerMessage, 0);
+				this.props.showMessage(message, 1000); // Display the message
 				break;
 			default:
 				break;;
@@ -95,8 +94,8 @@ var mapStateToProps = function (state) {
 
 var mapDispatchToProps = function (dispatch) {
 	return {
-		showMessage: function(message) {
-			dispatch(actions.showMessage(message));
+		showMessage: function(message, timeout) {
+			dispatch(actions.showMessage(message, timeout));
 		},
 		setName: function(name) {
 			dispatch(actions.setName(name));

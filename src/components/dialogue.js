@@ -8,7 +8,7 @@ var Dialogue = React.createClass({
 	displayName: "Dialogue",
 	propTypes: {
 		speaker: proptypes.string.isRequired,
-		line: proptypes.string.isRequired,
+		line: proptypes.object.isRequired,
 		name: proptypes.string.isRequired
 	},
 	render: function() {

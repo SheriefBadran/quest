@@ -1,4 +1,5 @@
-var constants = require("./constants");
+var constants = require("./constants"),
+	React = require("react");
 
 module.exports = function() { // Returns a function so it can't be modified accidentally
 	return {
@@ -8,7 +9,7 @@ module.exports = function() { // Returns a function so it can't be modified acci
 		},
 		log: {
 			messages: [
-				{ speaker: "Wizard", line: "Hey you there... yes you! The one with the funny... well everything! You're finally awake? Can you speak? Tell me your name." },
+				{ speaker: "Wizard", line: <p>Hey you there... yes you! The one with the funny... well everything! You're finally awake? Can you speak? Tell me your name.</p> },
 			]
 		},
 		player: {
