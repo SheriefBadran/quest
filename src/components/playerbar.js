@@ -80,7 +80,6 @@ var PlayerBar = React.createClass({
 					playerMessage = { speaker: "Player", line: <p>I'm {prefix.toLowerCase()} {chosenRace}... I think?</p> };
 					message = { speaker: "Wizard", line: <p>Aha! {prefix} <font className={chosenRace}>{chosenRace}</font> eh? {Classes[chosenRace].description} Are you sure about this?</p>};
 					this.props.setInputExpected(constants.EXPECTING_CONF);
-					// TODO
 				} else { // If it's not a valid race then we do a fail again
 					playerMessage = messageGen.getPlayerFail();
 					message = messageGen.getMultiChoiceFailMessage(this.props.input, raceOptions, this.props.name);
@@ -99,6 +98,11 @@ var PlayerBar = React.createClass({
 						case constants.EXPECTING_NAME:
 							this.props.showMessage(messageGen.getRaceMessage(this.props.name, Classes), 2000);
 							this.props.setInputExpected(constants.EXPECTING_RACE);
+							break;
+						case constants.EXPECTING_RACE:
+							// TODO move to next part, show next message, update player stats to be base stats of that race
+
+							this.props.setInputExpected(constants.DISABLED);
 							break;
 						default:
 							this.props.setInputExpected(constants.DISABLED);

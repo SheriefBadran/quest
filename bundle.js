@@ -40584,7 +40584,7 @@ var constants = require("./../constants"),
     React = require("react");
 
 module.exports = {
-	getConfirmMessage: function (prevInput, name) {
+	getConfirmMessage: function (prevInput, name, option = "") {
 		switch (prevInput) {
 			case constants.EXPECTING_NAME:
 				return { speaker: "Wizard", line: React.createElement(
@@ -40593,6 +40593,12 @@ module.exports = {
 						"Great! Then I'll call you ",
 						name,
 						" from now on."
+					) };
+			case constants.EXPECTING_RACE:
+				return { speaker: "Wizard", line: React.createElement(
+						"p",
+						null,
+						"Excellent! At least it seems you're sure of something..."
 					) };
 			default:
 				console.log("Missing confirm message for " + prevInput);
@@ -40743,9 +40749,9 @@ module.exports = {
 		return { speaker: "Wizard", line: React.createElement(
 				"p",
 				null,
-				"Well then ",
+				"So what are you ",
 				name,
-				", so what are you? ",
+				"? ",
 				races
 			) };
 	},
@@ -40941,12 +40947,11 @@ var PlayerBar = React.createClass({
 							" Are you sure about this?"
 						) };
 					this.props.setInputExpected(constants.EXPECTING_CONF);
-					// TODO
 				} else {
-						// If it's not a valid race then we do a fail again
-						playerMessage = messageGen.getPlayerFail();
-						message = messageGen.getMultiChoiceFailMessage(this.props.input, raceOptions, this.props.name);
-					}
+					// If it's not a valid race then we do a fail again
+					playerMessage = messageGen.getPlayerFail();
+					message = messageGen.getMultiChoiceFailMessage(this.props.input, raceOptions, this.props.name);
+				}
 
 				this.props.showMessage(playerMessage, 0);
 				this.props.showMessage(message, 1000); // Display the message
@@ -40961,6 +40966,11 @@ var PlayerBar = React.createClass({
 						case constants.EXPECTING_NAME:
 							this.props.showMessage(messageGen.getRaceMessage(this.props.name, Classes), 2000);
 							this.props.setInputExpected(constants.EXPECTING_RACE);
+							break;
+						case constants.EXPECTING_RACE:
+							// TODO move to next part, show next message, update player stats to be base stats of that race
+
+							this.props.setInputExpected(constants.DISABLED);
 							break;
 						default:
 							this.props.setInputExpected(constants.DISABLED);

@@ -2,10 +2,12 @@ var constants = require("./../constants"),
 	React = require("react");
 
 module.exports = {
-	getConfirmMessage: function(prevInput, name) {
+	getConfirmMessage: function(prevInput, name, option="") {
 		switch (prevInput) {
 			case constants.EXPECTING_NAME:
 				return { speaker: "Wizard", line: <p>Great! Then I'll call you {name} from now on.</p> };
+			case constants.EXPECTING_RACE:
+				return { speaker: "Wizard", line: <p>Excellent! At least it seems you're sure of something...</p> };
 			default:
 				console.log("Missing confirm message for " + prevInput);
 				return { speaker: "Narrator", line: <p>Whoops! Looks like some sort of error occurred... silly me!</p> };
@@ -75,7 +77,7 @@ module.exports = {
 				}
 			}
 		}
-		return { speaker: "Wizard", line: <p>Well then {name}, so what are you? {races}</p> };
+		return { speaker: "Wizard", line: <p>So what are you {name}? {races}</p> };
 	},
 	getPlayerYes: function() {
 		return { speaker: "Player", line: <p>Yes.</p> };
