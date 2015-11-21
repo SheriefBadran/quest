@@ -1,0 +1,20 @@
+.log-box {
+	overflow: auto;
+	height: 400px;
+	background-color: black;
+	border-color: black;
+	color: white;
+	text-align: left;
+}
+
+.Wizard {
+	color: orange;
+}
+
+.Player {
+	color: teal;
+}
+
+.Narrator {
+	color: white;
+}
