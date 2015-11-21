@@ -5,7 +5,8 @@ var React = require("react"),
 	constants = require("./../constants"),
 	messageGen = require("./messagegen"),
 	proptypes = React.PropTypes,
-	Input = require("react-bootstrap").Input;
+	Input = require("react-bootstrap").Input,
+	Classes = require("./../data/class");
 
 var PlayerBar = React.createClass({
 	displayName: "PlayerBar",
@@ -59,7 +60,8 @@ var PlayerBar = React.createClass({
 					message = messageGen.getConfirmMessage(this.props.prevInput, this.props.name);
 					switch (this.props.prevInput) {
 						case constants.EXPECTING_NAME:
-							this.props.setInputExpected(constants.DISABLED);
+							this.props.showMessage(messageGen.getRaceMessage(this.props.name, Classes), 2000);
+							this.props.setInputExpected(constants.EXPECTING_RACE);
 							break;
 						default:
 							this.props.setInputExpected(constants.DISABLED);

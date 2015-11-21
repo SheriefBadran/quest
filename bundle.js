@@ -40630,6 +40630,73 @@ module.exports = {
 					) };
 		}
 	},
+	getRaceMessage: function (name, classes) {
+
+		var races = [];
+
+		var firstLoop = true;
+
+		// Loop through all races
+		for (var raceName in classes) {
+			if (classes.hasOwnProperty(raceName)) {
+				var race = classes[raceName];
+				var prefix = "AEIOU".indexOf(race.name.charAt(0).toUpperCase()) < 0 ? "A" : "An";
+				if (!firstLoop) {
+					races.push(React.createElement(
+						"font",
+						{ key: race.name },
+						prefix,
+						" ",
+						React.createElement(
+							"font",
+							{ className: race.name },
+							race.name
+						),
+						"? "
+					));
+				} else {
+					races.push(React.createElement(
+						"font",
+						{ key: race.name },
+						"Are you ",
+						prefix.toLowerCase(),
+						" ",
+						React.createElement(
+							"font",
+							{ className: race.name },
+							race.name
+						),
+						"? "
+					));
+					firstLoop = false;
+				}
+			}
+		}
+
+		var elf = React.createElement(
+			"font",
+			{ className: "Elf" },
+			"Elf"
+		);
+		var human = React.createElement(
+			"font",
+			{ className: "Human" },
+			"Human"
+		);
+		var dwarf = React.createElement(
+			"font",
+			{ className: "Dwarf" },
+			"Dwarf"
+		);
+		return { speaker: "Wizard", line: React.createElement(
+				"p",
+				null,
+				"Alright then ",
+				name,
+				", so what are you? ",
+				races
+			) };
+	},
 	getPlayerYes: function () {
 		return { speaker: "Player", line: React.createElement(
 				"p",
@@ -40700,7 +40767,8 @@ var React = require("react"),
     constants = require("./../constants"),
     messageGen = require("./messagegen"),
     proptypes = React.PropTypes,
-    Input = require("react-bootstrap").Input;
+    Input = require("react-bootstrap").Input,
+    Classes = require("./../data/class");
 
 var PlayerBar = React.createClass({
 	displayName: "PlayerBar",
@@ -40774,7 +40842,8 @@ var PlayerBar = React.createClass({
 					message = messageGen.getConfirmMessage(this.props.prevInput, this.props.name);
 					switch (this.props.prevInput) {
 						case constants.EXPECTING_NAME:
-							this.props.setInputExpected(constants.DISABLED);
+							this.props.showMessage(messageGen.getRaceMessage(this.props.name, Classes), 2000);
+							this.props.setInputExpected(constants.EXPECTING_RACE);
 							break;
 						default:
 							this.props.setInputExpected(constants.DISABLED);
@@ -40821,7 +40890,7 @@ var mapDispatchToProps = function (dispatch) {
 
 module.exports = ReactRedux.connect(mapStateToProps, mapDispatchToProps)(PlayerBar);
 
-},{"./../actions":475,"./../constants":483,"./messagegen":478,"react":464,"react-bootstrap":98,"react-dom":271,"react-redux":274}],481:[function(require,module,exports){
+},{"./../actions":475,"./../constants":483,"./../data/class":484,"./messagegen":478,"react":464,"react-bootstrap":98,"react-dom":271,"react-redux":274}],481:[function(require,module,exports){
 var React = require("react"),
     Log = require("./log"),
     PlayerBar = require("./playerbar");
@@ -40894,6 +40963,7 @@ module.exports = {
 	// Input constants
 	DISABLED: "DISABLED",
 	EXPECTING_NAME: "EXPECTING_NAME",
+	EXPECTING_RACE: "EXPECTING_RACE",
 	EXPECTING_CONF: "EXPECTING_CONF",
 
 	// Dispatch constants
@@ -40903,6 +40973,27 @@ module.exports = {
 };
 
 },{}],484:[function(require,module,exports){
+var Classes = {
+	Elf: require("./classes/elf"),
+	Human: require("./classes/human"),
+	Dwarf: require("./classes/dwarf")
+};
+
+module.exports = Classes;
+
+},{"./classes/dwarf":485,"./classes/elf":486,"./classes/human":487}],485:[function(require,module,exports){
+module.exports={
+	"name": "Dwarf"
+}
+},{}],486:[function(require,module,exports){
+module.exports={
+	"name": "Elf"
+}
+},{}],487:[function(require,module,exports){
+module.exports={
+	"name": "Human"
+}
+},{}],488:[function(require,module,exports){
 /*
 This is the entry point for the app! From here we merely import our routes definitions,
 then use React and React-DOM to render it.
@@ -40922,7 +41013,7 @@ ReactDOM.render(React.createElement(
 	React.createElement(Router, { routes: routes })
 ), document.getElementById("root"));
 
-},{"./routes":489,"./store":490,"react":464,"react-dom":271,"react-redux":274,"react-router":303}],485:[function(require,module,exports){
+},{"./routes":493,"./store":494,"react":464,"react-dom":271,"react-redux":274,"react-router":303}],489:[function(require,module,exports){
 var constants = require("./constants"),
     React = require("react");
 
@@ -40946,7 +41037,7 @@ module.exports = function () {
 	};
 };
 
-},{"./constants":483,"react":464}],486:[function(require,module,exports){
+},{"./constants":483,"react":464}],490:[function(require,module,exports){
 var initialState = require("./../initialstate"),
     constants = require("./../constants");
 
@@ -40962,7 +41053,7 @@ module.exports = function (state, action) {
 	}
 };
 
-},{"./../constants":483,"./../initialstate":485}],487:[function(require,module,exports){
+},{"./../constants":483,"./../initialstate":489}],491:[function(require,module,exports){
 var initialState = require("./../initialstate"),
     constants = require("./../constants");
 
@@ -40977,7 +41068,7 @@ module.exports = function (state, action) {
 	}
 };
 
-},{"./../constants":483,"./../initialstate":485}],488:[function(require,module,exports){
+},{"./../constants":483,"./../initialstate":489}],492:[function(require,module,exports){
 var initialState = require("./../initialstate");
 
 module.exports = function (state, action) {
@@ -40991,7 +41082,7 @@ module.exports = function (state, action) {
 	}
 };
 
-},{"./../initialstate":485}],489:[function(require,module,exports){
+},{"./../initialstate":489}],493:[function(require,module,exports){
 var React = require('react'),
     ReactRouter = require('react-router'),
     Route = ReactRouter.Route,
@@ -41005,7 +41096,7 @@ module.exports = React.createElement(
     React.createElement(IndexRoute, { component: quest })
 );
 
-},{"./components/quest":481,"./components/wrapper":482,"react":464,"react-router":303}],490:[function(require,module,exports){
+},{"./components/quest":481,"./components/wrapper":482,"react":464,"react-router":303}],494:[function(require,module,exports){
 /*
 Redux Store
 */
@@ -41025,4 +41116,4 @@ var rootReducer = Redux.combineReducers({
 
 module.exports = Redux.applyMiddleware(thunk)(Redux.createStore)(rootReducer, initialState());
 
-},{"./initialstate":485,"./reducers/inputReducer":486,"./reducers/messageReducer":487,"./reducers/playerReducer":488,"redux":467,"redux-thunk":465}]},{},[484]);
+},{"./initialstate":489,"./reducers/inputReducer":490,"./reducers/messageReducer":491,"./reducers/playerReducer":492,"redux":467,"redux-thunk":465}]},{},[488]);

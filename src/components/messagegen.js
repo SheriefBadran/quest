@@ -22,6 +22,31 @@ module.exports = {
 				return { speaker: "Wizard", line: <p>I'm sorry, I have no idea what you're trying to say... It's a {yes} or {no} question!</p> };
 		}
 	},
+	getRaceMessage: function(name, classes) {
+
+		var races = [];
+
+		var firstLoop = true;
+
+		// Loop through all races
+		for (var raceName in classes) {
+			if (classes.hasOwnProperty(raceName)) {
+				var race = classes[raceName];
+				var prefix = ("AEIOU".indexOf(race.name.charAt(0).toUpperCase()) < 0) ? "A" : "An";
+				if (!firstLoop) {
+					races.push(<font key={race.name}>{prefix} <font className={race.name}>{race.name}</font>? </font>);
+				} else {
+					races.push(<font key={race.name}>Are you {prefix.toLowerCase()} <font className={race.name}>{race.name}</font>? </font>);
+					firstLoop = false;
+				}
+			}
+		}
+
+		var elf = <font className="Elf">Elf</font>;
+		var human = <font className="Human">Human</font>;
+		var dwarf = <font className="Dwarf">Dwarf</font>;
+		return { speaker: "Wizard", line: <p>Alright then {name}, so what are you? {races}</p> };
+	},
 	getPlayerYes: function() {
 		return { speaker: "Player", line: <p>Yes.</p> };
 	},

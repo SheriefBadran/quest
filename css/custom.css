@@ -26,3 +26,15 @@
 .deny {
 	color: red;
 }
+
+.Elf {
+	color: green;
+}
+
+.Human {
+	color: teal;
+}
+
+.Dwarf {
+	color: gold;
+}

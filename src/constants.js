@@ -5,6 +5,7 @@ module.exports = {
 	// Input constants
 	DISABLED: "DISABLED",
 	EXPECTING_NAME: "EXPECTING_NAME",
+	EXPECTING_RACE: "EXPECTING_RACE",
 	EXPECTING_CONF: "EXPECTING_CONF",
 
 	// Dispatch constants
