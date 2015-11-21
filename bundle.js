@@ -40594,9 +40594,16 @@ module.exports = {
 						name,
 						" from now on."
 					) };
+			default:
+				console.log("Missing confirm message for " + prevInput);
+				return { speaker: "Narrator", line: React.createElement(
+						"p",
+						null,
+						"Whoops! Looks like some sort of error occurred... silly me!"
+					) };
 		}
 	},
-	getDenyMessage: function (prevInput, name) {
+	getDenyMessage: function (prevInput, name, options) {
 		switch (prevInput) {
 			case constants.EXPECTING_NAME:
 				return { speaker: "Wizard", line: React.createElement(
@@ -40604,11 +40611,21 @@ module.exports = {
 						null,
 						"Alright, how about we try this again. What is your name?"
 					) };
+			case constants.EXPECTING_RACE:
+				return this.getRaceMessage(name, options);
+			default:
+				console.log("Missing deny message for " + prevInput);
+				return { speaker: "Narrator", line: React.createElement(
+						"p",
+						null,
+						"Whoops! Looks like some sort of error occurred... silly me!"
+					) };
 		}
 	},
 	getFailMessage: function (prevInput, name) {
 		switch (prevInput) {
 			case constants.EXPECTING_NAME:
+			case constants.EXPECTING_RACE:
 				var yes = React.createElement(
 					"font",
 					{ className: "confirm" },
@@ -40627,6 +40644,57 @@ module.exports = {
 						" or ",
 						no,
 						" question!"
+					) };
+			default:
+				console.log("Missing fail message for " + prevInput);
+				return { speaker: "Narrator", line: React.createElement(
+						"p",
+						null,
+						"Whoops! Looks like some sort of error occurred... silly me!"
+					) };
+		}
+	},
+	getMultiChoiceFailMessage: function (input, options, name) {
+		switch (input) {
+			case constants.EXPECTING_RACE:
+				var optionLines = [];
+
+				var firstLine = true;
+
+				var comma = options.length > 2 ? "," : "";
+
+				options.forEach((function (option, id) {
+					if (!firstLine) {
+						var or = id === options.length - 1 ? "or " : "";
+						optionLines.push(React.createElement(
+							"font",
+							{ key: id },
+							comma,
+							" ",
+							or,
+							React.createElement(
+								"font",
+								{ className: option },
+								option
+							)
+						));
+					} else {
+						firstLine = false;
+						optionLines.push(React.createElement(
+							"font",
+							{ className: option, key: id },
+							" ",
+							option
+						));
+					}
+				}).bind(this));
+
+				return { speaker: "Wizard", line: React.createElement(
+						"p",
+						null,
+						"I'm not sure what that's supposed to mean... The options are ",
+						optionLines,
+						"."
 					) };
 		}
 	},
@@ -40672,26 +40740,10 @@ module.exports = {
 				}
 			}
 		}
-
-		var elf = React.createElement(
-			"font",
-			{ className: "Elf" },
-			"Elf"
-		);
-		var human = React.createElement(
-			"font",
-			{ className: "Human" },
-			"Human"
-		);
-		var dwarf = React.createElement(
-			"font",
-			{ className: "Dwarf" },
-			"Dwarf"
-		);
 		return { speaker: "Wizard", line: React.createElement(
 				"p",
 				null,
-				"Alright then ",
+				"Well then ",
 				name,
 				", so what are you? ",
 				races
@@ -40712,11 +40764,16 @@ module.exports = {
 			) };
 	},
 	getPlayerFail: function () {
-		return { speaker: "Player", line: React.createElement(
-				"p",
-				null,
-				"*incomprehensible garbling*"
-			) };
+		var failLines = [React.createElement(
+			"p",
+			null,
+			"*incomprehensible garbling*"
+		), React.createElement(
+			"p",
+			null,
+			"*clucks like a chicken*"
+		)];
+		return { speaker: "Player", line: failLines[Math.floor(Math.random() * failLines.length)] };
 	}
 };
 
@@ -40834,6 +40891,66 @@ var PlayerBar = React.createClass({
 					) }, 0);
 				this.props.showMessage(message, 1000); // Display the message
 				break;
+			case constants.EXPECTING_RACE:
+				var playerMessage;
+				var message;
+
+				var raceOptions = [];
+
+				for (var raceName in Classes) {
+					if (Classes.hasOwnProperty(raceName)) {
+						raceOptions.push(raceName);
+					}
+				}
+
+				// Check if it's a valid race
+				var valid = false;
+				var chosenRace;
+				for (var i = 0; i < raceOptions.length; ++i) {
+					if (input.toUpperCase() === raceOptions[i].toUpperCase()) {
+						valid = true;
+						chosenRace = raceOptions[i];
+						break;
+					}
+				}
+
+				if (valid) {
+					var prefix = "AEIOU".indexOf(input.charAt(0).toUpperCase()) < 0 ? "A" : "An";
+					playerMessage = { speaker: "Player", line: React.createElement(
+							"p",
+							null,
+							"I'm ",
+							prefix.toLowerCase(),
+							" ",
+							chosenRace,
+							"... I think?"
+						) };
+					message = { speaker: "Wizard", line: React.createElement(
+							"p",
+							null,
+							"Aha! ",
+							prefix,
+							" ",
+							React.createElement(
+								"font",
+								{ className: chosenRace },
+								chosenRace
+							),
+							" eh? ",
+							Classes[chosenRace].description,
+							" Are you sure about this?"
+						) };
+					this.props.setInputExpected(constants.EXPECTING_CONF);
+					// TODO
+				} else {
+						// If it's not a valid race then we do a fail again
+						playerMessage = messageGen.getPlayerFail();
+						message = messageGen.getMultiChoiceFailMessage(this.props.input, raceOptions, this.props.name);
+					}
+
+				this.props.showMessage(playerMessage, 0);
+				this.props.showMessage(message, 1000); // Display the message
+				break;
 			case constants.EXPECTING_CONF:
 				var playerMessage;
 				var message;
@@ -40850,8 +40967,14 @@ var PlayerBar = React.createClass({
 							break;
 					}
 				} else if (input.toUpperCase() === "NO" || input.toUpperCase() === "N") {
+					var options = [];
+
+					if (this.props.prevInput === constants.EXPECTING_RACE) {
+						options = Classes;
+					}
+
 					playerMessage = messageGen.getPlayerNo();
-					message = messageGen.getDenyMessage(this.props.prevInput, this.props.name);
+					message = messageGen.getDenyMessage(this.props.prevInput, this.props.name, options);
 					this.props.setInputExpected(this.props.prevInput);
 				} else {
 					playerMessage = messageGen.getPlayerFail();
@@ -40983,15 +41106,18 @@ module.exports = Classes;
 
 },{"./classes/dwarf":485,"./classes/elf":486,"./classes/human":487}],485:[function(require,module,exports){
 module.exports={
-	"name": "Dwarf"
+	"name": "Dwarf",
+	"description": "DWARF DESC"
 }
 },{}],486:[function(require,module,exports){
 module.exports={
-	"name": "Elf"
+	"name": "Elf",
+	"description": "ELF DESC"
 }
 },{}],487:[function(require,module,exports){
 module.exports={
-	"name": "Human"
+	"name": "Human",
+	"description": "HUMAN DESC"
 }
 },{}],488:[function(require,module,exports){
 /*

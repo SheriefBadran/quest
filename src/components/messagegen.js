@@ -6,21 +6,55 @@ module.exports = {
 		switch (prevInput) {
 			case constants.EXPECTING_NAME:
 				return { speaker: "Wizard", line: <p>Great! Then I'll call you {name} from now on.</p> };
+			default:
+				console.log("Missing confirm message for " + prevInput);
+				return { speaker: "Narrator", line: <p>Whoops! Looks like some sort of error occurred... silly me!</p> };
 		}
 	},
-	getDenyMessage: function(prevInput, name) {
+	getDenyMessage: function(prevInput, name, options) {
 		switch (prevInput) {
 			case constants.EXPECTING_NAME:
 				return { speaker: "Wizard", line: <p>Alright, how about we try this again. What is your name?</p> };
+			case constants.EXPECTING_RACE:
+				return this.getRaceMessage(name, options);
+			default:
+				console.log("Missing deny message for " + prevInput);
+				return { speaker: "Narrator", line: <p>Whoops! Looks like some sort of error occurred... silly me!</p> };
 		}
 	},
 	getFailMessage: function(prevInput, name) {
 		switch (prevInput) {
 			case constants.EXPECTING_NAME:
+			case constants.EXPECTING_RACE:
 				var yes = <font className="confirm">yes</font>;
 				var no = <font className="deny">no</font>
 				return { speaker: "Wizard", line: <p>I'm sorry, I have no idea what you're trying to say... It's a {yes} or {no} question!</p> };
+			default:
+				console.log("Missing fail message for " + prevInput);
+				return { speaker: "Narrator", line: <p>Whoops! Looks like some sort of error occurred... silly me!</p> };
 		}
+	},
+	getMultiChoiceFailMessage: function(input, options, name) {
+		switch (input) {
+			case constants.EXPECTING_RACE:
+				var optionLines = [];
+
+				var firstLine = true;
+
+				var comma = (options.length > 2) ? "," : "";
+
+				options.forEach(function(option, id) {
+					if (!firstLine) {
+						var or = (id === options.length-1) ? "or " : "";
+						optionLines.push(<font key={id}>{comma} {or}<font className={option}>{option}</font></font>);
+					} else {
+						firstLine = false;
+						optionLines.push(<font className={option} key={id}> {option}</font>);
+					}
+				}.bind(this));
+
+				return {speaker: "Wizard", line: <p>I'm not sure what that's supposed to mean... The options are {optionLines}.</p> };
+			}
 	},
 	getRaceMessage: function(name, classes) {
 
@@ -41,11 +75,7 @@ module.exports = {
 				}
 			}
 		}
-
-		var elf = <font className="Elf">Elf</font>;
-		var human = <font className="Human">Human</font>;
-		var dwarf = <font className="Dwarf">Dwarf</font>;
-		return { speaker: "Wizard", line: <p>Alright then {name}, so what are you? {races}</p> };
+		return { speaker: "Wizard", line: <p>Well then {name}, so what are you? {races}</p> };
 	},
 	getPlayerYes: function() {
 		return { speaker: "Player", line: <p>Yes.</p> };
@@ -54,6 +84,10 @@ module.exports = {
 		return { speaker: "Player", line: <p>No.</p> };
 	},
 	getPlayerFail: function() {
-		return { speaker: "Player", line: <p>*incomprehensible garbling*</p> };
+		var failLines = [
+			<p>*incomprehensible garbling*</p>,
+			<p>*clucks like a chicken*</p>
+		];
+		return { speaker: "Player", line: failLines[Math.floor(Math.random() * failLines.length)] };
 	}
 };

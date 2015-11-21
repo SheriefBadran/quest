@@ -52,6 +52,43 @@ var PlayerBar = React.createClass({
 				this.props.showMessage({ speaker: "Player", line: <p>I'm {input}.</p> }, 0);
 				this.props.showMessage(message, 1000); // Display the message
 				break;
+			case constants.EXPECTING_RACE:
+				var playerMessage;
+				var message;
+
+				var raceOptions = [];
+
+				for (var raceName in Classes) {
+					if (Classes.hasOwnProperty(raceName)) {
+						raceOptions.push(raceName);
+					}
+				}
+
+				// Check if it's a valid race
+				var valid = false;
+				var chosenRace;
+				for (var i = 0; i < raceOptions.length; ++i) {
+					if (input.toUpperCase() === raceOptions[i].toUpperCase()) {
+						valid = true;
+						chosenRace = raceOptions[i];
+						break;
+					}
+				}
+
+				if (valid) {
+					var prefix = ("AEIOU".indexOf(input.charAt(0).toUpperCase()) < 0) ? "A" : "An";
+					playerMessage = { speaker: "Player", line: <p>I'm {prefix.toLowerCase()} {chosenRace}... I think?</p> };
+					message = { speaker: "Wizard", line: <p>Aha! {prefix} <font className={chosenRace}>{chosenRace}</font> eh? {Classes[chosenRace].description} Are you sure about this?</p>};
+					this.props.setInputExpected(constants.EXPECTING_CONF);
+					// TODO
+				} else { // If it's not a valid race then we do a fail again
+					playerMessage = messageGen.getPlayerFail();
+					message = messageGen.getMultiChoiceFailMessage(this.props.input, raceOptions, this.props.name);
+				}
+
+				this.props.showMessage(playerMessage, 0);
+				this.props.showMessage(message, 1000); // Display the message
+				break;
 			case constants.EXPECTING_CONF:
 				var playerMessage;
 				var message;
@@ -68,8 +105,14 @@ var PlayerBar = React.createClass({
 							break;
 					}
 				} else if (input.toUpperCase() === "NO" || input.toUpperCase() === "N") {
+					var options = [];
+
+					if (this.props.prevInput === constants.EXPECTING_RACE) {
+						options = Classes;
+					}
+
 					playerMessage = messageGen.getPlayerNo();
-					message = messageGen.getDenyMessage(this.props.prevInput, this.props.name);
+					message = messageGen.getDenyMessage(this.props.prevInput, this.props.name, options);
 					this.props.setInputExpected(this.props.prevInput);
 				} else {
 					playerMessage = messageGen.getPlayerFail();
