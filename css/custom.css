@@ -15,6 +15,20 @@
 	margin-bottom: 10px;
 }
 
+.inventory-window {
+	height: 200px;
+	text-align: center;
+	background-color: black;
+	border-color: black;
+	color: white;
+	margin-top: 10px;
+}
+
+.inventory-title {
+	border-bottom: 1px solid;
+	border-color: white;
+}
+
 .Wizard {
 	color: orange;
 }
@@ -45,4 +59,8 @@
 
 .Dwarf {
 	color: gold;
+}
+
+.Sword, .Bow, .Staff {
+	color: teal;
 }

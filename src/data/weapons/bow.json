@@ -1,0 +1,12 @@
+{
+	"name": "Bow",
+	"description": "BOW DESC",
+	"isPlural": false,
+	"prefix": "timeworn yew",
+	"stats": {
+		"str": 0,
+		"dex": 3,
+		"mag": 0,
+		"def": 0
+	}
+}

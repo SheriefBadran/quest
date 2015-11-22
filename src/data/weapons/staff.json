@@ -1,0 +1,12 @@
+{
+	"name": "Staff",
+	"description": "STAFF DESC",
+	"isPlural": false,
+	"prefix": "battered oak",
+	"stats": {
+		"str": 0,
+		"dex": 0,
+		"mag": 3,
+		"def": 0
+	}
+}

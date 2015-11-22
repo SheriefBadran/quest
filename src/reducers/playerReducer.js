@@ -13,7 +13,30 @@ module.exports = function (state, action) {
 			newState.stats.currentmp = newState.stats.mp;
 			return newState;
 		case constants.DISPLAY_STATS:
-			newState.display = action.display;
+			newState.displayStats = action.display;
+			return newState;
+		case constants.ADD_ITEM:
+			newState.inventory = [...newState.inventory, action.item];
+			return newState;
+		case constants.REMOVE_ITEM:
+			newState.inventory = [...newState.inventory];
+			newState.inventory.splice(newState.inventory.indexOf(action.item), 1);
+			return newState;
+		case constants.EQUIP_ITEM:
+			switch (action.item.type) {
+				case constants.WEAPON:
+					newState.weapon = action.item;
+					break;
+				case constants.ARMOUR:
+					newState.armour = action.item;
+					break;
+				default:
+					console.log("Invalid item type passed to equipItem - " + action.item.name);
+					break;
+			}
+			return newState;
+		case constants.DISPLAY_INVENTORY:
+			newState.displayInventory = action.display;
 			return newState;
 		default:
 			return state || initialState().player;

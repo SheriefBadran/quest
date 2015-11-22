@@ -6,7 +6,8 @@ var React = require("react"),
 	messageGen = require("./messagegen"),
 	proptypes = React.PropTypes,
 	Input = require("react-bootstrap").Input,
-	Classes = require("./../data/class");
+	Classes = require("./../data/class"),
+	Weapons = require("./../data/weapon");
 
 var PlayerBar = React.createClass({
 	displayName: "PlayerBar",
@@ -18,7 +19,12 @@ var PlayerBar = React.createClass({
 		setName: proptypes.func.isRequired,
 		setInputExpected: proptypes.func.isRequired,
 		setStats: proptypes.func.isRequired,
-		setDisplayStats: proptypes.func.isRequired
+		setDisplayStats: proptypes.func.isRequired,
+		addItem: proptypes.func.isRequired,
+		removeItem: proptypes.func.isRequired,
+		equipItem: proptypes.func.isRequired,
+		inventory: proptypes.array.isRequired,
+		setDisplayInventory: proptypes.func.isRequired
 	},
 	componentDidMount: function() {
  		this.input.getInputDOMNode().focus();
@@ -37,7 +43,43 @@ var PlayerBar = React.createClass({
 			}
 		}
 	},
-	validateAndSendInput: function(input) {
+	getRequestedItem: function(itemName) {
+		var requestedItem = null;
+		this.props.inventory.forEach(function(item) {
+			if (item.name.toUpperCase() === itemName.toUpperCase()) {
+				requestedItem = item;
+			}
+		}.bind(this));
+		return requestedItem;
+	},
+	validateAndSendInput: function(input) { // TODO IMPORANT - MAKE THIS METHOD MUCH SMALLER
+		if (input.split(" ")[0].toUpperCase() === "EQUIP" && this.props.inventory.length > 0) {
+			// If they're looking to equip and have an inventory
+			input = input.split(" ");
+
+			if (input.length > 1) {
+				var exists = false;
+				var itemName = input[1];
+				for (var i = 2; i < input.length; ++i) {
+					itemName += " " + input[i];
+				}
+
+				var requestedItem = this.getRequestedItem(itemName);
+
+				if (requestedItem) {
+					if (requestedItem.equippable) {
+						this.props.equipItem(requestedItem);
+						this.props.showMessage({ speaker: "Narrator", line: <p>You equip the {requestedItem.prefix} <font className={requestedItem.name}>{requestedItem.name}</font>.</p> }, 0);
+					} else {
+						this.props.showMessage({ speaker: "Narrator", line: <p><font className={requestedItem.name}>{requestedItem.name}</font> cannot be equipped!</p> }, 0);
+					}
+				} else {
+					this.props.showMessage({ speaker: "Narrator", line: <p>You don't currently possess an item of name <font className="deny">{itemName}</font>!</p> }, 0);
+				}
+			}
+
+			return;
+		}
 		switch (this.props.input) {
 			case constants.DISABLED:
 				break; // Should not be doing anything
@@ -70,7 +112,7 @@ var PlayerBar = React.createClass({
 				var valid = false;
 				var chosenRace;
 				for (var i = 0; i < raceOptions.length; ++i) {
-					if (input.toUpperCase() === raceOptions[i].toUpperCase()) {
+					if (input.toUpperCase().indexOf(raceOptions[i].toUpperCase()) > -1) { // Check if it's mentioned anywhere in the input
 						valid = true;
 						chosenRace = raceOptions[i];
 						break;
@@ -91,6 +133,59 @@ var PlayerBar = React.createClass({
 				this.props.showMessage(playerMessage, 0);
 				this.props.showMessage(message, 1000); // Display the message
 				break;
+			case constants.EXPECTING_WEAPON:
+				var playerMessage;
+				var message;
+
+				var weaponOptions = [];
+
+				for (var weaponName in Weapons.starter) {
+					if (Weapons.starter.hasOwnProperty(weaponName)) {
+						weaponOptions.push(weaponName);
+					}
+				}
+
+				// Check validity
+				var valid = false;
+				var chosenWeapon; // An object
+
+				for (var i = 0; i < weaponOptions.length; ++i) {
+					if (input.toUpperCase().indexOf(weaponOptions[i].toUpperCase()) > -1) { // Check if it's mentioned anywhere in the input
+						valid = true;
+						chosenWeapon = Weapons.starter[weaponOptions[i]];
+						break;
+					}
+				}
+
+				if (valid) {
+					playerMessage = { speaker: "Player", line: <p>I think I'll take the {chosenWeapon.name}.</p> };
+					message = { speaker: "Wizard", line: <p>A fine choice! {chosenWeapon.description} Is this what you really want?</p> };
+					if (this.props.inventory.length > 0) { // Remove the item if it was added in a previous cycle
+						this.props.removeItem(this.props.inventory[this.props.inventory.length-1]);
+					}
+					this.props.addItem(chosenWeapon);
+					this.props.setInputExpected(constants.EXPECTING_CONF);
+				} else {
+					playerMessage = messageGen.getPlayerFail();
+					message = messageGen.getMultiChoiceFailMessage(this.props.input, weaponOptions, this.props.name);
+				}
+
+				this.props.showMessage(playerMessage, 0);
+				this.props.showMessage(message, 1000); // Display the message
+				break;
+			case constants.EXPECTING_ANYTHING:
+				this.props.showMessage(messageGen.getPlayerFail(), 0);
+				this.props.showMessage({ speaker: "Wizard", line: <p>Oh, that's a pity... Well off with you then! Time to save the world or something!</p> }, 1000);
+				this.props.showMessage({ speaker: "Narrator", line: <p>With a strength belying his frail physique, the <font className="Wizard">Wizard</font> thrusts you form his crumbling tower and out into the unknown world...</p> }, 2000);
+				this.props.setInputExpected(constants.DISABLED);
+
+
+
+				//TODO actually start the game
+
+
+
+				break;
 			case constants.EXPECTING_CONF:
 				var playerMessage;
 				var message;
@@ -105,14 +200,22 @@ var PlayerBar = React.createClass({
 						case constants.EXPECTING_RACE:
 							this.props.showMessage({ speaker: "Narrator", line: <p>Your status has been updated!</p> }, 2000);
 							this.props.setDisplayStats(true, 2000);
+							this.props.showMessage(messageGen.getWeaponMessage(this.props.name, Weapons.starter), 3000);
+							this.props.setInputExpected(constants.EXPECTING_WEAPON);
+							break;
+						case constants.EXPECTING_WEAPON:
+							var latestItem = this.props.inventory[this.props.inventory.length-1];
+							var prefix = ("AEIOU".indexOf(latestItem.name.charAt(0).toUpperCase()) < 0) ? "A" : "An";
+							var has = (latestItem.isPlural) ? "have" : "has";
+							this.props.showMessage({ speaker: "Narrator", line: <p>{prefix} {latestItem.prefix} <font className={latestItem.name}>{latestItem.name}</font> {has} been added to your inventory!</p> }, 2000);
+							this.props.setDisplayInventory(true, 2000)
+							this.props.showMessage({ speaker: "Wizard", line: <p>Don't forget to equip it before you head out into the world by using <font className="confirm">equip {latestItem.name}</font>! Not my fault if you end up running around unarmed!</p> }, 3000);
+							this.props.showMessage({ speaker: "Wizard", line: <p>Ah, I can see from the look on your face that you have questions. Out with it then!</p> }, 4000);
+							this.props.setInputExpected(constants.EXPECTING_ANYTHING);
 
-							// TODO move to next part, show next message, update player stats to be base stats of that race
-							this.props.setInputExpected(constants.DISABLED);
-
-
-							
 							break;
 						default:
+							console.log("Missing case for confirmation.");
 							this.props.setInputExpected(constants.DISABLED);
 							break;
 					}
@@ -121,6 +224,12 @@ var PlayerBar = React.createClass({
 
 					if (this.props.prevInput === constants.EXPECTING_RACE) {
 						options = Classes;
+					} else if (this.props.prevInput === constants.EXPECTING_WEAPON) {
+						for (var weaponName in Weapons.starter) {
+							if (Weapons.starter.hasOwnProperty(weaponName)) {
+								options.push(weaponName);
+							}
+						}
 					}
 
 					playerMessage = messageGen.getPlayerNo();
@@ -134,6 +243,7 @@ var PlayerBar = React.createClass({
 				this.props.showMessage(message, 1000); // Display the message
 				break;
 			default:
+				console.log("Missing input case for " + this.props.input);
 				break;;
 		}
 	},
@@ -146,7 +256,7 @@ var PlayerBar = React.createClass({
 });
 
 var mapStateToProps = function (state) {
-	return { input: state.input.awaiting, prevInput: state.input.previous, name: state.player.name };
+	return { input: state.input.awaiting, prevInput: state.input.previous, name: state.player.name, inventory: state.player.inventory };
 };
 
 var mapDispatchToProps = function (dispatch) {
@@ -165,6 +275,18 @@ var mapDispatchToProps = function (dispatch) {
 		},
 		setDisplayStats: function(display, timeout) {
 			dispatch(actions.setDisplayStats(display, timeout));
+		},
+		addItem: function(item) {
+			dispatch(actions.addItem(item));
+		},
+		removeItem: function(item) {
+			dispatch(actions.removeItem(item));
+		},
+		equipItem: function(item) {
+			dispatch(actions.equipItem(item));
+		},
+		setDisplayInventory: function(display, timeout) {
+			dispatch(actions.setDisplayInventory(display, timeout));
 		}
 	}
 };

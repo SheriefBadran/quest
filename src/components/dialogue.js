@@ -12,15 +12,17 @@ var Dialogue = React.createClass({
 		name: proptypes.string.isRequired
 	},
 	render: function() {
-		var name = this.props.speaker;
-		if (name === "Player") {
-			name = this.props.name;
+		var name = this.props.speaker + ":";
+		if (name === "Player:") {
+			name = this.props.name + ":";
+		} else if (name === "Narrator:") {
+			name = "";
 		}
 
 		return (
 			<Row className={this.props.speaker}>
 				<Col xs={4} md={1}>
-					{name+":"}
+					{name}
 				</Col>
 				<Col xs={12} md={11}>
 					{this.props.line}

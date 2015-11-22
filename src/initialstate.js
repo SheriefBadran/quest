@@ -14,10 +14,14 @@ module.exports = function() { // Returns a function so it can't be modified acci
 		},
 		player: {
 			name: "???",
-			display: false,
+			displayStats: false,
 			stats: {
 
-			}
+			},
+			inventory: [],
+			displayInventory: false,
+			weapon: null,
+			armour: null
 		}
 	}
 };

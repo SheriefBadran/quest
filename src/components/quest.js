@@ -1,7 +1,8 @@
 var React = require("react"),
 	Log = require("./log"),
 	PlayerBar = require("./playerbar"),
-	Status = require("./status");
+	Status = require("./status"),
+	Inventory = require("./inventory");
 
 var Quest = React.createClass({
 	displayName: "Quest",
@@ -11,6 +12,7 @@ var Quest = React.createClass({
 			<Status />
 			<Log />
 			<PlayerBar />
+			<Inventory />
 			</div>
 		); // Probably should move the Input to its own component
 	}
