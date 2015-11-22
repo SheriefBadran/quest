@@ -16,7 +16,9 @@ var PlayerBar = React.createClass({
 		prevInput: proptypes.string.isRequired,
 		showMessage: proptypes.func.isRequired,
 		setName: proptypes.func.isRequired,
-		setInputExpected: proptypes.func.isRequired
+		setInputExpected: proptypes.func.isRequired,
+		setStats: proptypes.func.isRequired,
+		setDisplayStats: proptypes.func.isRequired
 	},
 	componentDidMount: function() {
  		this.input.getInputDOMNode().focus();
@@ -79,6 +81,7 @@ var PlayerBar = React.createClass({
 					var prefix = ("AEIOU".indexOf(input.charAt(0).toUpperCase()) < 0) ? "A" : "An";
 					playerMessage = { speaker: "Player", line: <p>I'm {prefix.toLowerCase()} {chosenRace}... I think?</p> };
 					message = { speaker: "Wizard", line: <p>Aha! {prefix} <font className={chosenRace}>{chosenRace}</font> eh? {Classes[chosenRace].description} Are you sure about this?</p>};
+					this.props.setStats(Classes[chosenRace].stats);
 					this.props.setInputExpected(constants.EXPECTING_CONF);
 				} else { // If it's not a valid race then we do a fail again
 					playerMessage = messageGen.getPlayerFail();
@@ -100,9 +103,14 @@ var PlayerBar = React.createClass({
 							this.props.setInputExpected(constants.EXPECTING_RACE);
 							break;
 						case constants.EXPECTING_RACE:
-							// TODO move to next part, show next message, update player stats to be base stats of that race
+							this.props.showMessage({ speaker: "Narrator", line: <p>Your status has been updated!</p> }, 2000);
+							this.props.setDisplayStats(true, 2000);
 
+							// TODO move to next part, show next message, update player stats to be base stats of that race
 							this.props.setInputExpected(constants.DISABLED);
+
+
+							
 							break;
 						default:
 							this.props.setInputExpected(constants.DISABLED);
@@ -149,8 +157,14 @@ var mapDispatchToProps = function (dispatch) {
 		setName: function(name) {
 			dispatch(actions.setName(name));
 		},
+		setStats: function(stats) {
+			dispatch(actions.setStats(stats));
+		},
 		setInputExpected: function(inputType) {
 			dispatch(actions.setInputExpected(inputType));
+		},
+		setDisplayStats: function(display, timeout) {
+			dispatch(actions.setDisplayStats(display, timeout));
 		}
 	}
 };

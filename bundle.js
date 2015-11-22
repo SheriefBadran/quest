@@ -40481,12 +40481,22 @@ module.exports = {
 	setName: function (name) {
 		return { type: constants.SET_NAME, name: name };
 	},
+	setStats: function (stats) {
+		return { type: constants.SET_STATS, stats: stats };
+	},
+	setDisplayStats: function (display, timeout) {
+		return function (dispatch) {
+			setTimeout(function () {
+				dispatch({ type: constants.DISPLAY_STATS, display: display });
+			}, timeout);
+		};
+	},
 	setInputExpected: function (inputType) {
 		return { type: constants.SET_INPUT, input: inputType };
 	}
 };
 
-},{"./constants":483}],476:[function(require,module,exports){
+},{"./constants":484}],476:[function(require,module,exports){
 var React = require("react"),
     ReactRedux = require("react-redux"),
     proptypes = React.PropTypes,
@@ -40783,7 +40793,7 @@ module.exports = {
 	}
 };
 
-},{"./../constants":483,"react":464}],479:[function(require,module,exports){
+},{"./../constants":484,"react":464}],479:[function(require,module,exports){
 var React = require("react"),
     LinkContainer = require("react-router-bootstrap").LinkContainer,
     IndexLinkContainer = require("react-router-bootstrap").IndexLinkContainer,
@@ -40814,6 +40824,11 @@ var Navigation = React.createClass({
 					NavItem,
 					{ disabled: true },
 					"Help"
+				),
+				React.createElement(
+					NavItem,
+					{ href: "https://github.com/MoombaDS/quest", target: "_blank" },
+					"Source Code"
 				)
 			)
 		);
@@ -40841,7 +40856,9 @@ var PlayerBar = React.createClass({
 		prevInput: proptypes.string.isRequired,
 		showMessage: proptypes.func.isRequired,
 		setName: proptypes.func.isRequired,
-		setInputExpected: proptypes.func.isRequired
+		setInputExpected: proptypes.func.isRequired,
+		setStats: proptypes.func.isRequired,
+		setDisplayStats: proptypes.func.isRequired
 	},
 	componentDidMount: function () {
 		this.input.getInputDOMNode().focus();
@@ -40946,6 +40963,7 @@ var PlayerBar = React.createClass({
 							Classes[chosenRace].description,
 							" Are you sure about this?"
 						) };
+					this.props.setStats(Classes[chosenRace].stats);
 					this.props.setInputExpected(constants.EXPECTING_CONF);
 				} else {
 					// If it's not a valid race then we do a fail again
@@ -40968,9 +40986,16 @@ var PlayerBar = React.createClass({
 							this.props.setInputExpected(constants.EXPECTING_RACE);
 							break;
 						case constants.EXPECTING_RACE:
-							// TODO move to next part, show next message, update player stats to be base stats of that race
+							this.props.showMessage({ speaker: "Narrator", line: React.createElement(
+									"p",
+									null,
+									"Your status has been updated!"
+								) }, 2000);
+							this.props.setDisplayStats(true, 2000);
 
+							// TODO move to next part, show next message, update player stats to be base stats of that race
 							this.props.setInputExpected(constants.DISABLED);
+
 							break;
 						default:
 							this.props.setInputExpected(constants.DISABLED);
@@ -41015,18 +41040,25 @@ var mapDispatchToProps = function (dispatch) {
 		setName: function (name) {
 			dispatch(actions.setName(name));
 		},
+		setStats: function (stats) {
+			dispatch(actions.setStats(stats));
+		},
 		setInputExpected: function (inputType) {
 			dispatch(actions.setInputExpected(inputType));
+		},
+		setDisplayStats: function (display, timeout) {
+			dispatch(actions.setDisplayStats(display, timeout));
 		}
 	};
 };
 
 module.exports = ReactRedux.connect(mapStateToProps, mapDispatchToProps)(PlayerBar);
 
-},{"./../actions":475,"./../constants":483,"./../data/class":484,"./messagegen":478,"react":464,"react-bootstrap":98,"react-dom":271,"react-redux":274}],481:[function(require,module,exports){
+},{"./../actions":475,"./../constants":484,"./../data/class":485,"./messagegen":478,"react":464,"react-bootstrap":98,"react-dom":271,"react-redux":274}],481:[function(require,module,exports){
 var React = require("react"),
     Log = require("./log"),
-    PlayerBar = require("./playerbar");
+    PlayerBar = require("./playerbar"),
+    Status = require("./status");
 
 var Quest = React.createClass({
 	displayName: "Quest",
@@ -41034,6 +41066,7 @@ var Quest = React.createClass({
 		return React.createElement(
 			"div",
 			null,
+			React.createElement(Status, null),
 			React.createElement(Log, null),
 			React.createElement(PlayerBar, null)
 		); // Probably should move the Input to its own component
@@ -41042,7 +41075,111 @@ var Quest = React.createClass({
 
 module.exports = Quest;
 
-},{"./log":477,"./playerbar":480,"react":464}],482:[function(require,module,exports){
+},{"./log":477,"./playerbar":480,"./status":482,"react":464}],482:[function(require,module,exports){
+var React = require("react"),
+    ReactDOM = require("react-dom"),
+    ReactRedux = require("react-redux"),
+    proptypes = React.PropTypes,
+    Panel = require("react-bootstrap").Panel,
+    Grid = require("react-bootstrap").Grid,
+    Row = require("react-bootstrap").Row,
+    Col = require("react-bootstrap").Col,
+    Dialogue = require("./dialogue");
+
+var Status = React.createClass({
+	displayName: "Status",
+	propTypes: {
+		name: proptypes.string.isRequired,
+		display: proptypes.bool.isRequired,
+		stats: proptypes.object.isRequired
+	},
+	render: function () {
+		if (this.props.display) {
+			return React.createElement(
+				Panel,
+				{ className: "status-window" },
+				React.createElement(
+					Grid,
+					{ fluid: true },
+					React.createElement(
+						Col,
+						{ xs: 1.5, md: 1 },
+						"Name:",
+						React.createElement("br", null),
+						"Race:"
+					),
+					React.createElement(
+						Col,
+						{ xs: 3, md: 2 },
+						this.props.name,
+						React.createElement("br", null),
+						React.createElement(
+							"font",
+							{ className: this.props.stats.race },
+							this.props.stats.race
+						)
+					),
+					React.createElement(
+						Col,
+						{ xs: 1.5, md: 1 },
+						"HP:",
+						React.createElement("br", null),
+						"MP:"
+					),
+					React.createElement(
+						Col,
+						{ xs: 3, md: 2 },
+						this.props.stats.currenthp,
+						"/",
+						this.props.stats.hp,
+						React.createElement("br", null),
+						this.props.stats.currentmp,
+						"/",
+						this.props.stats.mp
+					),
+					React.createElement(
+						Col,
+						{ xs: 1.5, md: 1 },
+						"Strength:",
+						React.createElement("br", null),
+						"Magic:"
+					),
+					React.createElement(
+						Col,
+						{ xs: 3, md: 2 },
+						this.props.stats.str,
+						React.createElement("br", null),
+						this.props.stats.mag
+					),
+					React.createElement(
+						Col,
+						{ xs: 1.5, md: 1 },
+						"Dexterity:",
+						React.createElement("br", null),
+						"Defence:"
+					),
+					React.createElement(
+						Col,
+						{ xs: 3, md: 2 },
+						this.props.stats.dex,
+						React.createElement("br", null),
+						this.props.stats.def
+					)
+				)
+			);
+		} else {
+			return React.createElement("div", null);
+		}
+	}
+});
+
+var mapStateToProps = function (state) {
+	return { name: state.player.name, display: state.player.display, stats: state.player.stats };
+};
+
+module.exports = ReactRedux.connect(mapStateToProps)(Status);
+
+},{"./dialogue":476,"react":464,"react-bootstrap":98,"react-dom":271,"react-redux":274}],483:[function(require,module,exports){
 var React = require('react'),
     Navigation = require("./navigation"),
     Panel = require("react-bootstrap").Panel,
@@ -41088,7 +41225,7 @@ var Wrapper = React.createClass({
 
 module.exports = Wrapper;
 
-},{"./navigation":479,"react":464,"react-bootstrap":98}],483:[function(require,module,exports){
+},{"./navigation":479,"react":464,"react-bootstrap":98}],484:[function(require,module,exports){
 module.exports = {
 	MAX_NAME_LENGTH: 8,
 	MIN_NAME_LENGTH: 3,
@@ -41102,10 +41239,12 @@ module.exports = {
 	// Dispatch constants
 	SHOW_MESSAGE: "SEND_MESSAGE",
 	SET_NAME: "SET_NAME",
-	SET_INPUT: "SET_INPUT"
+	SET_STATS: "SET_STATS",
+	SET_INPUT: "SET_INPUT",
+	DISPLAY_STATS: "DISPLAY_STATS"
 };
 
-},{}],484:[function(require,module,exports){
+},{}],485:[function(require,module,exports){
 var Classes = {
 	Elf: require("./classes/elf"),
 	Human: require("./classes/human"),
@@ -41114,22 +41253,49 @@ var Classes = {
 
 module.exports = Classes;
 
-},{"./classes/dwarf":485,"./classes/elf":486,"./classes/human":487}],485:[function(require,module,exports){
+},{"./classes/dwarf":486,"./classes/elf":487,"./classes/human":488}],486:[function(require,module,exports){
 module.exports={
 	"name": "Dwarf",
-	"description": "DWARF DESC"
-}
-},{}],486:[function(require,module,exports){
-module.exports={
-	"name": "Elf",
-	"description": "ELF DESC"
+	"description": "DWARF DESC",
+	"stats": {
+		"race": "Dwarf",
+		"hp": 20,
+		"mp": 10,
+		"str": 3,
+		"dex": 5,
+		"mag": 1,
+		"def": 3
+	}
 }
 },{}],487:[function(require,module,exports){
 module.exports={
-	"name": "Human",
-	"description": "HUMAN DESC"
+	"name": "Elf",
+	"description": "ELF DESC",
+	"stats": {
+		"race": "Elf",
+		"hp": 20,
+		"mp": 10,
+		"str": 3,
+		"dex": 5,
+		"mag": 2,
+		"def": 3
+	}
 }
 },{}],488:[function(require,module,exports){
+module.exports={
+	"name": "Human",
+	"description": "HUMAN DESC",
+	"stats": {
+		"race": "Human",
+		"hp": 20,
+		"mp": 10,
+		"str": 3,
+		"dex": 5,
+		"mag": 4,
+		"def": 3
+	}
+}
+},{}],489:[function(require,module,exports){
 /*
 This is the entry point for the app! From here we merely import our routes definitions,
 then use React and React-DOM to render it.
@@ -41149,7 +41315,7 @@ ReactDOM.render(React.createElement(
 	React.createElement(Router, { routes: routes })
 ), document.getElementById("root"));
 
-},{"./routes":493,"./store":494,"react":464,"react-dom":271,"react-redux":274,"react-router":303}],489:[function(require,module,exports){
+},{"./routes":494,"./store":495,"react":464,"react-dom":271,"react-redux":274,"react-router":303}],490:[function(require,module,exports){
 var constants = require("./constants"),
     React = require("react");
 
@@ -41168,12 +41334,14 @@ module.exports = function () {
 				) }]
 		},
 		player: {
-			name: "???"
+			name: "???",
+			display: false,
+			stats: {}
 		}
 	};
 };
 
-},{"./constants":483,"react":464}],490:[function(require,module,exports){
+},{"./constants":484,"react":464}],491:[function(require,module,exports){
 var initialState = require("./../initialstate"),
     constants = require("./../constants");
 
@@ -41189,7 +41357,7 @@ module.exports = function (state, action) {
 	}
 };
 
-},{"./../constants":483,"./../initialstate":489}],491:[function(require,module,exports){
+},{"./../constants":484,"./../initialstate":490}],492:[function(require,module,exports){
 var initialState = require("./../initialstate"),
     constants = require("./../constants");
 
@@ -41204,21 +41372,30 @@ module.exports = function (state, action) {
 	}
 };
 
-},{"./../constants":483,"./../initialstate":489}],492:[function(require,module,exports){
-var initialState = require("./../initialstate");
+},{"./../constants":484,"./../initialstate":490}],493:[function(require,module,exports){
+var initialState = require("./../initialstate"),
+    constants = require("./../constants");
 
 module.exports = function (state, action) {
 	var newState = Object.assign({}, state); // Copy to a new state so we don't screw up the old one
 	switch (action.type) {
-		case "SET_NAME":
+		case constants.SET_NAME:
 			newState.name = action.name;
+			return newState;
+		case constants.SET_STATS:
+			newState.stats = action.stats;
+			newState.stats.currenthp = newState.stats.hp;
+			newState.stats.currentmp = newState.stats.mp;
+			return newState;
+		case constants.DISPLAY_STATS:
+			newState.display = action.display;
 			return newState;
 		default:
 			return state || initialState().player;
 	}
 };
 
-},{"./../initialstate":489}],493:[function(require,module,exports){
+},{"./../constants":484,"./../initialstate":490}],494:[function(require,module,exports){
 var React = require('react'),
     ReactRouter = require('react-router'),
     Route = ReactRouter.Route,
@@ -41232,7 +41409,7 @@ module.exports = React.createElement(
     React.createElement(IndexRoute, { component: quest })
 );
 
-},{"./components/quest":481,"./components/wrapper":482,"react":464,"react-router":303}],494:[function(require,module,exports){
+},{"./components/quest":481,"./components/wrapper":483,"react":464,"react-router":303}],495:[function(require,module,exports){
 /*
 Redux Store
 */
@@ -41252,4 +41429,4 @@ var rootReducer = Redux.combineReducers({
 
 module.exports = Redux.applyMiddleware(thunk)(Redux.createStore)(rootReducer, initialState());
 
-},{"./initialstate":489,"./reducers/inputReducer":490,"./reducers/messageReducer":491,"./reducers/playerReducer":492,"redux":467,"redux-thunk":465}]},{},[488]);
+},{"./initialstate":490,"./reducers/inputReducer":491,"./reducers/messageReducer":492,"./reducers/playerReducer":493,"redux":467,"redux-thunk":465}]},{},[489]);

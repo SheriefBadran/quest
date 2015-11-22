@@ -9,9 +9,19 @@ module.exports = {
 		}
 	},
 	setName: function(name) {
-		return { type: constants.SET_NAME, name: name }
+		return { type: constants.SET_NAME, name: name };
+	},
+	setStats: function(stats) {
+		return { type: constants.SET_STATS, stats: stats };
+	},
+	setDisplayStats: function(display, timeout) {
+		return function(dispatch) {
+			setTimeout(function() {
+				dispatch({ type: constants.DISPLAY_STATS, display: display });
+			}, timeout);
+		}
 	},
 	setInputExpected: function(inputType) {
-		return { type: constants.SET_INPUT, input: inputType }
+		return { type: constants.SET_INPUT, input: inputType };
 	}
 };

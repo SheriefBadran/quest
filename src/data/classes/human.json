@@ -1,4 +1,13 @@
 {
 	"name": "Human",
-	"description": "HUMAN DESC"
+	"description": "HUMAN DESC",
+	"stats": {
+		"race": "Human",
+		"hp": 20,
+		"mp": 10,
+		"str": 3,
+		"dex": 5,
+		"mag": 4,
+		"def": 3
+	}
 }

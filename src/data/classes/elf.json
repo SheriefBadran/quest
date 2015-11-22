@@ -1,4 +1,13 @@
 {
 	"name": "Elf",
-	"description": "ELF DESC"
+	"description": "ELF DESC",
+	"stats": {
+		"race": "Elf",
+		"hp": 20,
+		"mp": 10,
+		"str": 3,
+		"dex": 5,
+		"mag": 2,
+		"def": 3
+	}
 }

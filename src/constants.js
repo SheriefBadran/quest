@@ -11,5 +11,7 @@ module.exports = {
 	// Dispatch constants
 	SHOW_MESSAGE: "SEND_MESSAGE",
 	SET_NAME: "SET_NAME",
-	SET_INPUT: "SET_INPUT"
+	SET_STATS: "SET_STATS",
+	SET_INPUT: "SET_INPUT",
+	DISPLAY_STATS: "DISPLAY_STATS"
 };
