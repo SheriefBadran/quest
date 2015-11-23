@@ -52823,42 +52823,44 @@ function pick(obj, fn) {
 
 module.exports = exports["default"];
 },{}],476:[function(require,module,exports){
+"use strict";
+
 var constants = require("./constants");
 
 module.exports = {
-	showMessage: function (message, timeout) {
+	showMessage: function showMessage(message, timeout) {
 		return function (dispatch) {
 			setTimeout(function () {
 				dispatch({ type: constants.SHOW_MESSAGE, message: message });
 			}, timeout);
 		};
 	},
-	setName: function (name) {
+	setName: function setName(name) {
 		return { type: constants.SET_NAME, name: name };
 	},
-	setStats: function (stats) {
+	setStats: function setStats(stats) {
 		return { type: constants.SET_STATS, stats: stats };
 	},
-	setDisplayStats: function (display, timeout) {
+	setDisplayStats: function setDisplayStats(display, timeout) {
 		return function (dispatch) {
 			setTimeout(function () {
 				dispatch({ type: constants.DISPLAY_STATS, display: display });
 			}, timeout);
 		};
 	},
-	setInputExpected: function (inputType) {
+	setInputExpected: function setInputExpected(inputType) {
 		return { type: constants.SET_INPUT, input: inputType };
 	},
-	addItem: function (item) {
+	addItem: function addItem(item) {
 		return { type: constants.ADD_ITEM, item: item };
 	},
-	removeItem: function (item) {
+	removeItem: function removeItem(item) {
 		return { type: constants.REMOVE_ITEM, item: item };
 	},
-	equipItem: function (item) {
+	equipItem: function equipItem(item) {
 		return { type: constants.EQUIP_ITEM, item: item };
 	},
-	setDisplayInventory: function (display, timeout) {
+	setDisplayInventory: function setDisplayInventory(display, timeout) {
 		return function (dispatch) {
 			setTimeout(function () {
 				dispatch({ type: constants.DISPLAY_INVENTORY, display: display });
@@ -52868,6 +52870,8 @@ module.exports = {
 };
 
 },{"./constants":486}],477:[function(require,module,exports){
+"use strict";
+
 var React = require("react"),
     ReactRedux = require("react-redux"),
     proptypes = React.PropTypes,
@@ -52881,7 +52885,7 @@ var Dialogue = React.createClass({
 		line: proptypes.object.isRequired,
 		name: proptypes.string.isRequired
 	},
-	render: function () {
+	render: function render() {
 		var name = this.props.speaker + ":";
 		if (name === "Player:") {
 			name = this.props.name + ":";
@@ -52906,13 +52910,15 @@ var Dialogue = React.createClass({
 	}
 });
 
-var mapStateToProps = function (state) {
+var mapStateToProps = function mapStateToProps(state) {
 	return { name: state.player.name };
 };
 
 module.exports = ReactRedux.connect(mapStateToProps)(Dialogue);
 
 },{"react":465,"react-bootstrap":99,"react-redux":275}],478:[function(require,module,exports){
+"use strict";
+
 var React = require("react"),
     ReactRedux = require("react-redux"),
     proptypes = React.PropTypes,
@@ -52927,7 +52933,7 @@ var Inventory = React.createClass({
 		display: proptypes.bool.isRequired,
 		inventory: proptypes.array.isRequired
 	},
-	render: function () {
+	render: function render() {
 		if (this.props.display) {
 			var col1 = [];
 			var col2 = [];
@@ -53020,13 +53026,15 @@ var Inventory = React.createClass({
 	}
 });
 
-var mapStateToProps = function (state) {
+var mapStateToProps = function mapStateToProps(state) {
 	return { display: state.player.displayInventory, inventory: state.player.inventory, weapon: state.player.weapon, armour: state.player.armour };
 };
 
 module.exports = ReactRedux.connect(mapStateToProps)(Inventory);
 
 },{"react":465,"react-bootstrap":99,"react-redux":275}],479:[function(require,module,exports){
+"use strict";
+
 var React = require("react"),
     ReactDOM = require("react-dom"),
     ReactRedux = require("react-redux"),
@@ -53043,15 +53051,17 @@ var Log = React.createClass({
 		name: proptypes.string.isRequired,
 		messages: proptypes.array.isRequired
 	},
-	componentDidMount: function () {
+	componentDidMount: function componentDidMount() {
 		var node = ReactDOM.findDOMNode(this.logpanel);
 		node.scrollTop = node.scrollHeight;
 	},
-	componentDidUpdate: function () {
+	componentDidUpdate: function componentDidUpdate() {
 		var node = ReactDOM.findDOMNode(this.logpanel);
 		node.scrollTop = node.scrollHeight;
 	},
-	render: function () {
+	render: function render() {
+		var _this = this;
+
 		var lines = [];
 
 		this.props.messages.forEach((function (message, id) {
@@ -53060,7 +53070,9 @@ var Log = React.createClass({
 
 		return React.createElement(
 			Panel,
-			{ className: "log-box", ref: ref => this.logpanel = ref },
+			{ className: "log-box", ref: function ref(_ref) {
+					return _this.logpanel = _ref;
+				} },
 			React.createElement(
 				Grid,
 				{ fluid: true },
@@ -53070,18 +53082,20 @@ var Log = React.createClass({
 	}
 });
 
-var mapStateToProps = function (state) {
+var mapStateToProps = function mapStateToProps(state) {
 	return { name: state.player.name, messages: state.log.messages };
 };
 
 module.exports = ReactRedux.connect(mapStateToProps)(Log);
 
 },{"./dialogue":477,"react":465,"react-bootstrap":99,"react-dom":272,"react-redux":275}],480:[function(require,module,exports){
+"use strict";
+
 var constants = require("./../constants"),
     React = require("react");
 
 module.exports = {
-	getConfirmMessage: function (prevInput, name, option) {
+	getConfirmMessage: function getConfirmMessage(prevInput, name, option) {
 		switch (prevInput) {
 			case constants.EXPECTING_NAME:
 				return { speaker: "Wizard", line: React.createElement(
@@ -53112,7 +53126,7 @@ module.exports = {
 					) };
 		}
 	},
-	getDenyMessage: function (prevInput, name, options) {
+	getDenyMessage: function getDenyMessage(prevInput, name, options) {
 		switch (prevInput) {
 			case constants.EXPECTING_NAME:
 				return { speaker: "Wizard", line: React.createElement(
@@ -53140,7 +53154,7 @@ module.exports = {
 					) };
 		}
 	},
-	getFailMessage: function (prevInput, name) {
+	getFailMessage: function getFailMessage(prevInput, name) {
 		switch (prevInput) {
 			case constants.EXPECTING_NAME:
 			case constants.EXPECTING_RACE:
@@ -53173,7 +53187,7 @@ module.exports = {
 					) };
 		}
 	},
-	getMultiChoiceFailMessage: function (input, options, name) {
+	getMultiChoiceFailMessage: function getMultiChoiceFailMessage(input, options, name) {
 		switch (input) {
 			case constants.EXPECTING_WEAPON:
 			case constants.EXPECTING_RACE:
@@ -53195,7 +53209,7 @@ module.exports = {
 					) };
 		}
 	},
-	getMultiOptionLines: function (options) {
+	getMultiOptionLines: function getMultiOptionLines(options) {
 		var optionLines = [];
 
 		var firstLine = true;
@@ -53230,7 +53244,7 @@ module.exports = {
 
 		return optionLines;
 	},
-	getRaceMessage: function (name, classes) {
+	getRaceMessage: function getRaceMessage(name, classes) {
 
 		var races = [];
 
@@ -53281,7 +53295,7 @@ module.exports = {
 				races
 			) };
 	},
-	getWeaponMessage: function (name, starterWeapons) {
+	getWeaponMessage: function getWeaponMessage(name, starterWeapons) {
 		var weapons = [];
 
 		var firstLoop = true;
@@ -53325,25 +53339,25 @@ module.exports = {
 		return { speaker: "Wizard", line: React.createElement(
 				"p",
 				null,
-				"Hmm... Come to think of it, we can't very well send you out unarmed now can we? What's your weapon of choice? ",
+				"Hmm... Come to think of it, we can't very well send you out unarmed now, can we? What's your weapon of choice? ",
 				weapons
 			) };
 	},
-	getPlayerYes: function () {
+	getPlayerYes: function getPlayerYes() {
 		return { speaker: "Player", line: React.createElement(
 				"p",
 				null,
 				"Yes."
 			) };
 	},
-	getPlayerNo: function () {
+	getPlayerNo: function getPlayerNo() {
 		return { speaker: "Player", line: React.createElement(
 				"p",
 				null,
 				"No."
 			) };
 	},
-	getPlayerFail: function () {
+	getPlayerFail: function getPlayerFail() {
 		var failLines = [React.createElement(
 			"p",
 			null,
@@ -53355,7 +53369,7 @@ module.exports = {
 		)];
 		return { speaker: "Player", line: failLines[Math.floor(Math.random() * failLines.length)] };
 	},
-	getNoSuchItemMessage: function (itemName) {
+	getNoSuchItemMessage: function getNoSuchItemMessage(itemName) {
 		return { speaker: "Narrator", line: React.createElement(
 				"p",
 				null,
@@ -53371,6 +53385,8 @@ module.exports = {
 };
 
 },{"./../constants":486,"react":465}],481:[function(require,module,exports){
+"use strict";
+
 var React = require("react"),
     LinkContainer = require("react-router-bootstrap").LinkContainer,
     IndexLinkContainer = require("react-router-bootstrap").IndexLinkContainer,
@@ -53381,7 +53397,7 @@ var React = require("react"),
 
 var Navigation = React.createClass({
 	displayName: "Navigation",
-	render: function () {
+	render: function render() {
 		return React.createElement(
 			"div",
 			null,
@@ -53415,6 +53431,8 @@ var Navigation = React.createClass({
 module.exports = Navigation;
 
 },{"react":465,"react-bootstrap":99,"react-router-bootstrap":284}],482:[function(require,module,exports){
+"use strict";
+
 var React = require("react"),
     ReactDOM = require("react-dom"),
     ReactRedux = require("react-redux"),
@@ -53443,16 +53461,16 @@ var PlayerBar = React.createClass({
 		inventory: proptypes.array.isRequired,
 		setDisplayInventory: proptypes.func.isRequired
 	},
-	componentDidMount: function () {
+	componentDidMount: function componentDidMount() {
 		this.input.getInputDOMNode().focus();
 	},
-	getInitialState: function () {
+	getInitialState: function getInitialState() {
 		return { text: "" };
 	},
-	handleChange: function (event) {
+	handleChange: function handleChange(event) {
 		this.setState({ text: event.target.value });
 	},
-	handleSubmit: function (event) {
+	handleSubmit: function handleSubmit(event) {
 		if (event.keyCode == 13) {
 			// If it's enter key
 			if (this.state.text) {
@@ -53461,7 +53479,7 @@ var PlayerBar = React.createClass({
 			}
 		}
 	},
-	getRequestedItem: function (itemName) {
+	getRequestedItem: function getRequestedItem(itemName) {
 		var requestedItem = null;
 		this.props.inventory.forEach((function (item) {
 			if (item.name.toUpperCase() === itemName.toUpperCase()) {
@@ -53470,7 +53488,7 @@ var PlayerBar = React.createClass({
 		}).bind(this));
 		return requestedItem;
 	},
-	validateAndSendInput: function (input) {
+	validateAndSendInput: function validateAndSendInput(input) {
 		// TODO IMPORANT - MAKE THIS METHOD MUCH SMALLER
 		if (input.split(" ")[0].toUpperCase() === "EQUIP" && this.props.inventory.length > 0) {
 			// If they're looking to equip and have an inventory
@@ -53837,43 +53855,47 @@ var PlayerBar = React.createClass({
 				break;;
 		}
 	},
-	render: function () {
-		return React.createElement(Input, { type: "text", placeholder: "Type here!", ref: ref => this.input = ref, disabled: this.props.input === constants.DISABLED,
+	render: function render() {
+		var _this = this;
+
+		return React.createElement(Input, { type: "text", placeholder: "Type here!", ref: function ref(_ref) {
+				return _this.input = _ref;
+			}, disabled: this.props.input === constants.DISABLED,
 			value: this.state.text, onChange: this.handleChange, onKeyDown: this.handleSubmit });
 	}
 });
 
-var mapStateToProps = function (state) {
+var mapStateToProps = function mapStateToProps(state) {
 	return { input: state.input.awaiting, prevInput: state.input.previous, name: state.player.name, inventory: state.player.inventory };
 };
 
-var mapDispatchToProps = function (dispatch) {
+var mapDispatchToProps = function mapDispatchToProps(dispatch) {
 	return {
-		showMessage: function (message, timeout) {
+		showMessage: function showMessage(message, timeout) {
 			dispatch(actions.showMessage(message, timeout));
 		},
-		setName: function (name) {
+		setName: function setName(name) {
 			dispatch(actions.setName(name));
 		},
-		setStats: function (stats) {
+		setStats: function setStats(stats) {
 			dispatch(actions.setStats(stats));
 		},
-		setInputExpected: function (inputType) {
+		setInputExpected: function setInputExpected(inputType) {
 			dispatch(actions.setInputExpected(inputType));
 		},
-		setDisplayStats: function (display, timeout) {
+		setDisplayStats: function setDisplayStats(display, timeout) {
 			dispatch(actions.setDisplayStats(display, timeout));
 		},
-		addItem: function (item) {
+		addItem: function addItem(item) {
 			dispatch(actions.addItem(item));
 		},
-		removeItem: function (item) {
+		removeItem: function removeItem(item) {
 			dispatch(actions.removeItem(item));
 		},
-		equipItem: function (item) {
+		equipItem: function equipItem(item) {
 			dispatch(actions.equipItem(item));
 		},
-		setDisplayInventory: function (display, timeout) {
+		setDisplayInventory: function setDisplayInventory(display, timeout) {
 			dispatch(actions.setDisplayInventory(display, timeout));
 		}
 	};
@@ -53882,6 +53904,8 @@ var mapDispatchToProps = function (dispatch) {
 module.exports = ReactRedux.connect(mapStateToProps, mapDispatchToProps)(PlayerBar);
 
 },{"./../actions":476,"./../constants":486,"./../data/class":487,"./../data/weapon":491,"./messagegen":480,"react":465,"react-bootstrap":99,"react-dom":272,"react-redux":275}],483:[function(require,module,exports){
+"use strict";
+
 var React = require("react"),
     Log = require("./log"),
     PlayerBar = require("./playerbar"),
@@ -53890,7 +53914,7 @@ var React = require("react"),
 
 var Quest = React.createClass({
 	displayName: "Quest",
-	render: function () {
+	render: function render() {
 		return React.createElement(
 			"div",
 			null,
@@ -53905,6 +53929,8 @@ var Quest = React.createClass({
 module.exports = Quest;
 
 },{"./inventory":478,"./log":479,"./playerbar":482,"./status":484,"react":465}],484:[function(require,module,exports){
+"use strict";
+
 var React = require("react"),
     ReactRedux = require("react-redux"),
     proptypes = React.PropTypes,
@@ -53919,7 +53945,7 @@ var Status = React.createClass({
 		display: proptypes.bool.isRequired,
 		stats: proptypes.object.isRequired
 	},
-	render: function () {
+	render: function render() {
 		if (this.props.display) {
 
 			var str = this.props.stats.str;
@@ -54019,13 +54045,15 @@ var Status = React.createClass({
 	}
 });
 
-var mapStateToProps = function (state) {
+var mapStateToProps = function mapStateToProps(state) {
 	return { name: state.player.name, display: state.player.displayStats, stats: state.player.stats, weapon: state.player.weapon, armour: state.player.armour };
 };
 
 module.exports = ReactRedux.connect(mapStateToProps)(Status);
 
 },{"react":465,"react-bootstrap":99,"react-redux":275}],485:[function(require,module,exports){
+"use strict";
+
 var React = require('react'),
     Navigation = require("./navigation"),
     Panel = require("react-bootstrap").Panel,
@@ -54035,7 +54063,7 @@ var React = require('react'),
 var Wrapper = React.createClass({
     displayName: "Wrapper",
 
-    render: function () {
+    render: function render() {
         return React.createElement(
             "div",
             { className: "wrapper" },
@@ -54072,6 +54100,8 @@ var Wrapper = React.createClass({
 module.exports = Wrapper;
 
 },{"./navigation":481,"react":465,"react-bootstrap":99}],486:[function(require,module,exports){
+"use strict";
+
 module.exports = {
 	MAX_NAME_LENGTH: 8,
 	MIN_NAME_LENGTH: 3,
@@ -54101,6 +54131,8 @@ module.exports = {
 };
 
 },{}],487:[function(require,module,exports){
+"use strict";
+
 var Classes = {
 	Elf: require("./classes/elf"),
 	Human: require("./classes/human"),
@@ -54152,6 +54184,10 @@ module.exports={
 	}
 }
 },{}],491:[function(require,module,exports){
+"use strict";
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _ = require("lodash"),
     constants = require("./../constants");
 
@@ -54164,7 +54200,7 @@ var Weapons = {
 	all: {}
 };
 
-Weapons.all = Object.assign(Weapons.all, Weapons.starter); // Copy all starter weapons into "all"
+Weapons.all = _extends(Weapons.all, Weapons.starter); // Copy all starter weapons into "all"
 
 Weapons.all = _.reduce(Weapons.all, function (ret, data, id) {
 	// Add the fact that they're equippable and of type weapon
@@ -54215,6 +54251,8 @@ module.exports={
 	}
 }
 },{}],495:[function(require,module,exports){
+"use strict";
+
 /*
 This is the entry point for the app! From here we merely import our routes definitions,
 then use React and React-DOM to render it.
@@ -54235,6 +54273,8 @@ ReactDOM.render(React.createElement(
 ), document.getElementById("root"));
 
 },{"./routes":500,"./store":501,"react":465,"react-dom":272,"react-redux":275,"react-router":304}],496:[function(require,module,exports){
+"use strict";
+
 var constants = require("./constants"),
     React = require("react");
 
@@ -54265,11 +54305,15 @@ module.exports = function () {
 };
 
 },{"./constants":486,"react":465}],497:[function(require,module,exports){
+"use strict";
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var initialState = require("./../initialstate"),
     constants = require("./../constants");
 
 module.exports = function (state, action) {
-	var newState = Object.assign({}, state); // Copy to a new state so we don't screw up the old one
+	var newState = _extends({}, state); // Copy to a new state so we don't screw up the old one
 	switch (action.type) {
 		case constants.SET_INPUT:
 			newState.previous = newState.awaiting;
@@ -54281,14 +54325,20 @@ module.exports = function (state, action) {
 };
 
 },{"./../constants":486,"./../initialstate":496}],498:[function(require,module,exports){
+"use strict";
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 var initialState = require("./../initialstate"),
     constants = require("./../constants");
 
 module.exports = function (state, action) {
-	var newState = Object.assign({}, state); // Copy to a new state so we don't screw up the old one
+	var newState = _extends({}, state); // Copy to a new state so we don't screw up the old one
 	switch (action.type) {
 		case constants.SHOW_MESSAGE:
-			newState.messages = [...newState.messages, action.message];
+			newState.messages = [].concat(_toConsumableArray(newState.messages), [action.message]);
 			return newState;
 		default:
 			return state || initialState().log;
@@ -54296,11 +54346,17 @@ module.exports = function (state, action) {
 };
 
 },{"./../constants":486,"./../initialstate":496}],499:[function(require,module,exports){
+"use strict";
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 var initialState = require("./../initialstate"),
     constants = require("./../constants");
 
 module.exports = function (state, action) {
-	var newState = Object.assign({}, state); // Copy to a new state so we don't screw up the old one
+	var newState = _extends({}, state); // Copy to a new state so we don't screw up the old one
 	switch (action.type) {
 		case constants.SET_NAME:
 			newState.name = action.name;
@@ -54314,10 +54370,10 @@ module.exports = function (state, action) {
 			newState.displayStats = action.display;
 			return newState;
 		case constants.ADD_ITEM:
-			newState.inventory = [...newState.inventory, action.item];
+			newState.inventory = [].concat(_toConsumableArray(newState.inventory), [action.item]);
 			return newState;
 		case constants.REMOVE_ITEM:
-			newState.inventory = [...newState.inventory];
+			newState.inventory = [].concat(_toConsumableArray(newState.inventory));
 			newState.inventory.splice(newState.inventory.indexOf(action.item), 1);
 			return newState;
 		case constants.EQUIP_ITEM:
@@ -54342,6 +54398,8 @@ module.exports = function (state, action) {
 };
 
 },{"./../constants":486,"./../initialstate":496}],500:[function(require,module,exports){
+'use strict';
+
 var React = require('react'),
     ReactRouter = require('react-router'),
     Route = ReactRouter.Route,
@@ -54356,6 +54414,8 @@ module.exports = React.createElement(
 );
 
 },{"./components/quest":483,"./components/wrapper":485,"react":465,"react-router":304}],501:[function(require,module,exports){
+"use strict";
+
 /*
 Redux Store
 */
@@ -54364,8 +54424,8 @@ var Redux = require("redux"),
     initialState = require("./initialstate"),
     messageReducer = require("./reducers/messageReducer"),
     playerReducer = require("./reducers/playerReducer"),
-    inputReducer = require("./reducers/inputReducer");
-thunk = require("redux-thunk"); // for asynch actions
+    inputReducer = require("./reducers/inputReducer"),
+    thunk = require("redux-thunk"); // for asynch actions
 
 var rootReducer = Redux.combineReducers({
 	log: messageReducer,

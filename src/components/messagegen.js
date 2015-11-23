@@ -112,7 +112,7 @@ module.exports = {
 				firstLoop = false;
 			}
 		}
-		return { speaker: "Wizard", line: <p>Hmm... Come to think of it, we can't very well send you out unarmed now can we? What's your weapon of choice? {weapons}</p> };
+		return { speaker: "Wizard", line: <p>Hmm... Come to think of it, we can't very well send you out unarmed now, can we? What's your weapon of choice? {weapons}</p> };
 	},
 	getPlayerYes: function() {
 		return { speaker: "Player", line: <p>Yes.</p> };

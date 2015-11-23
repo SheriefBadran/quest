@@ -6,7 +6,7 @@ var Redux = require("redux"),
 	initialState = require("./initialstate"),
 	messageReducer = require("./reducers/messageReducer"),
 	playerReducer = require("./reducers/playerReducer"),
-	inputReducer = require("./reducers/inputReducer")
+	inputReducer = require("./reducers/inputReducer"),
 	thunk = require("redux-thunk"); // for asynch actions
 
 var rootReducer = Redux.combineReducers({
