@@ -7,7 +7,8 @@ var React = require("react"),
 	proptypes = React.PropTypes,
 	Input = require("react-bootstrap").Input,
 	Classes = require("./../data/class"),
-	Weapons = require("./../data/weapon");
+	Weapons = require("./../data/weapon"),
+	MapGen = require("./mapgen");
 
 var PlayerBar = React.createClass({
 	displayName: "PlayerBar",
@@ -211,7 +212,7 @@ var PlayerBar = React.createClass({
 
 
 
-				//TODO actually start the game
+				//TODO actually start the game and generate map
 
 
 

@@ -52876,7 +52876,7 @@ module.exports = {
 	}
 };
 
-},{"./constants":486}],477:[function(require,module,exports){
+},{"./constants":489}],477:[function(require,module,exports){
 "use strict";
 
 var React = require("react"),
@@ -52924,6 +52924,117 @@ var mapStateToProps = function mapStateToProps(state) {
 module.exports = ReactRedux.connect(mapStateToProps)(Dialogue);
 
 },{"react":465,"react-bootstrap":99,"react-redux":275}],478:[function(require,module,exports){
+"use strict";
+
+var React = require("react"),
+    Panel = require("react-bootstrap").Panel,
+    Grid = require("react-bootstrap").Grid,
+    Row = require("react-bootstrap").Row,
+    Col = require("react-bootstrap").Col,
+    HelpList = require("./../data/helplist"),
+    HelpItem = require("./helpitem");
+
+var Help = React.createClass({
+	displayName: "Help",
+	render: function render() {
+		var rows = [];
+
+		HelpList.forEach((function (item, id) {
+			var desc = React.createElement(
+				"p",
+				null,
+				item.description,
+				React.createElement("br", null),
+				"ex: ",
+				React.createElement(
+					"font",
+					{ className: "command-style" },
+					item.example
+				)
+			);
+			rows.push(React.createElement(HelpItem, { command: item.name, description: desc, key: id }));
+		}).bind(this));
+
+		return React.createElement(
+			Panel,
+			{ className: "help-grid" },
+			React.createElement(
+				Grid,
+				{ fluid: true },
+				React.createElement(
+					Row,
+					{ className: "help-head" },
+					React.createElement(
+						Col,
+						{ xs: 18, md: 12 },
+						"Instructions"
+					)
+				),
+				React.createElement(
+					Row,
+					null,
+					React.createElement(
+						Col,
+						{ xs: 18, md: 12 },
+						"Probably some description here perhaps."
+					)
+				),
+				React.createElement(
+					Row,
+					{ className: "help-head" },
+					React.createElement(
+						Col,
+						{ xs: 18, md: 12 },
+						"Commands"
+					)
+				),
+				rows
+			)
+		);
+	}
+});
+
+module.exports = Help;
+
+},{"./../data/helplist":497,"./helpitem":479,"react":465,"react-bootstrap":99}],479:[function(require,module,exports){
+"use strict";
+
+var React = require("react"),
+    proptypes = React.PropTypes,
+    Row = require("react-bootstrap").Row,
+    Col = require("react-bootstrap").Col;
+
+var HelpItem = React.createClass({
+	displayName: "Help Item",
+	propTypes: {
+		command: proptypes.string.isRequired,
+		description: proptypes.object.isRequired
+	},
+	render: function render() {
+		return React.createElement(
+			Row,
+			{ className: "help-row" },
+			React.createElement(
+				Col,
+				{ className: "help-command", xs: 9, md: 6 },
+				React.createElement(
+					"font",
+					{ className: "command-style" },
+					this.props.command
+				)
+			),
+			React.createElement(
+				Col,
+				{ xs: 9, md: 6 },
+				this.props.description
+			)
+		);
+	}
+});
+
+module.exports = HelpItem;
+
+},{"react":465,"react-bootstrap":99}],480:[function(require,module,exports){
 "use strict";
 
 var React = require("react"),
@@ -53039,7 +53150,7 @@ var mapStateToProps = function mapStateToProps(state) {
 
 module.exports = ReactRedux.connect(mapStateToProps)(Inventory);
 
-},{"react":465,"react-bootstrap":99,"react-redux":275}],479:[function(require,module,exports){
+},{"react":465,"react-bootstrap":99,"react-redux":275}],481:[function(require,module,exports){
 "use strict";
 
 var React = require("react"),
@@ -53095,7 +53206,16 @@ var mapStateToProps = function mapStateToProps(state) {
 
 module.exports = ReactRedux.connect(mapStateToProps)(Log);
 
-},{"./dialogue":477,"react":465,"react-bootstrap":99,"react-dom":272,"react-redux":275}],480:[function(require,module,exports){
+},{"./dialogue":477,"react":465,"react-bootstrap":99,"react-dom":272,"react-redux":275}],482:[function(require,module,exports){
+"use strict";
+
+module.exports = {
+	generateMap: function generateMap() {
+		// TODO generate maps and all...
+	}
+};
+
+},{}],483:[function(require,module,exports){
 "use strict";
 
 var constants = require("./../constants"),
@@ -53432,7 +53552,7 @@ module.exports = {
 	}
 };
 
-},{"./../constants":486,"react":465}],481:[function(require,module,exports){
+},{"./../constants":489,"react":465}],484:[function(require,module,exports){
 "use strict";
 
 var React = require("react"),
@@ -53462,9 +53582,13 @@ var Navigation = React.createClass({
 					)
 				),
 				React.createElement(
-					NavItem,
-					{ disabled: true },
-					"Help"
+					LinkContainer,
+					{ to: "/help" },
+					React.createElement(
+						NavItem,
+						null,
+						"Help"
+					)
 				),
 				React.createElement(
 					NavItem,
@@ -53478,7 +53602,7 @@ var Navigation = React.createClass({
 
 module.exports = Navigation;
 
-},{"react":465,"react-bootstrap":99,"react-router-bootstrap":284}],482:[function(require,module,exports){
+},{"react":465,"react-bootstrap":99,"react-router-bootstrap":284}],485:[function(require,module,exports){
 "use strict";
 
 var React = require("react"),
@@ -53490,7 +53614,8 @@ var React = require("react"),
     proptypes = React.PropTypes,
     Input = require("react-bootstrap").Input,
     Classes = require("./../data/class"),
-    Weapons = require("./../data/weapon");
+    Weapons = require("./../data/weapon"),
+    MapGen = require("./mapgen");
 
 var PlayerBar = React.createClass({
 	displayName: "PlayerBar",
@@ -53816,7 +53941,7 @@ var PlayerBar = React.createClass({
 					) }, 2000);
 				this.props.setInputExpected(constants.DISABLED);
 
-				//TODO actually start the game
+				//TODO actually start the game and generate map
 
 				break;
 			case constants.EXPECTING_CONF:
@@ -53967,7 +54092,7 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
 
 module.exports = ReactRedux.connect(mapStateToProps, mapDispatchToProps)(PlayerBar);
 
-},{"./../actions":476,"./../constants":486,"./../data/class":487,"./../data/weapon":491,"./messagegen":480,"react":465,"react-bootstrap":99,"react-dom":272,"react-redux":275}],483:[function(require,module,exports){
+},{"./../actions":476,"./../constants":489,"./../data/class":490,"./../data/weapon":498,"./mapgen":482,"./messagegen":483,"react":465,"react-bootstrap":99,"react-dom":272,"react-redux":275}],486:[function(require,module,exports){
 "use strict";
 
 var React = require("react"),
@@ -53992,7 +54117,7 @@ var Quest = React.createClass({
 
 module.exports = Quest;
 
-},{"./inventory":478,"./log":479,"./playerbar":482,"./status":484,"react":465}],484:[function(require,module,exports){
+},{"./inventory":480,"./log":481,"./playerbar":485,"./status":487,"react":465}],487:[function(require,module,exports){
 "use strict";
 
 var React = require("react"),
@@ -54115,7 +54240,7 @@ var mapStateToProps = function mapStateToProps(state) {
 
 module.exports = ReactRedux.connect(mapStateToProps)(Status);
 
-},{"react":465,"react-bootstrap":99,"react-redux":275}],485:[function(require,module,exports){
+},{"react":465,"react-bootstrap":99,"react-redux":275}],488:[function(require,module,exports){
 "use strict";
 
 var React = require('react'),
@@ -54163,7 +54288,7 @@ var Wrapper = React.createClass({
 
 module.exports = Wrapper;
 
-},{"./navigation":481,"react":465,"react-bootstrap":99}],486:[function(require,module,exports){
+},{"./navigation":484,"react":465,"react-bootstrap":99}],489:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -54204,7 +54329,7 @@ module.exports = {
 	RESET: "RESET"
 };
 
-},{}],487:[function(require,module,exports){
+},{}],490:[function(require,module,exports){
 "use strict";
 
 var Classes = {
@@ -54215,49 +54340,74 @@ var Classes = {
 
 module.exports = Classes;
 
-},{"./classes/dwarf":488,"./classes/elf":489,"./classes/human":490}],488:[function(require,module,exports){
+},{"./classes/dwarf":491,"./classes/elf":492,"./classes/human":493}],491:[function(require,module,exports){
 module.exports={
 	"name": "Dwarf",
-	"description": "DWARF DESC",
+	"description": "You don't often see Dwarves these days - they tend to prefer remaining cloistered within the halls of their great mountain fortresses. Stout of build, and wide of girth, they are known for their defensive capabilities and raw strength. Their other attributes, however, are somewhat lacking.",
 	"stats": {
 		"race": "Dwarf",
 		"hp": 20,
 		"mp": 10,
-		"str": 3,
-		"dex": 5,
-		"mag": 1,
-		"def": 3
+		"str": 5,
+		"dex": 2,
+		"mag": 2,
+		"def": 5
 	}
 }
-},{}],489:[function(require,module,exports){
+},{}],492:[function(require,module,exports){
 module.exports={
 	"name": "Elf",
-	"description": "ELF DESC",
+	"description": "Elves are known to be fleet of foot, their agility second to none. Their slight builds allow them a freedom no others share. As a result, they can be a little fragile and prefer to avoid direct confrontation with their foes, erring on the side of ranged weaponry and magic.",
 	"stats": {
 		"race": "Elf",
 		"hp": 20,
 		"mp": 10,
 		"str": 3,
 		"dex": 5,
-		"mag": 2,
-		"def": 3
+		"mag": 4,
+		"def": 2
 	}
 }
-},{}],490:[function(require,module,exports){
+},{}],493:[function(require,module,exports){
 module.exports={
 	"name": "Human",
-	"description": "HUMAN DESC",
+	"description": "The most abundant of the humanoid races, Humans come in all shapes and sizes. As such, they tend to be the most flexible when it comes to combat. Many would say they fall into the age old trap of being a jack of all trades, but master of none.",
 	"stats": {
 		"race": "Human",
 		"hp": 20,
 		"mp": 10,
-		"str": 3,
-		"dex": 5,
+		"str": 4,
+		"dex": 3,
 		"mag": 4,
 		"def": 3
 	}
 }
-},{}],491:[function(require,module,exports){
+},{}],494:[function(require,module,exports){
+module.exports={
+	"name": "equip",
+	"example": "equip Sword",
+	"description": "Equip the specified weapon or armour."
+}
+},{}],495:[function(require,module,exports){
+module.exports={
+	"name": "look at",
+	"example": "look at Bow",
+	"description": "Look at the indicated item. Stats are displayed in the case of weapons or armour."
+}
+},{}],496:[function(require,module,exports){
+module.exports={
+	"name": "reset",
+	"example": "reset",
+	"description": "Most likely commit seppuku, reseting the game and all progress."
+}
+},{}],497:[function(require,module,exports){
+"use strict";
+
+var HelpList = [require("./helpitems/equip.json"), require("./helpitems/lookat.json"), require("./helpitems/reset.json")];
+
+module.exports = HelpList;
+
+},{"./helpitems/equip.json":494,"./helpitems/lookat.json":495,"./helpitems/reset.json":496}],498:[function(require,module,exports){
 "use strict";
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -54285,7 +54435,7 @@ Weapons.all = _.reduce(Weapons.all, function (ret, data, id) {
 
 module.exports = Weapons;
 
-},{"./../constants":486,"./weapons/bow.json":492,"./weapons/staff.json":493,"./weapons/sword.json":494,"lodash":27}],492:[function(require,module,exports){
+},{"./../constants":489,"./weapons/bow.json":499,"./weapons/staff.json":500,"./weapons/sword.json":501,"lodash":27}],499:[function(require,module,exports){
 module.exports={
 	"name": "Bow",
 	"description": "BOW DESC",
@@ -54298,7 +54448,7 @@ module.exports={
 		"def": 0
 	}
 }
-},{}],493:[function(require,module,exports){
+},{}],500:[function(require,module,exports){
 module.exports={
 	"name": "Staff",
 	"description": "STAFF DESC",
@@ -54311,7 +54461,7 @@ module.exports={
 		"def": 0
 	}
 }
-},{}],494:[function(require,module,exports){
+},{}],501:[function(require,module,exports){
 module.exports={
 	"name": "Sword",
 	"description": "SWORD DESC",
@@ -54324,7 +54474,7 @@ module.exports={
 		"def": 0
 	}
 }
-},{}],495:[function(require,module,exports){
+},{}],502:[function(require,module,exports){
 "use strict";
 
 /*
@@ -54346,7 +54496,7 @@ ReactDOM.render(React.createElement(
 	React.createElement(Router, { routes: routes })
 ), document.getElementById("root"));
 
-},{"./routes":500,"./store":501,"react":465,"react-dom":272,"react-redux":275,"react-router":304}],496:[function(require,module,exports){
+},{"./routes":508,"./store":509,"react":465,"react-dom":272,"react-redux":275,"react-router":304}],503:[function(require,module,exports){
 "use strict";
 
 var constants = require("./constants"),
@@ -54356,9 +54506,13 @@ module.exports = function () {
 	// Returns a function so it can't be modified accidentally
 	return {
 		input: {
+			// Currently expected input
 			awaiting: constants.EXPECTING_NAME,
+			// The input that was being expected before (we need this for confirmations so we know what's being confirmed)
 			previous: constants.EXPECTING_NAME,
+			// The currently expected input at time of a reset request - so we know what to go back to if they cancel the reset
 			beforeReset: constants.EXPECTING_NAME,
+			// If the above was a confirmation, we also need to store the input type expected before that (for the same reason as with previous)
 			beforeResetIfConf: constants.EXPECTING_NAME
 		},
 		log: {
@@ -54380,14 +54534,14 @@ module.exports = function () {
 				x: 0,
 				y: 0
 			}
+		},
+		world: {
+			map: [[]]
 		}
-		//world: {
-		//	seed: ""
-		//}
 	};
 };
 
-},{"./constants":486,"react":465}],497:[function(require,module,exports){
+},{"./constants":489,"react":465}],504:[function(require,module,exports){
 "use strict";
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -54399,19 +54553,20 @@ module.exports = function (state, action) {
 	var newState = _extends({}, state); // Copy to a new state so we don't screw up the old one
 	switch (action.type) {
 		case constants.SET_INPUT:
+			// We need to do special stuff if it was a reset command
 			if (action.input === constants.EXPECTING_RESET) {
 				// Shuffle these around so we don't lose where we are if there's a reset command
 				if (newState.previous === constants.EXPECTING_RESET) {
 					// If we're already in the reset period that means we're trying to cancel the reset
-					action.input = newState.beforeReset; // revert to the old settings
+					action.input = newState.beforeReset; // revert to the old state
 					if (newState.beforeReset === constants.EXPECTING_CONF) {
-						// If it was a conf before we tried to reset we need to grab the state that was before that
+						// If it was a confirm before we tried to reset we need to grab the state that was before that too
 						newState.awaiting = newState.beforeResetIfConf;
 					}
 				} else {
 					newState.beforeReset = newState.awaiting; // We're going into reset confirmation mode
 					if (newState.beforeReset === constants.EXPECTING_CONF) {
-						// If it's a conf we need to store the state before it too
+						// If it's a confirmation already we need to store the state before it too (since confimrations are dependent on previous state)
 						newState.beforeResetIfConf = newState.previous;
 					}
 				}
@@ -54426,7 +54581,7 @@ module.exports = function (state, action) {
 	}
 };
 
-},{"./../constants":486,"./../initialstate":496}],498:[function(require,module,exports){
+},{"./../constants":489,"./../initialstate":503}],505:[function(require,module,exports){
 "use strict";
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -54449,7 +54604,7 @@ module.exports = function (state, action) {
 	}
 };
 
-},{"./../constants":486,"./../initialstate":496}],499:[function(require,module,exports){
+},{"./../constants":489,"./../initialstate":503}],506:[function(require,module,exports){
 "use strict";
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -54503,7 +54658,25 @@ module.exports = function (state, action) {
 	}
 };
 
-},{"./../constants":486,"./../initialstate":496}],500:[function(require,module,exports){
+},{"./../constants":489,"./../initialstate":503}],507:[function(require,module,exports){
+"use strict";
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var initialState = require("./../initialstate"),
+    constants = require("./../constants");
+
+module.exports = function (state, action) {
+	var newState = _extends({}, state); // Copy to a new state so we don't screw up the old one
+	switch (action.type) {
+		case constants.RESET:
+			return initialState().world;
+		default:
+			return state || initialState().world;
+	}
+};
+
+},{"./../constants":489,"./../initialstate":503}],508:[function(require,module,exports){
 'use strict';
 
 var React = require('react'),
@@ -54511,15 +54684,17 @@ var React = require('react'),
     Route = ReactRouter.Route,
     IndexRoute = ReactRouter.IndexRoute,
     Wrap = require('./components/wrapper'),
-    quest = require('./components/quest');
+    quest = require('./components/quest'),
+    help = require('./components/help');
 
 module.exports = React.createElement(
     Route,
     { path: '/', component: Wrap },
-    React.createElement(IndexRoute, { component: quest })
+    React.createElement(IndexRoute, { component: quest }),
+    React.createElement(Route, { path: '/help', component: help })
 );
 
-},{"./components/quest":483,"./components/wrapper":485,"react":465,"react-router":304}],501:[function(require,module,exports){
+},{"./components/help":478,"./components/quest":486,"./components/wrapper":488,"react":465,"react-router":304}],509:[function(require,module,exports){
 "use strict";
 
 /*
@@ -54531,14 +54706,16 @@ var Redux = require("redux"),
     messageReducer = require("./reducers/messageReducer"),
     playerReducer = require("./reducers/playerReducer"),
     inputReducer = require("./reducers/inputReducer"),
+    worldReducer = require("./reducers/worldReducer"),
     thunk = require("redux-thunk"); // for asynch actions
 
 var rootReducer = Redux.combineReducers({
 	log: messageReducer,
 	player: playerReducer,
-	input: inputReducer
+	input: inputReducer,
+	world: worldReducer
 });
 
 module.exports = Redux.applyMiddleware(thunk)(Redux.createStore)(rootReducer, initialState());
 
-},{"./initialstate":496,"./reducers/inputReducer":497,"./reducers/messageReducer":498,"./reducers/playerReducer":499,"redux":468,"redux-thunk":466}]},{},[495]);
+},{"./initialstate":503,"./reducers/inputReducer":504,"./reducers/messageReducer":505,"./reducers/playerReducer":506,"./reducers/worldReducer":507,"redux":468,"redux-thunk":466}]},{},[502]);

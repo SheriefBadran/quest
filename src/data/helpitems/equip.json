@@ -1,0 +1,5 @@
+{
+	"name": "equip",
+	"example": "equip Sword",
+	"description": "Equip the specified weapon or armour."
+}

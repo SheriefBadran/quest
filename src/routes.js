@@ -3,10 +3,12 @@ var React = require('react'),
     Route = ReactRouter.Route,
     IndexRoute = ReactRouter.IndexRoute,
     Wrap = require('./components/wrapper'),
-    quest = require('./components/quest');
+    quest = require('./components/quest'),
+    help = require('./components/help');
 
 module.exports = (
     <Route path='/' component={Wrap}>
         <IndexRoute component={quest} />
+        <Route path="/help" component={help} />
     </Route>
 );

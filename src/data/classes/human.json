@@ -1,12 +1,12 @@
 {
 	"name": "Human",
-	"description": "HUMAN DESC",
+	"description": "The most abundant of the humanoid races, Humans come in all shapes and sizes. As such, they tend to be the most flexible when it comes to combat. Many would say they fall into the age old trap of being a jack of all trades, but master of none.",
 	"stats": {
 		"race": "Human",
 		"hp": 20,
 		"mp": 10,
-		"str": 3,
-		"dex": 5,
+		"str": 4,
+		"dex": 3,
 		"mag": 4,
 		"def": 3
 	}

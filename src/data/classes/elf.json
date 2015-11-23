@@ -1,13 +1,13 @@
 {
 	"name": "Elf",
-	"description": "ELF DESC",
+	"description": "Elves are known to be fleet of foot, their agility second to none. Their slight builds allow them a freedom no others share. As a result, they can be a little fragile and prefer to avoid direct confrontation with their foes, erring on the side of ranged weaponry and magic.",
 	"stats": {
 		"race": "Elf",
 		"hp": 20,
 		"mp": 10,
 		"str": 3,
 		"dex": 5,
-		"mag": 2,
-		"def": 3
+		"mag": 4,
+		"def": 2
 	}
 }

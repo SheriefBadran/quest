@@ -1,0 +1,5 @@
+{
+	"name": "look at",
+	"example": "look at Bow",
+	"description": "Look at the indicated item. Stats are displayed in the case of weapons or armour."
+}

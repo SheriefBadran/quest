@@ -1,13 +1,13 @@
 {
 	"name": "Dwarf",
-	"description": "DWARF DESC",
+	"description": "You don't often see Dwarves these days - they tend to prefer remaining cloistered within the halls of their great mountain fortresses. Stout of build, and wide of girth, they are known for their defensive capabilities and raw strength. Their other attributes, however, are somewhat lacking.",
 	"stats": {
 		"race": "Dwarf",
 		"hp": 20,
 		"mp": 10,
-		"str": 3,
-		"dex": 5,
-		"mag": 1,
-		"def": 3
+		"str": 5,
+		"dex": 2,
+		"mag": 2,
+		"def": 5
 	}
 }

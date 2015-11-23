@@ -13,7 +13,7 @@ var Navigation = React.createClass({
 			<div>
 				<Nav bsStyle="pills">
 						<IndexLinkContainer to="/"><NavItem>Home</NavItem></IndexLinkContainer>
-						<NavItem disabled>Help</NavItem>
+						<LinkContainer to="/help"><NavItem>Help</NavItem></LinkContainer>
 						<NavItem href="https://github.com/MoombaDS/quest" target="_blank">Source Code</NavItem>
 				</Nav>
 
