@@ -58,7 +58,7 @@ var PlayerBar = React.createClass({
 			input = input.split(" ");
 
 			if (input.length > 1) {
-				var exists = false;
+
 				var itemName = input[1];
 				for (var i = 2; i < input.length; ++i) {
 					itemName += " " + input[i];
@@ -74,7 +74,30 @@ var PlayerBar = React.createClass({
 						this.props.showMessage({ speaker: "Narrator", line: <p><font className={requestedItem.name}>{requestedItem.name}</font> cannot be equipped!</p> }, 0);
 					}
 				} else {
-					this.props.showMessage({ speaker: "Narrator", line: <p>You don't currently possess an item of name <font className="deny">{itemName}</font>!</p> }, 0);
+					this.props.showMessage(messageGen.getNoSuchItemMessage(itemName), 0);
+				}
+			}
+
+			return;
+		} else if (input.toUpperCase().indexOf("LOOK AT") > -1 && this.props.inventory.length > 0) {
+			input = input.split(" ");
+
+			if (input.length > 2) {
+				var itemName = input[2];
+				for (var i = 3; i < input.length; ++i) {
+					itemName += " " + input[i];
+				}
+
+				var requestedItem = this.getRequestedItem(itemName);
+
+				if (requestedItem) {
+					var prefix = ("AEIOU".indexOf(requestedItem.prefix.charAt(0).toUpperCase()) < 0) ? "A" : "An";
+					this.props.showMessage({ speaker: "Narrator", line: <p>{prefix} {requestedItem.prefix} <font className={requestedItem.name}>{requestedItem.name}</font>. {requestedItem.description}</p> }, 0);
+					if (requestedItem.type === constants.WEAPON || requestedItem.type === constants.ARMOUR) {
+						this.props.showMessage({ speaker: "Narrator", line: <p>The stats are Strength: {requestedItem.stats.str}, Magic: {requestedItem.stats.mag}, Dexterity: {requestedItem.stats.dex}, and Defence: {requestedItem.stats.def}.</p> }, 0);
+					}
+				} else {
+					this.props.showMessage(messageGen.getNoSuchItemMessage(itemName), 0);
 				}
 			}
 

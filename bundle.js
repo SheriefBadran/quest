@@ -53354,6 +53354,19 @@ module.exports = {
 			"*clucks like a chicken*"
 		)];
 		return { speaker: "Player", line: failLines[Math.floor(Math.random() * failLines.length)] };
+	},
+	getNoSuchItemMessage: function (itemName) {
+		return { speaker: "Narrator", line: React.createElement(
+				"p",
+				null,
+				"You don't currently possess an item of name ",
+				React.createElement(
+					"font",
+					{ className: "deny" },
+					itemName
+				),
+				"!"
+			) };
 	}
 };
 
@@ -53464,7 +53477,7 @@ var PlayerBar = React.createClass({
 			input = input.split(" ");
 
 			if (input.length > 1) {
-				var exists = false;
+
 				var itemName = input[1];
 				for (var i = 2; i < input.length; ++i) {
 					itemName += " " + input[i];
@@ -53501,17 +53514,56 @@ var PlayerBar = React.createClass({
 							) }, 0);
 					}
 				} else {
+					this.props.showMessage(messageGen.getNoSuchItemMessage(itemName), 0);
+				}
+			}
+
+			return;
+		} else if (input.toUpperCase().indexOf("LOOK AT") > -1 && this.props.inventory.length > 0) {
+			input = input.split(" ");
+
+			if (input.length > 2) {
+				var itemName = input[2];
+				for (var i = 3; i < input.length; ++i) {
+					itemName += " " + input[i];
+				}
+
+				var requestedItem = this.getRequestedItem(itemName);
+
+				if (requestedItem) {
+					var prefix = "AEIOU".indexOf(requestedItem.prefix.charAt(0).toUpperCase()) < 0 ? "A" : "An";
 					this.props.showMessage({ speaker: "Narrator", line: React.createElement(
 							"p",
 							null,
-							"You don't currently possess an item of name ",
+							prefix,
+							" ",
+							requestedItem.prefix,
+							" ",
 							React.createElement(
 								"font",
-								{ className: "deny" },
-								itemName
+								{ className: requestedItem.name },
+								requestedItem.name
 							),
-							"!"
+							". ",
+							requestedItem.description
 						) }, 0);
+					if (requestedItem.type === constants.WEAPON || requestedItem.type === constants.ARMOUR) {
+						this.props.showMessage({ speaker: "Narrator", line: React.createElement(
+								"p",
+								null,
+								"The stats are Strength: ",
+								requestedItem.stats.str,
+								", Magic: ",
+								requestedItem.stats.mag,
+								", Dexterity: ",
+								requestedItem.stats.dex,
+								", and Defence: ",
+								requestedItem.stats.def,
+								"."
+							) }, 0);
+					}
+				} else {
+					this.props.showMessage(messageGen.getNoSuchItemMessage(itemName), 0);
 				}
 			}
 

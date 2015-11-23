@@ -126,5 +126,8 @@ module.exports = {
 			<p>*clucks like a chicken*</p>
 		];
 		return { speaker: "Player", line: failLines[Math.floor(Math.random() * failLines.length)] };
+	},
+	getNoSuchItemMessage: function(itemName) {
+		return { speaker: "Narrator", line: <p>You don't currently possess an item of name <font className="deny">{itemName}</font>!</p> };
 	}
 };
