@@ -53081,7 +53081,7 @@ var constants = require("./../constants"),
     React = require("react");
 
 module.exports = {
-	getConfirmMessage: function (prevInput, name, option = "") {
+	getConfirmMessage: function (prevInput, name, option) {
 		switch (prevInput) {
 			case constants.EXPECTING_NAME:
 				return { speaker: "Wizard", line: React.createElement(
