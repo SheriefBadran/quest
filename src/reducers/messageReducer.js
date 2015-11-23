@@ -7,6 +7,8 @@ module.exports = function (state, action) {
 		case constants.SHOW_MESSAGE:
 			newState.messages = [...newState.messages, action.message];
 			return newState;
+		case constants.RESET:
+			return initialState().log;
 		default:
 			return state || initialState().log;
 	}

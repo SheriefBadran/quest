@@ -52866,6 +52866,13 @@ module.exports = {
 				dispatch({ type: constants.DISPLAY_INVENTORY, display: display });
 			}, timeout);
 		};
+	},
+	resetGame: function resetGame() {
+		return function (dispatch) {
+			setTimeout(function () {
+				dispatch({ type: constants.RESET });
+			}, 5000);
+		};
 	}
 };
 
@@ -53098,7 +53105,7 @@ module.exports = {
 	getConfirmMessage: function getConfirmMessage(prevInput, name, option) {
 		switch (prevInput) {
 			case constants.EXPECTING_NAME:
-				return { speaker: "Wizard", line: React.createElement(
+				return { speaker: constants.WIZARD, line: React.createElement(
 						"p",
 						null,
 						"Great! Then I'll call you ",
@@ -53106,20 +53113,26 @@ module.exports = {
 						" from now on."
 					) };
 			case constants.EXPECTING_RACE:
-				return { speaker: "Wizard", line: React.createElement(
+				return { speaker: constants.WIZARD, line: React.createElement(
 						"p",
 						null,
 						"Excellent! At least it seems you're sure of something..."
 					) };
 			case constants.EXPECTING_WEAPON:
-				return { speaker: "Wizard", line: React.createElement(
+				return { speaker: constants.WIZARD, line: React.createElement(
 						"p",
 						null,
 						"Fantastic! I'm sure it will serve you well in the trials to come."
 					) };
+			case constants.EXPECTING_RESET:
+				return { speaker: constants.FINAL_BOSS, line: React.createElement(
+						"p",
+						null,
+						"Ah well. Guess I win then?"
+					) };
 			default:
 				console.log("Missing confirm message for " + prevInput);
-				return { speaker: "Narrator", line: React.createElement(
+				return { speaker: constants.NARRATOR, line: React.createElement(
 						"p",
 						null,
 						"Whoops! Looks like some sort of error occurred... silly me!"
@@ -53129,7 +53142,7 @@ module.exports = {
 	getDenyMessage: function getDenyMessage(prevInput, name, options) {
 		switch (prevInput) {
 			case constants.EXPECTING_NAME:
-				return { speaker: "Wizard", line: React.createElement(
+				return { speaker: constants.WIZARD, line: React.createElement(
 						"p",
 						null,
 						"Alright, how about we try this again. What is your name?"
@@ -53138,16 +53151,22 @@ module.exports = {
 				return this.getRaceMessage(name, options);
 			case constants.EXPECTING_WEAPON:
 				var lines = this.getMultiOptionLines(options);
-				return { speaker: "Wizard", line: React.createElement(
+				return { speaker: constants.WIZARD, line: React.createElement(
 						"p",
 						null,
 						"Let's try again. Pick something to hit things with. ",
 						lines,
 						"?"
 					) };
+			case constants.EXPECTING_RESET:
+				return { speaker: constants.FINAL_BOSS, line: React.createElement(
+						"p",
+						null,
+						"Well that's a relief! Better get back to what you were doing... I'll just be over here creating an oppressive reign of terror or whatever it is that I do..."
+					) };
 			default:
 				console.log("Missing deny message for " + prevInput);
-				return { speaker: "Narrator", line: React.createElement(
+				return { speaker: constants.NARRATOR, line: React.createElement(
 						"p",
 						null,
 						"Whoops! Looks like some sort of error occurred... silly me!"
@@ -53169,7 +53188,7 @@ module.exports = {
 					{ className: "deny" },
 					"no"
 				);
-				return { speaker: "Wizard", line: React.createElement(
+				return { speaker: constants.WIZARD, line: React.createElement(
 						"p",
 						null,
 						"I'm sorry, I have no idea what you're trying to say... It's a ",
@@ -53178,9 +53197,29 @@ module.exports = {
 						no,
 						" question!"
 					) };
+			case constants.EXPECTING_RESET:
+				var yes = React.createElement(
+					"font",
+					{ className: "confirm" },
+					"yes"
+				);
+				var no = React.createElement(
+					"font",
+					{ className: "deny" },
+					"no"
+				);
+				return { speaker: constants.FINAL_BOSS, line: React.createElement(
+						"p",
+						null,
+						"What on earth is that supposed to mean? All I need is a simple ",
+						yes,
+						" or ",
+						no,
+						"!"
+					) };
 			default:
 				console.log("Missing fail message for " + prevInput + " confirmation.");
-				return { speaker: "Narrator", line: React.createElement(
+				return { speaker: constants.NARRATOR, line: React.createElement(
 						"p",
 						null,
 						"Whoops! Looks like some sort of error occurred... silly me!"
@@ -53193,7 +53232,7 @@ module.exports = {
 			case constants.EXPECTING_RACE:
 				var optionLines = this.getMultiOptionLines(options);
 
-				return { speaker: "Wizard", line: React.createElement(
+				return { speaker: constants.WIZARD, line: React.createElement(
 						"p",
 						null,
 						"I'm not sure what that's supposed to mean... The options are ",
@@ -53202,7 +53241,7 @@ module.exports = {
 					) };
 			default:
 				console.log("Missing npc fail message for: " + input);
-				return { speaker: "Narrator", line: React.createElement(
+				return { speaker: constants.NARRATOR, line: React.createElement(
 						"p",
 						null,
 						"Whoops! Looks like some sort of error occurred... silly me!"
@@ -53286,7 +53325,7 @@ module.exports = {
 				}
 			}
 		}
-		return { speaker: "Wizard", line: React.createElement(
+		return { speaker: constants.WIZARD, line: React.createElement(
 				"p",
 				null,
 				"So what are you ",
@@ -53336,7 +53375,7 @@ module.exports = {
 				firstLoop = false;
 			}
 		}
-		return { speaker: "Wizard", line: React.createElement(
+		return { speaker: constants.WIZARD, line: React.createElement(
 				"p",
 				null,
 				"Hmm... Come to think of it, we can't very well send you out unarmed now, can we? What's your weapon of choice? ",
@@ -53344,14 +53383,14 @@ module.exports = {
 			) };
 	},
 	getPlayerYes: function getPlayerYes() {
-		return { speaker: "Player", line: React.createElement(
+		return { speaker: constants.PLAYER, line: React.createElement(
 				"p",
 				null,
 				"Yes."
 			) };
 	},
 	getPlayerNo: function getPlayerNo() {
-		return { speaker: "Player", line: React.createElement(
+		return { speaker: constants.PLAYER, line: React.createElement(
 				"p",
 				null,
 				"No."
@@ -53367,10 +53406,10 @@ module.exports = {
 			null,
 			"*clucks like a chicken*"
 		)];
-		return { speaker: "Player", line: failLines[Math.floor(Math.random() * failLines.length)] };
+		return { speaker: constants.PLAYER, line: failLines[Math.floor(Math.random() * failLines.length)] };
 	},
 	getNoSuchItemMessage: function getNoSuchItemMessage(itemName) {
-		return { speaker: "Narrator", line: React.createElement(
+		return { speaker: constants.NARRATOR, line: React.createElement(
 				"p",
 				null,
 				"You don't currently possess an item of name ",
@@ -53380,6 +53419,15 @@ module.exports = {
 					itemName
 				),
 				"!"
+			) };
+	},
+	getResetMessage: function getResetMessage(name) {
+		return { speaker: constants.FINAL_BOSS, line: React.createElement(
+				"p",
+				null,
+				"Whoa there ",
+				name,
+				"! Are you absolutely certain you want to throw in the towel and let me have my way with the world? That doesn't sound very fun..."
 			) };
 	}
 };
@@ -53459,7 +53507,8 @@ var PlayerBar = React.createClass({
 		removeItem: proptypes.func.isRequired,
 		equipItem: proptypes.func.isRequired,
 		inventory: proptypes.array.isRequired,
-		setDisplayInventory: proptypes.func.isRequired
+		setDisplayInventory: proptypes.func.isRequired,
+		resetGame: proptypes.func.isRequired
 	},
 	componentDidMount: function componentDidMount() {
 		this.input.getInputDOMNode().focus();
@@ -53490,7 +53539,17 @@ var PlayerBar = React.createClass({
 	},
 	validateAndSendInput: function validateAndSendInput(input) {
 		// TODO IMPORANT - MAKE THIS METHOD MUCH SMALLER
-		if (input.split(" ")[0].toUpperCase() === "EQUIP" && this.props.inventory.length > 0) {
+		if (input.split(" ")[0].toUpperCase() === "RESET") {
+			this.props.showMessage({ speaker: constants.PLAYER, line: React.createElement(
+					"p",
+					null,
+					"I can't take this anymore..."
+				) }, 0);
+			this.props.showMessage(messageGen.getResetMessage(this.props.name), 1000);
+			this.props.setInputExpected(constants.EXPECTING_RESET);
+			this.props.setInputExpected(constants.EXPECTING_CONF);
+			return;
+		} else if (input.split(" ")[0].toUpperCase() === "EQUIP" && this.props.inventory.length > 0) {
 			// If they're looking to equip and have an inventory
 			input = input.split(" ");
 
@@ -53506,7 +53565,7 @@ var PlayerBar = React.createClass({
 				if (requestedItem) {
 					if (requestedItem.equippable) {
 						this.props.equipItem(requestedItem);
-						this.props.showMessage({ speaker: "Narrator", line: React.createElement(
+						this.props.showMessage({ speaker: constants.NARRATOR, line: React.createElement(
 								"p",
 								null,
 								"You equip the ",
@@ -53520,7 +53579,7 @@ var PlayerBar = React.createClass({
 								"."
 							) }, 0);
 					} else {
-						this.props.showMessage({ speaker: "Narrator", line: React.createElement(
+						this.props.showMessage({ speaker: constants.NARRATOR, line: React.createElement(
 								"p",
 								null,
 								React.createElement(
@@ -53550,7 +53609,7 @@ var PlayerBar = React.createClass({
 
 				if (requestedItem) {
 					var prefix = "AEIOU".indexOf(requestedItem.prefix.charAt(0).toUpperCase()) < 0 ? "A" : "An";
-					this.props.showMessage({ speaker: "Narrator", line: React.createElement(
+					this.props.showMessage({ speaker: constants.NARRATOR, line: React.createElement(
 							"p",
 							null,
 							prefix,
@@ -53566,7 +53625,7 @@ var PlayerBar = React.createClass({
 							requestedItem.description
 						) }, 0);
 					if (requestedItem.type === constants.WEAPON || requestedItem.type === constants.ARMOUR) {
-						this.props.showMessage({ speaker: "Narrator", line: React.createElement(
+						this.props.showMessage({ speaker: constants.NARRATOR, line: React.createElement(
 								"p",
 								null,
 								"The stats are Strength: ",
@@ -53594,7 +53653,7 @@ var PlayerBar = React.createClass({
 				// Validate the length of the name
 				var message;
 				if (input.length > constants.MAX_NAME_LENGTH || input.length < constants.MIN_NAME_LENGTH) {
-					message = { speaker: "Wizard", line: React.createElement(
+					message = { speaker: constants.WIZARD, line: React.createElement(
 							"p",
 							null,
 							"Hmmm... are you sure about that? Around here, names are usually between ",
@@ -53604,7 +53663,7 @@ var PlayerBar = React.createClass({
 							" characters in length! How about trying again?"
 						) };
 				} else {
-					message = { speaker: "Wizard", line: React.createElement(
+					message = { speaker: constants.WIZARD, line: React.createElement(
 							"p",
 							null,
 							input,
@@ -53613,7 +53672,7 @@ var PlayerBar = React.createClass({
 					this.props.setName(input);
 					this.props.setInputExpected(constants.EXPECTING_CONF);
 				}
-				this.props.showMessage({ speaker: "Player", line: React.createElement(
+				this.props.showMessage({ speaker: constants.PLAYER, line: React.createElement(
 						"p",
 						null,
 						"I'm ",
@@ -53648,7 +53707,7 @@ var PlayerBar = React.createClass({
 
 				if (valid) {
 					var prefix = "AEIOU".indexOf(input.charAt(0).toUpperCase()) < 0 ? "A" : "An";
-					playerMessage = { speaker: "Player", line: React.createElement(
+					playerMessage = { speaker: constants.PLAYER, line: React.createElement(
 							"p",
 							null,
 							"I'm ",
@@ -53657,7 +53716,7 @@ var PlayerBar = React.createClass({
 							chosenRace,
 							"... I think?"
 						) };
-					message = { speaker: "Wizard", line: React.createElement(
+					message = { speaker: constants.WIZARD, line: React.createElement(
 							"p",
 							null,
 							"Aha! ",
@@ -53709,14 +53768,14 @@ var PlayerBar = React.createClass({
 				}
 
 				if (valid) {
-					playerMessage = { speaker: "Player", line: React.createElement(
+					playerMessage = { speaker: constants.PLAYER, line: React.createElement(
 							"p",
 							null,
 							"I think I'll take the ",
 							chosenWeapon.name,
 							"."
 						) };
-					message = { speaker: "Wizard", line: React.createElement(
+					message = { speaker: constants.WIZARD, line: React.createElement(
 							"p",
 							null,
 							"A fine choice! ",
@@ -53739,19 +53798,19 @@ var PlayerBar = React.createClass({
 				break;
 			case constants.EXPECTING_ANYTHING:
 				this.props.showMessage(messageGen.getPlayerFail(), 0);
-				this.props.showMessage({ speaker: "Wizard", line: React.createElement(
+				this.props.showMessage({ speaker: constants.WIZARD, line: React.createElement(
 						"p",
 						null,
 						"Oh, that's a pity... Well off with you then! Time to save the world or something!"
 					) }, 1000);
-				this.props.showMessage({ speaker: "Narrator", line: React.createElement(
+				this.props.showMessage({ speaker: constants.NARRATOR, line: React.createElement(
 						"p",
 						null,
 						"With a strength belying his frail physique, the ",
 						React.createElement(
 							"font",
-							{ className: "Wizard" },
-							"Wizard"
+							{ className: constants.WIZARD },
+							constants.WIZARD
 						),
 						" thrusts you form his crumbling tower and out into the unknown world..."
 					) }, 2000);
@@ -53772,7 +53831,7 @@ var PlayerBar = React.createClass({
 							this.props.setInputExpected(constants.EXPECTING_RACE);
 							break;
 						case constants.EXPECTING_RACE:
-							this.props.showMessage({ speaker: "Narrator", line: React.createElement(
+							this.props.showMessage({ speaker: constants.NARRATOR, line: React.createElement(
 									"p",
 									null,
 									"Your status has been updated!"
@@ -53785,7 +53844,7 @@ var PlayerBar = React.createClass({
 							var latestItem = this.props.inventory[this.props.inventory.length - 1];
 							var prefix = "AEIOU".indexOf(latestItem.name.charAt(0).toUpperCase()) < 0 ? "A" : "An";
 							var has = latestItem.isPlural ? "have" : "has";
-							this.props.showMessage({ speaker: "Narrator", line: React.createElement(
+							this.props.showMessage({ speaker: constants.NARRATOR, line: React.createElement(
 									"p",
 									null,
 									prefix,
@@ -53802,7 +53861,7 @@ var PlayerBar = React.createClass({
 									" been added to your inventory!"
 								) }, 2000);
 							this.props.setDisplayInventory(true, 2000);
-							this.props.showMessage({ speaker: "Wizard", line: React.createElement(
+							this.props.showMessage({ speaker: constants.WIZARD, line: React.createElement(
 									"p",
 									null,
 									"Don't forget to equip it before you head out into the world by using ",
@@ -53814,13 +53873,15 @@ var PlayerBar = React.createClass({
 									),
 									"! Not my fault if you end up running around unarmed!"
 								) }, 3000);
-							this.props.showMessage({ speaker: "Wizard", line: React.createElement(
+							this.props.showMessage({ speaker: constants.WIZARD, line: React.createElement(
 									"p",
 									null,
 									"Ah, I can see from the look on your face that you have questions. Out with it then!"
 								) }, 4000);
 							this.props.setInputExpected(constants.EXPECTING_ANYTHING);
-
+							break;
+						case constants.EXPECTING_RESET:
+							this.props.resetGame();
 							break;
 						default:
 							console.log("Missing case for confirmation.");
@@ -53897,6 +53958,9 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
 		},
 		setDisplayInventory: function setDisplayInventory(display, timeout) {
 			dispatch(actions.setDisplayInventory(display, timeout));
+		},
+		resetGame: function resetGame() {
+			dispatch(actions.resetGame());
 		}
 	};
 };
@@ -54106,6 +54170,14 @@ module.exports = {
 	MAX_NAME_LENGTH: 8,
 	MIN_NAME_LENGTH: 3,
 
+	// Names of characters
+	WIZARD: "Wizard",
+	FINAL_BOSS: "Demon",
+
+	// These should not be changed
+	PLAYER: "Player",
+	NARRATOR: "Narrator",
+
 	// Item types
 	WEAPON: "WEAPON",
 	ARMOUR: "ARMOUR",
@@ -54117,6 +54189,7 @@ module.exports = {
 	EXPECTING_WEAPON: "EXPECTING_WEAPON",
 	EXPECTING_CONF: "EXPECTING_CONF",
 	EXPECTING_ANYTHING: "EXPECTING_ANYTHING",
+	EXPECTING_RESET: "EXPECTING_RESET",
 
 	// Dispatch constants
 	SHOW_MESSAGE: "SEND_MESSAGE",
@@ -54127,7 +54200,8 @@ module.exports = {
 	REMOVE_ITEM: "REMOVE_ITEM",
 	EQUIP_ITEM: "EQUIP_ITEM",
 	DISPLAY_STATS: "DISPLAY_STATS",
-	DISPLAY_INVENTORY: "DISPLAY_INVENTORY"
+	DISPLAY_INVENTORY: "DISPLAY_INVENTORY",
+	RESET: "RESET"
 };
 
 },{}],487:[function(require,module,exports){
@@ -54283,10 +54357,12 @@ module.exports = function () {
 	return {
 		input: {
 			awaiting: constants.EXPECTING_NAME,
-			previous: constants.EXPECTING_NAME
+			previous: constants.EXPECTING_NAME,
+			beforeReset: constants.EXPECTING_NAME,
+			beforeResetIfConf: constants.EXPECTING_NAME
 		},
 		log: {
-			messages: [{ speaker: "Wizard", line: React.createElement(
+			messages: [{ speaker: constants.WIZARD, line: React.createElement(
 					"p",
 					null,
 					"Hey you there... yes you! The one with the funny... well everything! You're finally awake? Can you speak? Tell me your name."
@@ -54299,8 +54375,15 @@ module.exports = function () {
 			inventory: [],
 			displayInventory: false,
 			weapon: null,
-			armour: null
+			armour: null,
+			position: {
+				x: 0,
+				y: 0
+			}
 		}
+		//world: {
+		//	seed: ""
+		//}
 	};
 };
 
@@ -54316,9 +54399,28 @@ module.exports = function (state, action) {
 	var newState = _extends({}, state); // Copy to a new state so we don't screw up the old one
 	switch (action.type) {
 		case constants.SET_INPUT:
+			if (action.input === constants.EXPECTING_RESET) {
+				// Shuffle these around so we don't lose where we are if there's a reset command
+				if (newState.previous === constants.EXPECTING_RESET) {
+					// If we're already in the reset period that means we're trying to cancel the reset
+					action.input = newState.beforeReset; // revert to the old settings
+					if (newState.beforeReset === constants.EXPECTING_CONF) {
+						// If it was a conf before we tried to reset we need to grab the state that was before that
+						newState.awaiting = newState.beforeResetIfConf;
+					}
+				} else {
+					newState.beforeReset = newState.awaiting; // We're going into reset confirmation mode
+					if (newState.beforeReset === constants.EXPECTING_CONF) {
+						// If it's a conf we need to store the state before it too
+						newState.beforeResetIfConf = newState.previous;
+					}
+				}
+			}
 			newState.previous = newState.awaiting;
 			newState.awaiting = action.input;
 			return newState;
+		case constants.RESET:
+			return initialState().input;
 		default:
 			return state || initialState().input;
 	}
@@ -54340,6 +54442,8 @@ module.exports = function (state, action) {
 		case constants.SHOW_MESSAGE:
 			newState.messages = [].concat(_toConsumableArray(newState.messages), [action.message]);
 			return newState;
+		case constants.RESET:
+			return initialState().log;
 		default:
 			return state || initialState().log;
 	}
@@ -54392,6 +54496,8 @@ module.exports = function (state, action) {
 		case constants.DISPLAY_INVENTORY:
 			newState.displayInventory = action.display;
 			return newState;
+		case constants.RESET:
+			return initialState().player;
 		default:
 			return state || initialState().player;
 	}

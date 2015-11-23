@@ -38,6 +38,8 @@ module.exports = function (state, action) {
 		case constants.DISPLAY_INVENTORY:
 			newState.displayInventory = action.display;
 			return newState;
+		case constants.RESET:
+			return initialState().player;
 		default:
 			return state || initialState().player;
 	}

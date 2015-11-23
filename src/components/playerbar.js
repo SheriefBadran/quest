@@ -24,7 +24,8 @@ var PlayerBar = React.createClass({
 		removeItem: proptypes.func.isRequired,
 		equipItem: proptypes.func.isRequired,
 		inventory: proptypes.array.isRequired,
-		setDisplayInventory: proptypes.func.isRequired
+		setDisplayInventory: proptypes.func.isRequired,
+		resetGame: proptypes.func.isRequired
 	},
 	componentDidMount: function() {
  		this.input.getInputDOMNode().focus();
@@ -53,7 +54,13 @@ var PlayerBar = React.createClass({
 		return requestedItem;
 	},
 	validateAndSendInput: function(input) { // TODO IMPORANT - MAKE THIS METHOD MUCH SMALLER
-		if (input.split(" ")[0].toUpperCase() === "EQUIP" && this.props.inventory.length > 0) {
+		if (input.split(" ")[0].toUpperCase() === "RESET") {
+			this.props.showMessage({ speaker: constants.PLAYER, line: <p>I can't take this anymore...</p> }, 0);
+			this.props.showMessage(messageGen.getResetMessage(this.props.name), 1000);
+			this.props.setInputExpected(constants.EXPECTING_RESET);
+			this.props.setInputExpected(constants.EXPECTING_CONF);
+			return;
+		} else if (input.split(" ")[0].toUpperCase() === "EQUIP" && this.props.inventory.length > 0) {
 			// If they're looking to equip and have an inventory
 			input = input.split(" ");
 
@@ -69,9 +76,9 @@ var PlayerBar = React.createClass({
 				if (requestedItem) {
 					if (requestedItem.equippable) {
 						this.props.equipItem(requestedItem);
-						this.props.showMessage({ speaker: "Narrator", line: <p>You equip the {requestedItem.prefix} <font className={requestedItem.name}>{requestedItem.name}</font>.</p> }, 0);
+						this.props.showMessage({ speaker: constants.NARRATOR, line: <p>You equip the {requestedItem.prefix} <font className={requestedItem.name}>{requestedItem.name}</font>.</p> }, 0);
 					} else {
-						this.props.showMessage({ speaker: "Narrator", line: <p><font className={requestedItem.name}>{requestedItem.name}</font> cannot be equipped!</p> }, 0);
+						this.props.showMessage({ speaker: constants.NARRATOR, line: <p><font className={requestedItem.name}>{requestedItem.name}</font> cannot be equipped!</p> }, 0);
 					}
 				} else {
 					this.props.showMessage(messageGen.getNoSuchItemMessage(itemName), 0);
@@ -92,9 +99,9 @@ var PlayerBar = React.createClass({
 
 				if (requestedItem) {
 					var prefix = ("AEIOU".indexOf(requestedItem.prefix.charAt(0).toUpperCase()) < 0) ? "A" : "An";
-					this.props.showMessage({ speaker: "Narrator", line: <p>{prefix} {requestedItem.prefix} <font className={requestedItem.name}>{requestedItem.name}</font>. {requestedItem.description}</p> }, 0);
+					this.props.showMessage({ speaker: constants.NARRATOR, line: <p>{prefix} {requestedItem.prefix} <font className={requestedItem.name}>{requestedItem.name}</font>. {requestedItem.description}</p> }, 0);
 					if (requestedItem.type === constants.WEAPON || requestedItem.type === constants.ARMOUR) {
-						this.props.showMessage({ speaker: "Narrator", line: <p>The stats are Strength: {requestedItem.stats.str}, Magic: {requestedItem.stats.mag}, Dexterity: {requestedItem.stats.dex}, and Defence: {requestedItem.stats.def}.</p> }, 0);
+						this.props.showMessage({ speaker: constants.NARRATOR, line: <p>The stats are Strength: {requestedItem.stats.str}, Magic: {requestedItem.stats.mag}, Dexterity: {requestedItem.stats.dex}, and Defence: {requestedItem.stats.def}.</p> }, 0);
 					}
 				} else {
 					this.props.showMessage(messageGen.getNoSuchItemMessage(itemName), 0);
@@ -110,13 +117,13 @@ var PlayerBar = React.createClass({
 				// Validate the length of the name
 				var message;
 				if (input.length > constants.MAX_NAME_LENGTH || input.length < constants.MIN_NAME_LENGTH) {
-					message = { speaker: "Wizard", line: <p>Hmmm... are you sure about that? Around here, names are usually between {constants.MIN_NAME_LENGTH} and {constants.MAX_NAME_LENGTH} characters in length! How about trying again?</p> };
+					message = { speaker: constants.WIZARD, line: <p>Hmmm... are you sure about that? Around here, names are usually between {constants.MIN_NAME_LENGTH} and {constants.MAX_NAME_LENGTH} characters in length! How about trying again?</p> };
 				} else {
-					message = { speaker: "Wizard", line: <p>{input} you say? Weird name... are you sure about that?</p> };
+					message = { speaker: constants.WIZARD, line: <p>{input} you say? Weird name... are you sure about that?</p> };
 					this.props.setName(input);
 					this.props.setInputExpected(constants.EXPECTING_CONF);
 				}
-				this.props.showMessage({ speaker: "Player", line: <p>I'm {input}.</p> }, 0);
+				this.props.showMessage({ speaker: constants.PLAYER, line: <p>I'm {input}.</p> }, 0);
 				this.props.showMessage(message, 1000); // Display the message
 				break;
 			case constants.EXPECTING_RACE:
@@ -144,8 +151,8 @@ var PlayerBar = React.createClass({
 
 				if (valid) {
 					var prefix = ("AEIOU".indexOf(input.charAt(0).toUpperCase()) < 0) ? "A" : "An";
-					playerMessage = { speaker: "Player", line: <p>I'm {prefix.toLowerCase()} {chosenRace}... I think?</p> };
-					message = { speaker: "Wizard", line: <p>Aha! {prefix} <font className={chosenRace}>{chosenRace}</font> eh? {Classes[chosenRace].description} Are you sure about this?</p>};
+					playerMessage = { speaker: constants.PLAYER, line: <p>I'm {prefix.toLowerCase()} {chosenRace}... I think?</p> };
+					message = { speaker: constants.WIZARD, line: <p>Aha! {prefix} <font className={chosenRace}>{chosenRace}</font> eh? {Classes[chosenRace].description} Are you sure about this?</p>};
 					this.props.setStats(Classes[chosenRace].stats);
 					this.props.setInputExpected(constants.EXPECTING_CONF);
 				} else { // If it's not a valid race then we do a fail again
@@ -181,8 +188,8 @@ var PlayerBar = React.createClass({
 				}
 
 				if (valid) {
-					playerMessage = { speaker: "Player", line: <p>I think I'll take the {chosenWeapon.name}.</p> };
-					message = { speaker: "Wizard", line: <p>A fine choice! {chosenWeapon.description} Is this what you really want?</p> };
+					playerMessage = { speaker: constants.PLAYER, line: <p>I think I'll take the {chosenWeapon.name}.</p> };
+					message = { speaker: constants.WIZARD, line: <p>A fine choice! {chosenWeapon.description} Is this what you really want?</p> };
 					if (this.props.inventory.length > 0) { // Remove the item if it was added in a previous cycle
 						this.props.removeItem(this.props.inventory[this.props.inventory.length-1]);
 					}
@@ -198,8 +205,8 @@ var PlayerBar = React.createClass({
 				break;
 			case constants.EXPECTING_ANYTHING:
 				this.props.showMessage(messageGen.getPlayerFail(), 0);
-				this.props.showMessage({ speaker: "Wizard", line: <p>Oh, that's a pity... Well off with you then! Time to save the world or something!</p> }, 1000);
-				this.props.showMessage({ speaker: "Narrator", line: <p>With a strength belying his frail physique, the <font className="Wizard">Wizard</font> thrusts you form his crumbling tower and out into the unknown world...</p> }, 2000);
+				this.props.showMessage({ speaker: constants.WIZARD, line: <p>Oh, that's a pity... Well off with you then! Time to save the world or something!</p> }, 1000);
+				this.props.showMessage({ speaker: constants.NARRATOR, line: <p>With a strength belying his frail physique, the <font className={constants.WIZARD}>{constants.WIZARD}</font> thrusts you form his crumbling tower and out into the unknown world...</p> }, 2000);
 				this.props.setInputExpected(constants.DISABLED);
 
 
@@ -221,7 +228,7 @@ var PlayerBar = React.createClass({
 							this.props.setInputExpected(constants.EXPECTING_RACE);
 							break;
 						case constants.EXPECTING_RACE:
-							this.props.showMessage({ speaker: "Narrator", line: <p>Your status has been updated!</p> }, 2000);
+							this.props.showMessage({ speaker: constants.NARRATOR, line: <p>Your status has been updated!</p> }, 2000);
 							this.props.setDisplayStats(true, 2000);
 							this.props.showMessage(messageGen.getWeaponMessage(this.props.name, Weapons.starter), 3000);
 							this.props.setInputExpected(constants.EXPECTING_WEAPON);
@@ -230,12 +237,14 @@ var PlayerBar = React.createClass({
 							var latestItem = this.props.inventory[this.props.inventory.length-1];
 							var prefix = ("AEIOU".indexOf(latestItem.name.charAt(0).toUpperCase()) < 0) ? "A" : "An";
 							var has = (latestItem.isPlural) ? "have" : "has";
-							this.props.showMessage({ speaker: "Narrator", line: <p>{prefix} {latestItem.prefix} <font className={latestItem.name}>{latestItem.name}</font> {has} been added to your inventory!</p> }, 2000);
+							this.props.showMessage({ speaker: constants.NARRATOR, line: <p>{prefix} {latestItem.prefix} <font className={latestItem.name}>{latestItem.name}</font> {has} been added to your inventory!</p> }, 2000);
 							this.props.setDisplayInventory(true, 2000)
-							this.props.showMessage({ speaker: "Wizard", line: <p>Don't forget to equip it before you head out into the world by using <font className="confirm">equip {latestItem.name}</font>! Not my fault if you end up running around unarmed!</p> }, 3000);
-							this.props.showMessage({ speaker: "Wizard", line: <p>Ah, I can see from the look on your face that you have questions. Out with it then!</p> }, 4000);
+							this.props.showMessage({ speaker: constants.WIZARD, line: <p>Don't forget to equip it before you head out into the world by using <font className="confirm">equip {latestItem.name}</font>! Not my fault if you end up running around unarmed!</p> }, 3000);
+							this.props.showMessage({ speaker: constants.WIZARD, line: <p>Ah, I can see from the look on your face that you have questions. Out with it then!</p> }, 4000);
 							this.props.setInputExpected(constants.EXPECTING_ANYTHING);
-
+							break;
+						case constants.EXPECTING_RESET:
+							this.props.resetGame();
 							break;
 						default:
 							console.log("Missing case for confirmation.");
@@ -310,6 +319,9 @@ var mapDispatchToProps = function (dispatch) {
 		},
 		setDisplayInventory: function(display, timeout) {
 			dispatch(actions.setDisplayInventory(display, timeout));
+		},
+		resetGame: function() {
+			dispatch(actions.resetGame());
 		}
 	}
 };

@@ -2,6 +2,14 @@ module.exports = {
 	MAX_NAME_LENGTH: 8,
 	MIN_NAME_LENGTH: 3,
 
+	// Names of characters
+	WIZARD: "Wizard",
+	FINAL_BOSS: "Demon",
+
+	// These should not be changed
+	PLAYER: "Player",
+	NARRATOR: "Narrator",
+
 	// Item types
 	WEAPON: "WEAPON",
 	ARMOUR: "ARMOUR",
@@ -13,6 +21,7 @@ module.exports = {
 	EXPECTING_WEAPON: "EXPECTING_WEAPON",
 	EXPECTING_CONF: "EXPECTING_CONF",
 	EXPECTING_ANYTHING: "EXPECTING_ANYTHING",
+	EXPECTING_RESET: "EXPECTING_RESET",
 
 	// Dispatch constants
 	SHOW_MESSAGE: "SEND_MESSAGE",
@@ -23,5 +32,6 @@ module.exports = {
 	REMOVE_ITEM: "REMOVE_ITEM",
 	EQUIP_ITEM: "EQUIP_ITEM",
 	DISPLAY_STATS: "DISPLAY_STATS",
-	DISPLAY_INVENTORY: "DISPLAY_INVENTORY"
+	DISPLAY_INVENTORY: "DISPLAY_INVENTORY",
+	RESET: "RESET"
 };

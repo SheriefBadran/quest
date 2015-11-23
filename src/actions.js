@@ -39,5 +39,12 @@ module.exports = {
 	 			dispatch({ type: constants.DISPLAY_INVENTORY, display: display });
 	 		}, timeout);
 	 	}
+	},
+	resetGame: function() {
+		return function(dispatch) {
+			setTimeout(function() {
+				dispatch({ type: constants.RESET });
+			}, 5000);
+		}
 	}
 };
