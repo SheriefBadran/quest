@@ -3,8 +3,7 @@ var React = require("react"),
 	Grid = require("react-bootstrap").Grid,
 	Row = require("react-bootstrap").Row,
 	Col = require("react-bootstrap").Col,
-	HelpList = require("./../data/helplist"),
-	HelpItem = require("./helpitem");
+	HelpList = require("./../data/helplist");
 
 var Help = React.createClass({
 	displayName: "Help",
@@ -40,5 +39,18 @@ var Help = React.createClass({
 		);
 	}
 });
+
+var HelpItem = function(props) {
+	return (
+		<Row className="help-row">
+			<Col className="help-command" xs={9} md={6}>
+				<font className="command-style">{props.command}</font>
+			</Col>
+			<Col xs={9} md={6}>
+				{props.description}
+			</Col>
+		</Row>
+	);
+};
 
 module.exports = Help;

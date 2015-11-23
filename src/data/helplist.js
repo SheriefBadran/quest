@@ -1,3 +1,5 @@
-var HelpList = [ require("./helpitems/equip.json"), require("./helpitems/lookat.json"), require("./helpitems/reset.json") ];
+var _ = require("lodash");
 
-module.exports = HelpList;
+var HelpList = [ require("./helpitems/equip.json"), require("./helpitems/reset.json"), require("./helpitems/lookat.json") ];
+
+module.exports = _.sortBy(HelpList, "name");
