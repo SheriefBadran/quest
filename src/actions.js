@@ -40,6 +40,9 @@ module.exports = {
 	 		}, timeout);
 	 	}
 	},
+	addMap: function(map) {
+		return { type: constants.ADD_MAP, map: map };
+	},
 	resetGame: function() {
 		return function(dispatch) {
 			setTimeout(function() {

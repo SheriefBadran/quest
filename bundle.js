@@ -25688,6 +25688,7 @@
 		EQUIP_ITEM: "EQUIP_ITEM",
 		DISPLAY_STATS: "DISPLAY_STATS",
 		DISPLAY_INVENTORY: "DISPLAY_INVENTORY",
+		ADD_MAP: "ADD_MAP",
 		RESET: "RESET"
 	};
 
@@ -25831,6 +25832,10 @@
 	module.exports = function (state, action) {
 		var newState = _extends({}, state); // Copy to a new state so we don't screw up the old one
 		switch (action.type) {
+			case constants.ADD_MAP:
+				newState.displayMap = true;
+				newState.map = action.map;
+				return newState;
 			case constants.RESET:
 				return initialState().world;
 			default:
@@ -43330,7 +43335,8 @@
 			equipItem: proptypes.func.isRequired,
 			inventory: proptypes.array.isRequired,
 			setDisplayInventory: proptypes.func.isRequired,
-			resetGame: proptypes.func.isRequired
+			resetGame: proptypes.func.isRequired,
+			addMap: proptypes.func.isRequired
 		},
 		componentDidMount: function componentDidMount() {
 			this.input.getInputDOMNode().focus();
@@ -43634,9 +43640,10 @@
 								{ className: constants.WIZARD },
 								constants.WIZARD
 							),
-							" thrusts you form his crumbling tower and out into the unknown world..."
+							" thrusts you from his crumbling tower and out into the unknown world..."
 						) }, 2000);
 					this.props.setInputExpected(constants.DISABLED);
+					this.props.addMap(MapGen.generateMap());
 
 					//TODO actually start the game and generate map
 
@@ -43781,6 +43788,9 @@
 			setDisplayInventory: function setDisplayInventory(display, timeout) {
 				dispatch(actions.setDisplayInventory(display, timeout));
 			},
+			addMap: function addMap(map) {
+				dispatch(actions.addMap(map));
+			},
 			resetGame: function resetGame() {
 				dispatch(actions.resetGame());
 			}
@@ -43836,6 +43846,9 @@
 					dispatch({ type: constants.DISPLAY_INVENTORY, display: display });
 				}, timeout);
 			};
+		},
+		addMap: function addMap(map) {
+			return { type: constants.ADD_MAP, map: map };
 		},
 		resetGame: function resetGame() {
 			return function (dispatch) {
@@ -56718,7 +56731,26 @@
 
 	module.exports = {
 		generateMap: function generateMap() {
-			// TODO generate maps and all...
+			var mapSize = 10; // TODO change to be randomised perhaps
+
+			var map = new Array(mapSize);
+
+			for (var x = 0; x < mapSize; ++x) {
+				map[x] = new Array(mapSize);
+			}
+
+			for (var x = 0; x < map.length; ++x) {
+				for (var y = 0; y < map[x].length; ++y) {
+					var rand = Math.floor(Math.random() * 2) + 1;
+
+					if (rand === 1) {
+						map[x][y] = { type: "Mountain", visited: false };
+					} else {
+						map[x][y] = { type: "Grass", visited: false };
+					}
+				}
+			}
+			return map;
 		}
 	};
 
@@ -56986,7 +57018,44 @@
 
 		render: function render() {
 			if (this.props.display) {
-				return React.createElement(Panel, { className: "map" });
+
+				var rows = [];
+
+				for (var x = 0; x < this.props.map.length; ++x) {
+					var mapRow = [];
+					for (var y = 0; y < this.props.map[x].length; ++y) {
+						switch (this.props.map[x][y].type) {
+							case "Grass":
+								mapRow.push(React.createElement(
+									"font",
+									{ key: x + "" + y, className: "grass" },
+									"#"
+								));
+								break;
+							case "Mountain":
+								mapRow.push(React.createElement(
+									"font",
+									{ key: x + "" + y, className: "cliff" },
+									"V"
+								));
+								break;
+							default:
+								console.log("Something went wrong in map drawing.");
+								break;
+						}
+					}
+					rows.push(React.createElement(
+						"p",
+						{ key: x },
+						mapRow
+					));
+				}
+
+				return React.createElement(
+					Panel,
+					{ className: "map" },
+					rows
+				);
 			} else {
 				return React.createElement("div", null);
 			}
@@ -56994,7 +57063,7 @@
 	});
 
 	var mapStateToProps = function mapStateToProps(state) {
-		return { display: state.world.displayMap };
+		return { display: state.world.displayMap, map: state.world.map };
 	};
 
 	module.exports = ReactRedux.connect(mapStateToProps)(WorldMap);

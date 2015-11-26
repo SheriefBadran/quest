@@ -27,6 +27,12 @@
 .map {
 	height: 200px;
 	width: 200px;
+	font-family: monospace;
+	line-height: 8px;
+	letter-spacing: 1px;
+	font-size: 25px;
+	background-color: black;
+	border-color: black;
 }
 
 .inventory-title {
@@ -101,4 +107,16 @@
 
 .Demon {
 	color: red;
+}
+
+/*
+* Map stuff
+*/
+
+.grass {
+	color: green;
+}
+
+.cliff {
+	color: gray;
 }

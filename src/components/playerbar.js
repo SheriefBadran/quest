@@ -26,7 +26,8 @@ var PlayerBar = React.createClass({
 		equipItem: proptypes.func.isRequired,
 		inventory: proptypes.array.isRequired,
 		setDisplayInventory: proptypes.func.isRequired,
-		resetGame: proptypes.func.isRequired
+		resetGame: proptypes.func.isRequired,
+		addMap: proptypes.func.isRequired
 	},
 	componentDidMount: function() {
  		this.input.getInputDOMNode().focus();
@@ -207,9 +208,9 @@ var PlayerBar = React.createClass({
 			case constants.EXPECTING_ANYTHING:
 				this.props.showMessage(messageGen.getPlayerFail(), 0);
 				this.props.showMessage({ speaker: constants.WIZARD, line: <p>Oh, that's a pity... Well off with you then! Time to save the world or something!</p> }, 1000);
-				this.props.showMessage({ speaker: constants.NARRATOR, line: <p>With a strength belying his frail physique, the <font className={constants.WIZARD}>{constants.WIZARD}</font> thrusts you form his crumbling tower and out into the unknown world...</p> }, 2000);
+				this.props.showMessage({ speaker: constants.NARRATOR, line: <p>With a strength belying his frail physique, the <font className={constants.WIZARD}>{constants.WIZARD}</font> thrusts you from his crumbling tower and out into the unknown world...</p> }, 2000);
 				this.props.setInputExpected(constants.DISABLED);
-
+				this.props.addMap(MapGen.generateMap());
 
 
 				//TODO actually start the game and generate map
@@ -320,6 +321,9 @@ var mapDispatchToProps = function (dispatch) {
 		},
 		setDisplayInventory: function(display, timeout) {
 			dispatch(actions.setDisplayInventory(display, timeout));
+		},
+		addMap: function(map) {
+			dispatch(actions.addMap(map));
 		},
 		resetGame: function() {
 			dispatch(actions.resetGame());
