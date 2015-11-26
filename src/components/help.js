@@ -16,26 +16,28 @@ var Help = React.createClass({
 		}.bind(this));
 
 		return (
-			<Panel className="help-grid">
-				<Grid fluid>
-					<Row className="help-head">
-						<Col xs={18} md={12}>
-							Instructions
-						</Col>
-					</Row>
-					<Row>
-						<Col xs={18} md={12}>
-							Probably some description here perhaps.
-						</Col>
-					</Row>
-					<Row className="help-head">
-						<Col xs={18} md={12}>
-							Commands
-						</Col>
-					</Row>
-					{rows}
-				</Grid>
-			</Panel>
+			<Grid fluid>
+				<Col mdOffset={3} md={6}>
+					<Panel className="help-grid">
+						<Row className="help-head">
+							<Col md={12}>
+								Instructions
+							</Col>
+						</Row>
+						<Row>
+							<Col md={12}>
+								Probably some description here perhaps.
+							</Col>
+						</Row>
+						<Row className="help-head">
+							<Col md={12}>
+								Commands
+							</Col>
+						</Row>
+						{rows}
+					</Panel>
+				</Col>
+			</Grid>
 		);
 	}
 });
@@ -43,10 +45,10 @@ var Help = React.createClass({
 var HelpItem = function(props) {
 	return (
 		<Row className="help-row">
-			<Col className="help-command" xs={9} md={6}>
+			<Col className="help-command" md={6}>
 				<font className="command-style">{props.command}</font>
 			</Col>
-			<Col xs={9} md={6}>
+			<Col md={6}>
 				{props.description}
 			</Col>
 		</Row>

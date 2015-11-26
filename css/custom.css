@@ -24,6 +24,11 @@
 	margin-top: 10px;
 }
 
+.map {
+	height: 200px;
+	width: 200px;
+}
+
 .inventory-title {
 	border-bottom: 1px solid;
 	border-color: white;
