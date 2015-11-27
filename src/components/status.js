@@ -53,19 +53,19 @@ var Status = React.createClass({
 							{this.props.stats.currenthp}/{this.props.stats.hp}<br />
 							{this.props.stats.currentmp}/{this.props.stats.mp}
 						</Col>
-						<Col xs={2} md={1}>
+						<Col xs={2} md={2}>
 							Strength:<br />
 							Magic:
 						</Col>
-						<Col xs={2} md={2}>
+						<Col xs={2} md={1}>
 							{str}<br />
 							{mag}
 						</Col>
-						<Col xs={2} md={1}>
+						<Col xs={2} md={2}>
 							Dexterity:<br />
 							Defence:
 						</Col>
-						<Col xs={2} md={2}>
+						<Col xs={2} md={1}>
 							{dex}<br />
 							{def}
 						</Col>

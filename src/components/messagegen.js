@@ -154,6 +154,6 @@ module.exports = {
 		return { speaker: constants.ELF, line: <p>Now remember, this doesn't mean we're friends or anything!</p> };
 	},
 	getElfLeaveMessage: function() {
-		return { speaker: constants.NARRATOR, line: <p>The <font className={constants.ELF}>{constants.ELF}</font> gives you one last glance before pulling herself up into the tree and vanishing from sight, leaving you to wonder why she had ever appeared in the first place. You are now free to roam.</p> };
+		return { speaker: constants.NARRATOR, line: <p>The <font className={constants.ELF}>{constants.ELF}</font> gives you one last glance before pulling herself up into the tree and vanishing from sight, leaving you to wonder why she had ever appeared in the first place. You are now free to roam. Perhaps you should start by looking around?</p> };
 	}
 };

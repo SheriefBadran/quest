@@ -20,7 +20,7 @@ module.exports = {
 			}
 		}
 
-		map[5][4] = { type: "Wizard", seen: true, obstacle: true, description: "the crumbling ruins of an old tower. You should probably not go back there" };
+		map[5][4] = { type: "Wizard", seen: true, obstacle: true, description: "the crumbling ruins of an old tower. You probably shouldn't go back there" };
 
 		var playerPos = { x: 4, y: 4 };
 

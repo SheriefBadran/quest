@@ -44398,7 +44398,7 @@
 						{ className: constants.ELF },
 						constants.ELF
 					),
-					" gives you one last glance before pulling herself up into the tree and vanishing from sight, leaving you to wonder why she had ever appeared in the first place. You are now free to roam."
+					" gives you one last glance before pulling herself up into the tree and vanishing from sight, leaving you to wonder why she had ever appeared in the first place. You are now free to roam. Perhaps you should start by looking around?"
 				) };
 		}
 	};
@@ -56978,7 +56978,7 @@
 				}
 			}
 
-			map[5][4] = { type: "Wizard", seen: true, obstacle: true, description: "the crumbling ruins of an old tower. You should probably not go back there" };
+			map[5][4] = { type: "Wizard", seen: true, obstacle: true, description: "the crumbling ruins of an old tower. You probably shouldn't go back there" };
 
 			var playerPos = { x: 4, y: 4 };
 
@@ -57072,28 +57072,28 @@
 						),
 						React.createElement(
 							Col,
-							{ xs: 2, md: 1 },
+							{ xs: 2, md: 2 },
 							"Strength:",
 							React.createElement("br", null),
 							"Magic:"
 						),
 						React.createElement(
 							Col,
-							{ xs: 2, md: 2 },
+							{ xs: 2, md: 1 },
 							str,
 							React.createElement("br", null),
 							mag
 						),
 						React.createElement(
 							Col,
-							{ xs: 2, md: 1 },
+							{ xs: 2, md: 2 },
 							"Dexterity:",
 							React.createElement("br", null),
 							"Defence:"
 						),
 						React.createElement(
 							Col,
-							{ xs: 2, md: 2 },
+							{ xs: 2, md: 1 },
 							dex,
 							React.createElement("br", null),
 							def
