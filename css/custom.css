@@ -27,7 +27,7 @@
 .map {
 	height: 200px;
 	width: 200px;
-	font-family: monospace;
+	font-family: Pragmata, Menlo, 'DejaVu LGC Sans Mono', 'DejaVu Sans Mono', Consolas, 'Everson Mono', 'Lucida Console', 'Andale Mono', 'Nimbus Mono L', 'Liberation Mono', FreeMono, 'Osaka Monospaced', Courier, 'New Courier', monospace;
 	line-height: 8px;
 	letter-spacing: 1px;
 	font-size: 25px;
@@ -101,7 +101,7 @@
 	color: gold;
 }
 
-.Sword, .Bow, .Staff {
+.Sword, .Bow, .Staff, .Map {
 	color: teal;
 }
 

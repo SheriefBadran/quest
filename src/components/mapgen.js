@@ -1,24 +1,29 @@
 module.exports = {
 	generateMap: function() {
-		var mapSize = 10; // TODO change to be randomised perhaps
+		var mapSize = 9; // TODO change to be randomised
 
 		var map = new Array(mapSize);
 
-		for (var x = 0; x < mapSize; ++x) {
-			map[x] = new Array(mapSize);
+		for (var y = 0; y < mapSize; ++y) {
+			map[y] = new Array(mapSize);
 		}
 
-		for (var x = 0; x < map.length; ++x) {
-			for (var y = 0; y < map[x].length; ++y) {
-				var rand = Math.floor(Math.random() * 2) + 1;
+		for (var y = 0; y < map.length; ++y) {
+			for (var x = 0; x < map[y].length; ++x) {
+				//var rand = Math.floor(Math.random() * 2) + 1;
 
-				if (rand === 1) {
-					map[x][y] = { type: "Mountain", visited: false };
-				} else {
-					map[x][y] = { type: "Grass", visited: false };
-				}
+				//if (rand === 1) {
+				//	map[y][x] = { type: "Mountain", visited: false };
+				//} else {
+					map[y][x] = { type: "grasslands", seen: false };
+				//}
 			}
 		}
-		return map;
+
+		map[5][4] = { type: "Wizard", seen: true, obstacle: true, description: "the crumbling ruins of an old tower. You should probably not go back there" };
+
+		var playerPos = { x: 4, y: 4 };
+
+		return { map: map, start: playerPos };
 	}
 };

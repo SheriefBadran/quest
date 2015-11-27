@@ -22,13 +22,13 @@ var Inventory = React.createClass({
 			for (var i = 0; i < this.props.inventory.length; ++i) {
 				// TODO improve the way this works a lot since it will be horrible for more than 20 items
 				if (i < 5) {
-					col1.push(this.props.inventory[i].name);
+					col1.push(<p key={i}>{this.props.inventory[i].name}</p>);
 				} else if (i < 10) {
-					col2.push(this.props.inventory[i].name);
+					col2.push(<p key={i}>{this.props.inventory[i].name}</p>);
 				} else if (i < 15) {
-					col3.push(this.props.inventory[i].name);
+					col3.push(<p key={i}>{this.props.inventory[i].name}</p>);
 				} else {
-					col4.push(this.props.inventory[i].name);
+					col4.push(<p key={i}>{this.props.inventory[i].name}</p>);
 				}
 			}
 

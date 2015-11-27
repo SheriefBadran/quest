@@ -24,8 +24,12 @@ module.exports = {
 	setInputExpected: function(inputType) {
 		return { type: constants.SET_INPUT, input: inputType };
 	},
-	addItem: function(item) {
-		return { type: constants.ADD_ITEM, item: item};
+	addItem: function(item, timeout) {
+		return function(dispatch) {
+	 		setTimeout(function() {
+	 			dispatch({ type: constants.ADD_ITEM, item: item});
+	 		}, timeout);
+	 	}
 	},
 	removeItem: function(item) {
 		return { type:constants.REMOVE_ITEM, item: item };
@@ -40,8 +44,15 @@ module.exports = {
 	 		}, timeout);
 	 	}
 	},
-	addMap: function(map) {
-		return { type: constants.ADD_MAP, map: map };
+	addMap: function(map, position, timeout) {
+		return function(dispatch) {
+	 		setTimeout(function() {
+	 			dispatch({ type: constants.ADD_MAP, map: map, position: position });
+	 		}, timeout);
+	 	}
+	},
+	movePlayer: function(movement) {
+		return { type: constants.MOVE, movement: movement };
 	},
 	resetGame: function() {
 		return function(dispatch) {

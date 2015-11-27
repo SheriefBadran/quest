@@ -27,15 +27,15 @@ module.exports = function() { // Returns a function so it can't be modified acci
 			inventory: [],
 			displayInventory: false,
 			weapon: null,
-			armour: null,
-			position: {
-				x: 0,
-				y: 0
-			}
+			armour: null
 		},
 		world: {
 			displayMap: false,
-			map: [[]]
+			map: [[]],
+			playerPos: {
+				x: 0,
+				y: 0
+			}
 		}
 	}
 };

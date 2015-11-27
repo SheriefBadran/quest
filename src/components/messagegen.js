@@ -140,5 +140,20 @@ module.exports = {
 	},
 	getResetMessage: function(name) {
 		return { speaker: constants.FINAL_BOSS, line: <p>Whoa there {name}! Are you absolutely certain you want to throw in the towel and let me have my way with the world? That doesn't sound very fun...</p> };
+	},
+	getAfterWizardMessage: function() {
+		return { speaker: constants.NARRATOR, line: <p>Stepping forth into the blinding sunlight, you immediately find yourself confronted by a young <font className={constants.ELF}>{constants.ELF}</font>, suspended upside-down from the branches of a nearby tree.</p> };
+	},
+	getMapIntroMessage: function() {
+		return { speaker: constants.ELF, line: <p>Oh. You must be the latest vic- uh... hero. <font className="Player">Hero</font>. Right. I don't really want to but I'm supposed to give you this ah uh... <font className="Map">Magic Map</font>. As long as you draw on it while you walk, you should probably be able to navigate with it!</p> };
+	},
+	getMapAddedMessage: function() {
+		return { speaker: constants.NARRATOR, line: <p>A useless blank piece of pa- uh <font className="Map">Magic Map</font>! is forcibly inserted into your inventory!</p> };
+	},
+	getMapContMessage: function() {
+		return { speaker: constants.ELF, line: <p>Now remember, this doesn't mean we're friends or anything!</p> };
+	},
+	getElfLeaveMessage: function() {
+		return { speaker: constants.NARRATOR, line: <p>The <font className={constants.ELF}>{constants.ELF}</font> gives you one last glance before pulling herself up into the tree and vanishing from sight, leaving you to wonder why she had ever appeared in the first place. You are now free to roam.</p> };
 	}
 };

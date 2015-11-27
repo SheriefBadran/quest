@@ -25634,15 +25634,15 @@
 				inventory: [],
 				displayInventory: false,
 				weapon: null,
-				armour: null,
-				position: {
-					x: 0,
-					y: 0
-				}
+				armour: null
 			},
 			world: {
 				displayMap: false,
-				map: [[]]
+				map: [[]],
+				playerPos: {
+					x: 0,
+					y: 0
+				}
 			}
 		};
 	};
@@ -25660,6 +25660,7 @@
 		// Names of characters
 		WIZARD: "Wizard",
 		FINAL_BOSS: "Demon",
+		ELF: "Elf",
 
 		// These should not be changed
 		PLAYER: "Player",
@@ -25677,6 +25678,7 @@
 		EXPECTING_CONF: "EXPECTING_CONF",
 		EXPECTING_ANYTHING: "EXPECTING_ANYTHING",
 		EXPECTING_RESET: "EXPECTING_RESET",
+		EXPECTING_MOVEMENT: "EXPECTING_MOVEMENT",
 
 		// Dispatch constants
 		SHOW_MESSAGE: "SEND_MESSAGE",
@@ -25689,6 +25691,7 @@
 		DISPLAY_STATS: "DISPLAY_STATS",
 		DISPLAY_INVENTORY: "DISPLAY_INVENTORY",
 		ADD_MAP: "ADD_MAP",
+		MOVE: "MOVE",
 		RESET: "RESET"
 	};
 
@@ -25830,11 +25833,37 @@
 	    constants = __webpack_require__(229);
 
 	module.exports = function (state, action) {
+		var updateMapVisibility = function updateMapVisibility(newState) {
+			if (newState.playerPos.x > 0) {
+				newState.map[newState.playerPos.y][newState.playerPos.x - 1].seen = true;
+			}
+			if (newState.playerPos.y > 0) {
+				newState.map[newState.playerPos.y - 1][newState.playerPos.x].seen = true;
+			}
+			if (newState.playerPos.x < newState.map[0].length - 1) {
+				newState.map[newState.playerPos.y][newState.playerPos.x + 1].seen = true;
+			}
+			if (newState.playerPos.y < newState.map.length - 1) {
+				newState.map[newState.playerPos.y + 1][newState.playerPos.x].seen = true;
+			}
+			return newState;
+		};
+
 		var newState = _extends({}, state); // Copy to a new state so we don't screw up the old one
 		switch (action.type) {
 			case constants.ADD_MAP:
 				newState.displayMap = true;
 				newState.map = action.map;
+				// Set player position
+				newState.playerPos = action.position;
+				// Make initially visible tiles visible
+				newState = updateMapVisibility(newState);
+				return newState;
+			case constants.MOVE:
+				// TODO check validity of movement here too before making the move
+				var newPosition = { x: newState.playerPos.x + action.movement.x, y: newState.playerPos.y + action.movement.y };
+				newState.playerPos = newPosition;
+				newState = updateMapVisibility(newState);
 				return newState;
 			case constants.RESET:
 				return initialState().world;
@@ -25877,7 +25906,7 @@
 	    IndexRoute = ReactRouter.IndexRoute,
 	    Wrap = __webpack_require__(236),
 	    quest = __webpack_require__(485),
-	    help = __webpack_require__(505);
+	    help = __webpack_require__(507);
 
 	module.exports = React.createElement(
 	    Route,
@@ -43132,9 +43161,9 @@
 	var React = __webpack_require__(1),
 	    Log = __webpack_require__(486),
 	    PlayerBar = __webpack_require__(488),
-	    Status = __webpack_require__(502),
-	    Inventory = __webpack_require__(503),
-	    WorldMap = __webpack_require__(504),
+	    Status = __webpack_require__(504),
+	    Inventory = __webpack_require__(505),
+	    WorldMap = __webpack_require__(506),
 	    Grid = __webpack_require__(241).Grid,
 	    Row = __webpack_require__(241).Row,
 	    Col = __webpack_require__(241).Col;
@@ -43317,7 +43346,8 @@
 	    Input = __webpack_require__(241).Input,
 	    Classes = __webpack_require__(491),
 	    Weapons = __webpack_require__(495),
-	    MapGen = __webpack_require__(501);
+	    Items = __webpack_require__(501),
+	    MapGen = __webpack_require__(503);
 
 	var PlayerBar = React.createClass({
 		displayName: "PlayerBar",
@@ -43473,6 +43503,40 @@
 				}
 
 				return;
+			} else if (input.toUpperCase().indexOf("LOOK AROUND") > -1 && this.props.input === constants.EXPECTING_MOVEMENT) {
+				// TODO make it look around the tile you're currently in too
+
+				// We need to check what's in the four cardinal directions
+				var message = "";
+
+				// Make sure it's both on the map
+				if (this.props.playerPos.y - 1 >= 0) {
+					message += "To the north you see ";
+					message += (this.props.map[this.props.playerPos.y - 1][this.props.playerPos.x].description || this.props.map[this.props.playerPos.y - 1][this.props.playerPos.x].type) + ". ";
+				}
+
+				if (this.props.playerPos.x + 1 < this.props.map[0].length) {
+					message += "To the east you see ";
+					message += (this.props.map[this.props.playerPos.y][this.props.playerPos.x + 1].description || this.props.map[this.props.playerPos.y][this.props.playerPos.x + 1].type) + ". ";
+				}
+
+				if (this.props.playerPos.y + 1 < this.props.map.length) {
+					message += "To the south you see ";
+					message += (this.props.map[this.props.playerPos.y + 1][this.props.playerPos.x].description || this.props.map[this.props.playerPos.y + 1][this.props.playerPos.x].type) + ". ";
+				}
+
+				if (this.props.playerPos.x - 1 >= 0) {
+					message += "To the west you see ";
+					message += (this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].description || this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].type) + ". ";
+				}
+
+				this.props.showMessage({ speaker: constants.NARRATOR, line: React.createElement(
+						"p",
+						null,
+						message
+					) }, 0);
+
+				return;
 			}
 			switch (this.props.input) {
 				case constants.DISABLED:
@@ -43614,7 +43678,7 @@
 							// Remove the item if it was added in a previous cycle
 							this.props.removeItem(this.props.inventory[this.props.inventory.length - 1]);
 						}
-						this.props.addItem(chosenWeapon);
+						this.props.addItem(chosenWeapon, 0);
 						this.props.setInputExpected(constants.EXPECTING_CONF);
 					} else {
 						playerMessage = messageGen.getPlayerFail();
@@ -43642,11 +43706,15 @@
 							),
 							" thrusts you from his crumbling tower and out into the unknown world..."
 						) }, 2000);
-					this.props.setInputExpected(constants.DISABLED);
-					this.props.addMap(MapGen.generateMap());
-
-					//TODO actually start the game and generate map
-
+					this.props.showMessage(messageGen.getAfterWizardMessage(), 4000);
+					this.props.showMessage(messageGen.getMapIntroMessage(), 6000);
+					this.props.showMessage(messageGen.getMapAddedMessage(), 8000);
+					this.props.addItem(Items.map, 8000);
+					var map = MapGen.generateMap();
+					this.props.addMap(map.map, map.start, 8000);
+					this.props.showMessage(messageGen.getMapContMessage(), 9000);
+					this.props.showMessage(messageGen.getElfLeaveMessage(), 11000);
+					this.props.setInputExpected(constants.EXPECTING_MOVEMENT);
 					break;
 				case constants.EXPECTING_CONF:
 					var playerMessage;
@@ -43740,6 +43808,62 @@
 					this.props.showMessage(playerMessage, 0);
 					this.props.showMessage(message, 1000); // Display the message
 					break;
+				case constants.EXPECTING_MOVEMENT:
+					var wrongWay = { speaker: constants.NARRATOR, line: React.createElement(
+							"p",
+							null,
+							"You can't go that way!"
+						) };
+
+					if (input.toUpperCase() === "N" || input.toUpperCase().indexOf("NORTH") > -1) {
+						// Make sure it's both on the map and that it's not an obstacle
+						if (this.props.playerPos.y - 1 < 0 || this.props.map[this.props.playerPos.y - 1][this.props.playerPos.x].obstacle) {
+							this.props.showMessage(wrongWay, 0);
+						} else {
+							this.props.movePlayer({ x: 0, y: -1 });
+							this.props.showMessage({ speaker: "Narrator", line: React.createElement(
+									"p",
+									null,
+									"You move north."
+								) }, 0);
+						}
+					} else if (input.toUpperCase() === "E" || input.toUpperCase().indexOf("EAST") > -1) {
+						if (this.props.playerPos.x + 1 > this.props.map[0].length - 1 || this.props.map[this.props.playerPos.y][this.props.playerPos.x + 1].obstacle) {
+							this.props.showMessage(wrongWay, 0);
+						} else {
+							this.props.movePlayer({ x: 1, y: 0 });
+							this.props.showMessage({ speaker: "Narrator", line: React.createElement(
+									"p",
+									null,
+									"You move east."
+								) }, 0);
+						}
+					} else if (input.toUpperCase() === "S" || input.toUpperCase().indexOf("SOUTH") > -1) {
+						if (this.props.playerPos.y + 1 > this.props.map.length - 1 || this.props.map[this.props.playerPos.y + 1][this.props.playerPos.x].obstacle) {
+							this.props.showMessage(wrongWay, 0);
+						} else {
+							this.props.movePlayer({ x: 0, y: 1 });
+							this.props.showMessage({ speaker: "Narrator", line: React.createElement(
+									"p",
+									null,
+									"You move south."
+								) }, 0);
+						}
+					} else if (input.toUpperCase() === "W" || input.toUpperCase().indexOf("WEST") > -1) {
+						if (this.props.playerPos.x - 1 < 0 || this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].obstacle) {
+							this.props.showMessage(wrongWay, 0);
+						} else {
+							this.props.movePlayer({ x: -1, y: 0 });
+							this.props.showMessage({ speaker: "Narrator", line: React.createElement(
+									"p",
+									null,
+									"You move west."
+								) }, 0);
+						}
+					}
+
+					// TODO
+					break;
 				default:
 					console.log("Missing input case for " + this.props.input);
 					break;;
@@ -43756,7 +43880,8 @@
 	});
 
 	var mapStateToProps = function mapStateToProps(state) {
-		return { input: state.input.awaiting, prevInput: state.input.previous, name: state.player.name, inventory: state.player.inventory };
+		return { input: state.input.awaiting, prevInput: state.input.previous, name: state.player.name, inventory: state.player.inventory, map: state.world.map,
+			playerPos: state.world.playerPos };
 	};
 
 	var mapDispatchToProps = function mapDispatchToProps(dispatch) {
@@ -43776,8 +43901,8 @@
 			setDisplayStats: function setDisplayStats(display, timeout) {
 				dispatch(actions.setDisplayStats(display, timeout));
 			},
-			addItem: function addItem(item) {
-				dispatch(actions.addItem(item));
+			addItem: function addItem(item, timeout) {
+				dispatch(actions.addItem(item, timeout));
 			},
 			removeItem: function removeItem(item) {
 				dispatch(actions.removeItem(item));
@@ -43788,8 +43913,11 @@
 			setDisplayInventory: function setDisplayInventory(display, timeout) {
 				dispatch(actions.setDisplayInventory(display, timeout));
 			},
-			addMap: function addMap(map) {
-				dispatch(actions.addMap(map));
+			addMap: function addMap(map, position, timeout) {
+				dispatch(actions.addMap(map, position, timeout));
+			},
+			movePlayer: function movePlayer(movement) {
+				dispatch(actions.movePlayer(movement));
 			},
 			resetGame: function resetGame() {
 				dispatch(actions.resetGame());
@@ -43831,8 +43959,12 @@
 		setInputExpected: function setInputExpected(inputType) {
 			return { type: constants.SET_INPUT, input: inputType };
 		},
-		addItem: function addItem(item) {
-			return { type: constants.ADD_ITEM, item: item };
+		addItem: function addItem(item, timeout) {
+			return function (dispatch) {
+				setTimeout(function () {
+					dispatch({ type: constants.ADD_ITEM, item: item });
+				}, timeout);
+			};
 		},
 		removeItem: function removeItem(item) {
 			return { type: constants.REMOVE_ITEM, item: item };
@@ -43847,8 +43979,15 @@
 				}, timeout);
 			};
 		},
-		addMap: function addMap(map) {
-			return { type: constants.ADD_MAP, map: map };
+		addMap: function addMap(map, position, timeout) {
+			return function (dispatch) {
+				setTimeout(function () {
+					dispatch({ type: constants.ADD_MAP, map: map, position: position });
+				}, timeout);
+			};
+		},
+		movePlayer: function movePlayer(movement) {
+			return { type: constants.MOVE, movement: movement };
 		},
 		resetGame: function resetGame() {
 			return function (dispatch) {
@@ -44195,6 +44334,71 @@
 					"Whoa there ",
 					name,
 					"! Are you absolutely certain you want to throw in the towel and let me have my way with the world? That doesn't sound very fun..."
+				) };
+		},
+		getAfterWizardMessage: function getAfterWizardMessage() {
+			return { speaker: constants.NARRATOR, line: React.createElement(
+					"p",
+					null,
+					"Stepping forth into the blinding sunlight, you immediately find yourself confronted by a young ",
+					React.createElement(
+						"font",
+						{ className: constants.ELF },
+						constants.ELF
+					),
+					", suspended upside-down from the branches of a nearby tree."
+				) };
+		},
+		getMapIntroMessage: function getMapIntroMessage() {
+			return { speaker: constants.ELF, line: React.createElement(
+					"p",
+					null,
+					"Oh. You must be the latest vic- uh... hero. ",
+					React.createElement(
+						"font",
+						{ className: "Player" },
+						"Hero"
+					),
+					". Right. I don't really want to but I'm supposed to give you this ah uh... ",
+					React.createElement(
+						"font",
+						{ className: "Map" },
+						"Magic Map"
+					),
+					". As long as you draw on it while you walk, you should probably be able to navigate with it!"
+				) };
+		},
+		getMapAddedMessage: function getMapAddedMessage() {
+			return { speaker: constants.NARRATOR, line: React.createElement(
+					"p",
+					null,
+					"A useless blank piece of pa- uh ",
+					React.createElement(
+						"font",
+						{ className: "Map" },
+						"Magic Map"
+					),
+					"! is forcibly inserted into your inventory!"
+				) };
+		},
+		getMapContMessage: function getMapContMessage() {
+			return { speaker: constants.ELF, line: React.createElement(
+					"p",
+					null,
+					"Now remember, this doesn't mean we're friends or anything!"
+				) };
+		},
+		getElfLeaveMessage: function getElfLeaveMessage() {
+			return { speaker: constants.NARRATOR, line: React.createElement(
+					"p",
+					null,
+					"The ",
+					React.createElement(
+						"font",
+						{ className: constants.ELF },
+						constants.ELF
+					),
+					" gives you one last glance before pulling herself up into the tree and vanishing from sight, leaving you to wonder why she had ever appeared in the first place. You are now free to roam."
 				) };
 		}
 	};
@@ -56725,37 +56929,65 @@
 
 /***/ },
 /* 501 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var Items = {
+			map: __webpack_require__(502)
+	};
+
+	module.exports = Items;
+
+/***/ },
+/* 502 */
+/***/ function(module, exports) {
+
+	module.exports = {
+		"name": "Magic Map",
+		"description": "Only works if you draw the map on it yourself. Doesn't that mean it's just a normal sheet of paper?",
+		"isPlural": false,
+		"prefix": "imitation"
+	};
+
+/***/ },
+/* 503 */
 /***/ function(module, exports) {
 
 	"use strict";
 
 	module.exports = {
 		generateMap: function generateMap() {
-			var mapSize = 10; // TODO change to be randomised perhaps
+			var mapSize = 9; // TODO change to be randomised
 
 			var map = new Array(mapSize);
 
-			for (var x = 0; x < mapSize; ++x) {
-				map[x] = new Array(mapSize);
+			for (var y = 0; y < mapSize; ++y) {
+				map[y] = new Array(mapSize);
 			}
 
-			for (var x = 0; x < map.length; ++x) {
-				for (var y = 0; y < map[x].length; ++y) {
-					var rand = Math.floor(Math.random() * 2) + 1;
+			for (var y = 0; y < map.length; ++y) {
+				for (var x = 0; x < map[y].length; ++x) {
+					//var rand = Math.floor(Math.random() * 2) + 1;
 
-					if (rand === 1) {
-						map[x][y] = { type: "Mountain", visited: false };
-					} else {
-						map[x][y] = { type: "Grass", visited: false };
-					}
+					//if (rand === 1) {
+					//	map[y][x] = { type: "Mountain", visited: false };
+					//} else {
+					map[y][x] = { type: "grasslands", seen: false };
+					//}
 				}
 			}
-			return map;
+
+			map[5][4] = { type: "Wizard", seen: true, obstacle: true, description: "the crumbling ruins of an old tower. You should probably not go back there" };
+
+			var playerPos = { x: 4, y: 4 };
+
+			return { map: map, start: playerPos };
 		}
 	};
 
 /***/ },
-/* 502 */
+/* 504 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -56881,7 +57113,7 @@
 	module.exports = ReactRedux.connect(mapStateToProps)(Status);
 
 /***/ },
-/* 503 */
+/* 505 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -56910,13 +57142,29 @@
 				for (var i = 0; i < this.props.inventory.length; ++i) {
 					// TODO improve the way this works a lot since it will be horrible for more than 20 items
 					if (i < 5) {
-						col1.push(this.props.inventory[i].name);
+						col1.push(React.createElement(
+							"p",
+							{ key: i },
+							this.props.inventory[i].name
+						));
 					} else if (i < 10) {
-						col2.push(this.props.inventory[i].name);
+						col2.push(React.createElement(
+							"p",
+							{ key: i },
+							this.props.inventory[i].name
+						));
 					} else if (i < 15) {
-						col3.push(this.props.inventory[i].name);
+						col3.push(React.createElement(
+							"p",
+							{ key: i },
+							this.props.inventory[i].name
+						));
 					} else {
-						col4.push(this.props.inventory[i].name);
+						col4.push(React.createElement(
+							"p",
+							{ key: i },
+							this.props.inventory[i].name
+						));
 					}
 				}
 
@@ -57000,7 +57248,7 @@
 	module.exports = ReactRedux.connect(mapStateToProps)(Inventory);
 
 /***/ },
-/* 504 */
+/* 506 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -57021,11 +57269,29 @@
 
 				var rows = [];
 
-				for (var x = 0; x < this.props.map.length; ++x) {
+				for (var y = 0; y < this.props.map.length; ++y) {
 					var mapRow = [];
-					for (var y = 0; y < this.props.map[x].length; ++y) {
-						switch (this.props.map[x][y].type) {
-							case "Grass":
+					for (var x = 0; x < this.props.map[y].length; ++x) {
+						if (x === this.props.player.x && y === this.props.player.y) {
+							// Place the player character
+							mapRow.push(React.createElement(
+								"font",
+								{ key: x + "" + y, className: "Player" },
+								"☺"
+							));
+							continue;
+						}
+						if (!this.props.map[y][x].seen) {
+							// If the area has not been seen it should be hidden
+							mapRow.push(React.createElement(
+								"font",
+								{ key: x + "" + y },
+								" "
+							));
+							continue;
+						}
+						switch (this.props.map[y][x].type) {// TODO remove this switch statement and just use a map to get symbols with type as key
+							case "grasslands":
 								mapRow.push(React.createElement(
 									"font",
 									{ key: x + "" + y, className: "grass" },
@@ -57036,7 +57302,21 @@
 								mapRow.push(React.createElement(
 									"font",
 									{ key: x + "" + y, className: "cliff" },
-									"V"
+									"▲"
+								));
+								break;
+							case "Water":
+								mapRow.push(React.createElement(
+									"font",
+									{ key: x + "" + y, className: "water" },
+									"♒"
+								));
+								break;
+							case "Wizard":
+								mapRow.push(React.createElement(
+									"font",
+									{ key: x + "" + y, className: "Wizard" },
+									"Π"
 								));
 								break;
 							default:
@@ -57046,7 +57326,7 @@
 					}
 					rows.push(React.createElement(
 						"p",
-						{ key: x },
+						{ key: y },
 						mapRow
 					));
 				}
@@ -57063,13 +57343,13 @@
 	});
 
 	var mapStateToProps = function mapStateToProps(state) {
-		return { display: state.world.displayMap, map: state.world.map };
+		return { display: state.world.displayMap, map: state.world.map, player: state.world.playerPos };
 	};
 
 	module.exports = ReactRedux.connect(mapStateToProps)(WorldMap);
 
 /***/ },
-/* 505 */
+/* 507 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -57079,7 +57359,7 @@
 	    Grid = __webpack_require__(241).Grid,
 	    Row = __webpack_require__(241).Row,
 	    Col = __webpack_require__(241).Col,
-	    HelpList = __webpack_require__(506);
+	    HelpList = __webpack_require__(508);
 
 	var Help = React.createClass({
 		displayName: "Help",
@@ -57169,19 +57449,19 @@
 	module.exports = Help;
 
 /***/ },
-/* 506 */
+/* 508 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
 	var _ = __webpack_require__(496);
 
-	var HelpList = [__webpack_require__(507), __webpack_require__(508), __webpack_require__(509)];
+	var HelpList = [__webpack_require__(509), __webpack_require__(510), __webpack_require__(511), __webpack_require__(512), __webpack_require__(513), __webpack_require__(514), __webpack_require__(515), __webpack_require__(516)];
 
 	module.exports = _.sortBy(HelpList, "name");
 
 /***/ },
-/* 507 */
+/* 509 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -57191,7 +57471,7 @@
 	};
 
 /***/ },
-/* 508 */
+/* 510 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -57201,13 +57481,63 @@
 	};
 
 /***/ },
-/* 509 */
+/* 511 */
 /***/ function(module, exports) {
 
 	module.exports = {
 		"name": "look at",
 		"example": "look at Bow",
 		"description": "Look at the indicated item. Stats are displayed in the case of weapons or armour."
+	};
+
+/***/ },
+/* 512 */
+/***/ function(module, exports) {
+
+	module.exports = {
+		"name": "north",
+		"example": "north",
+		"description": "Move north."
+	};
+
+/***/ },
+/* 513 */
+/***/ function(module, exports) {
+
+	module.exports = {
+		"name": "east",
+		"example": "east",
+		"description": "Move east."
+	};
+
+/***/ },
+/* 514 */
+/***/ function(module, exports) {
+
+	module.exports = {
+		"name": "south",
+		"example": "south",
+		"description": "Move south."
+	};
+
+/***/ },
+/* 515 */
+/***/ function(module, exports) {
+
+	module.exports = {
+		"name": "west",
+		"example": "west",
+		"description": "Move west."
+	};
+
+/***/ },
+/* 516 */
+/***/ function(module, exports) {
+
+	module.exports = {
+		"name": "look around",
+		"example": "look around",
+		"description": "Look around your current area, taking in what lies in the four cardinal directions."
 	};
 
 /***/ }

@@ -8,6 +8,7 @@ var React = require("react"),
 	Input = require("react-bootstrap").Input,
 	Classes = require("./../data/class"),
 	Weapons = require("./../data/weapon"),
+	Items = require("./../data/item"),
 	MapGen = require("./mapgen");
 
 var PlayerBar = React.createClass({
@@ -111,6 +112,36 @@ var PlayerBar = React.createClass({
 			}
 
 			return;
+		} else if (input.toUpperCase().indexOf("LOOK AROUND") > -1 && this.props.input === constants.EXPECTING_MOVEMENT) {
+			// TODO make it look around the tile you're currently in too
+
+			// We need to check what's in the four cardinal directions
+			var message = "";
+
+			// Make sure it's both on the map 
+			if (this.props.playerPos.y -1 >= 0 ) {
+				message += "To the north you see ";
+				message += (this.props.map[this.props.playerPos.y - 1][this.props.playerPos.x].description || this.props.map[this.props.playerPos.y - 1][this.props.playerPos.x].type) + ". ";
+			}
+			
+			if (this.props.playerPos.x + 1 < this.props.map[0].length) {
+				message += "To the east you see ";
+				message += (this.props.map[this.props.playerPos.y][this.props.playerPos.x + 1].description || this.props.map[this.props.playerPos.y][this.props.playerPos.x + 1].type) + ". ";
+			}
+			
+			if (this.props.playerPos.y + 1 < this.props.map.length) {
+				message += "To the south you see ";
+				message += (this.props.map[this.props.playerPos.y + 1][this.props.playerPos.x].description || this.props.map[this.props.playerPos.y + 1][this.props.playerPos.x].type) + ". ";
+			}
+		
+			if (this.props.playerPos.x -1 >= 0 ) {
+				message += "To the west you see ";
+				message += (this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].description || this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].type) + ". ";
+			}
+
+			this.props.showMessage({ speaker: constants.NARRATOR, line: <p>{message}</p> }, 0);
+
+			return;
 		}
 		switch (this.props.input) {
 			case constants.DISABLED:
@@ -195,7 +226,7 @@ var PlayerBar = React.createClass({
 					if (this.props.inventory.length > 0) { // Remove the item if it was added in a previous cycle
 						this.props.removeItem(this.props.inventory[this.props.inventory.length-1]);
 					}
-					this.props.addItem(chosenWeapon);
+					this.props.addItem(chosenWeapon, 0);
 					this.props.setInputExpected(constants.EXPECTING_CONF);
 				} else {
 					playerMessage = messageGen.getPlayerFail();
@@ -209,14 +240,15 @@ var PlayerBar = React.createClass({
 				this.props.showMessage(messageGen.getPlayerFail(), 0);
 				this.props.showMessage({ speaker: constants.WIZARD, line: <p>Oh, that's a pity... Well off with you then! Time to save the world or something!</p> }, 1000);
 				this.props.showMessage({ speaker: constants.NARRATOR, line: <p>With a strength belying his frail physique, the <font className={constants.WIZARD}>{constants.WIZARD}</font> thrusts you from his crumbling tower and out into the unknown world...</p> }, 2000);
-				this.props.setInputExpected(constants.DISABLED);
-				this.props.addMap(MapGen.generateMap());
-
-
-				//TODO actually start the game and generate map
-
-
-
+				this.props.showMessage(messageGen.getAfterWizardMessage(), 4000);
+				this.props.showMessage(messageGen.getMapIntroMessage(), 6000);
+				this.props.showMessage(messageGen.getMapAddedMessage(), 8000);
+				this.props.addItem(Items.map, 8000);
+				var map = MapGen.generateMap();
+				this.props.addMap(map.map, map.start, 8000);
+				this.props.showMessage(messageGen.getMapContMessage(), 9000);
+				this.props.showMessage(messageGen.getElfLeaveMessage(), 11000);
+				this.props.setInputExpected(constants.EXPECTING_MOVEMENT);
 				break;
 			case constants.EXPECTING_CONF:
 				var playerMessage;
@@ -276,6 +308,42 @@ var PlayerBar = React.createClass({
 				this.props.showMessage(playerMessage, 0);
 				this.props.showMessage(message, 1000); // Display the message
 				break;
+			case constants.EXPECTING_MOVEMENT:
+				var wrongWay = { speaker: constants.NARRATOR, line: <p>You can't go that way!</p> };
+
+				if (input.toUpperCase() === "N" || input.toUpperCase().indexOf("NORTH") > -1) {
+					// Make sure it's both on the map and that it's not an obstacle
+					if (this.props.playerPos.y -1 < 0 || this.props.map[this.props.playerPos.y - 1][this.props.playerPos.x].obstacle) {
+						this.props.showMessage(wrongWay, 0);
+					} else {
+						this.props.movePlayer({ x: 0, y: -1 });
+						this.props.showMessage({ speaker: "Narrator", line: <p>You move north.</p> }, 0);
+					}
+				} else if (input.toUpperCase() === "E" || input.toUpperCase().indexOf("EAST") > -1) {
+					if (this.props.playerPos.x + 1 > this.props.map[0].length - 1 || this.props.map[this.props.playerPos.y][this.props.playerPos.x + 1].obstacle) {
+						this.props.showMessage(wrongWay, 0);
+					} else {
+						this.props.movePlayer({ x: 1, y: 0 });
+						this.props.showMessage({ speaker: "Narrator", line: <p>You move east.</p> }, 0);
+					}
+				} else if (input.toUpperCase() === "S" || input.toUpperCase().indexOf("SOUTH") > -1) {
+					if (this.props.playerPos.y + 1 > this.props.map.length - 1 || this.props.map[this.props.playerPos.y + 1][this.props.playerPos.x].obstacle) {
+						this.props.showMessage(wrongWay, 0);
+					} else {
+						this.props.movePlayer({ x: 0, y: 1 });
+						this.props.showMessage({ speaker: "Narrator", line: <p>You move south.</p> }, 0);
+					}
+				} else if (input.toUpperCase() === "W" || input.toUpperCase().indexOf("WEST") > -1) {
+					if (this.props.playerPos.x -1 < 0 || this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].obstacle) {
+						this.props.showMessage(wrongWay, 0);
+					} else {
+						this.props.movePlayer({ x: -1, y: 0 });
+						this.props.showMessage({ speaker: "Narrator", line: <p>You move west.</p> }, 0);
+					}
+				}
+
+				// TODO
+				break;
 			default:
 				console.log("Missing input case for " + this.props.input);
 				break;;
@@ -290,7 +358,8 @@ var PlayerBar = React.createClass({
 });
 
 var mapStateToProps = function (state) {
-	return { input: state.input.awaiting, prevInput: state.input.previous, name: state.player.name, inventory: state.player.inventory };
+	return { input: state.input.awaiting, prevInput: state.input.previous, name: state.player.name, inventory: state.player.inventory, map: state.world.map,
+				playerPos: state.world.playerPos };
 };
 
 var mapDispatchToProps = function (dispatch) {
@@ -310,8 +379,8 @@ var mapDispatchToProps = function (dispatch) {
 		setDisplayStats: function(display, timeout) {
 			dispatch(actions.setDisplayStats(display, timeout));
 		},
-		addItem: function(item) {
-			dispatch(actions.addItem(item));
+		addItem: function(item, timeout) {
+			dispatch(actions.addItem(item, timeout));
 		},
 		removeItem: function(item) {
 			dispatch(actions.removeItem(item));
@@ -322,8 +391,11 @@ var mapDispatchToProps = function (dispatch) {
 		setDisplayInventory: function(display, timeout) {
 			dispatch(actions.setDisplayInventory(display, timeout));
 		},
-		addMap: function(map) {
-			dispatch(actions.addMap(map));
+		addMap: function(map, position, timeout) {
+			dispatch(actions.addMap(map, position, timeout));
+		},
+		movePlayer: function(movement) {
+			dispatch(actions.movePlayer(movement));
 		},
 		resetGame: function() {
 			dispatch(actions.resetGame());

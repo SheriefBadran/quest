@@ -5,6 +5,7 @@ module.exports = {
 	// Names of characters
 	WIZARD: "Wizard",
 	FINAL_BOSS: "Demon",
+	ELF: "Elf",
 
 	// These should not be changed
 	PLAYER: "Player",
@@ -22,6 +23,7 @@ module.exports = {
 	EXPECTING_CONF: "EXPECTING_CONF",
 	EXPECTING_ANYTHING: "EXPECTING_ANYTHING",
 	EXPECTING_RESET: "EXPECTING_RESET",
+	EXPECTING_MOVEMENT: "EXPECTING_MOVEMENT",
 
 	// Dispatch constants
 	SHOW_MESSAGE: "SEND_MESSAGE",
@@ -34,5 +36,6 @@ module.exports = {
 	DISPLAY_STATS: "DISPLAY_STATS",
 	DISPLAY_INVENTORY: "DISPLAY_INVENTORY",
 	ADD_MAP: "ADD_MAP",
+	MOVE: "MOVE",
 	RESET: "RESET"
 };
