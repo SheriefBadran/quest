@@ -20,7 +20,7 @@ var Inventory = React.createClass({
 			var col4 = [];
 
 			for (var i = 0; i < this.props.inventory.length; ++i) {
-				// TODO improve the way this works a lot since it will be horrible for more than 20 items
+				// TODO: improve the way this works a lot since it will be horrible for more than 20 items
 				if (i < 5) {
 					col1.push(<p key={i}>{this.props.inventory[i].name}</p>);
 				} else if (i < 10) {

@@ -24,7 +24,7 @@ var WorldMap = React.createClass({
 						mapRow.push(<font key={x + "" + y}>&nbsp;</font>);
 						continue;
 					}
-					switch (this.props.map[y][x].type) { // TODO remove this switch statement and just use a map to get symbols with type as key
+					switch (this.props.map[y][x].type) { // TODO: remove this switch statement and just use a map to get symbols with type as key
 						case "grasslands":
 							mapRow.push(<font key={x + "" + y} className="grass">#</font>);
 							break;

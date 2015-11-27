@@ -1,0 +1,15 @@
+{
+	"name": "Elf",
+	"description": "Before you stands a beautiful young Elf. Her eyes suggest she hates you.",
+	"attacked": [ 
+		"Ow! That hurts! Why would you do that?!", 
+		"Hey! What are you doing?!", 
+		"Why? *sniff*" 
+		],
+	"talk": [ 
+		"You again? What do you want?" 
+		],
+	"flee": [ 
+		"That's right! You can't take me!" 
+		]
+}

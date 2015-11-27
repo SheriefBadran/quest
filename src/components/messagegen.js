@@ -145,7 +145,7 @@ module.exports = {
 		return { speaker: constants.NARRATOR, line: <p>Stepping forth into the blinding sunlight, you immediately find yourself confronted by a young <font className={constants.ELF}>{constants.ELF}</font>, suspended upside-down from the branches of a nearby tree.</p> };
 	},
 	getMapIntroMessage: function() {
-		return { speaker: constants.ELF, line: <p>Oh. You must be the latest vic- uh... hero. <font className="Player">Hero</font>. Right. I don't really want to but I'm supposed to give you this ah uh... <font className="Map">Magic Map</font>. As long as you draw on it while you walk, you should probably be able to navigate with it!</p> };
+		return { speaker: constants.ELF, line: <p>Oh. You must be the latest vic- uh... hero. <font className={constants.Player}>Hero</font>. Right. I don't really want to but I'm supposed to give you this ah uh... <font className="Map">Magic Map</font>. As long as you draw on it while you walk, you should probably be able to navigate with it!</p> };
 	},
 	getMapAddedMessage: function() {
 		return { speaker: constants.NARRATOR, line: <p>A useless blank piece of pa- uh <font className="Map">Magic Map</font>! is forcibly inserted into your inventory!</p> };

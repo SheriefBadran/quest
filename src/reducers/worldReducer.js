@@ -29,7 +29,7 @@ module.exports = function (state, action) {
 			newState = updateMapVisibility(newState);
 			return newState;
 		case constants.MOVE:
-			// TODO check validity of movement here too before making the move
+			// TODO: check validity of movement here too before making the move
 			var newPosition = { x: newState.playerPos.x + action.movement.x, y: newState.playerPos.y + action.movement.y };
 			newState.playerPos = newPosition;
 			newState = updateMapVisibility(newState);

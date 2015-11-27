@@ -56,187 +56,295 @@ var PlayerBar = React.createClass({
 		}.bind(this));
 		return requestedItem;
 	},
-	validateAndSendInput: function(input) { // TODO IMPORANT - MAKE THIS METHOD MUCH SMALLER
-		if (input.split(" ")[0].toUpperCase() === "RESET") {
+	attemptEquip: function(input) {
+		input = input.split(" ");
+
+		if (input.length > 1) {
+
+			var itemName = input[1];
+			for (var i = 2; i < input.length; ++i) {
+				itemName += " " + input[i];
+			}
+
+			var requestedItem = this.getRequestedItem(itemName);
+
+			if (requestedItem) {
+				if (requestedItem.equippable) {
+					this.props.equipItem(requestedItem);
+					this.props.showMessage({ speaker: constants.NARRATOR, line: <p>You equip the {requestedItem.prefix} <font className={requestedItem.name}>{requestedItem.name}</font>.</p> }, 0);
+				} else {
+					this.props.showMessage({ speaker: constants.NARRATOR, line: <p><font className={requestedItem.name}>{requestedItem.name}</font> cannot be equipped!</p> }, 0);
+				}
+			} else {
+				this.props.showMessage(messageGen.getNoSuchItemMessage(itemName), 0);
+			}
+		}
+	},
+	attemptLookAt: function(input) {
+		input = input.split(" ");
+
+		if (input.length > 2) {
+			var itemName = input[2];
+			for (var i = 3; i < input.length; ++i) {
+				itemName += " " + input[i];
+			}
+
+			var requestedItem = this.getRequestedItem(itemName);
+
+			if (requestedItem) {
+				var prefix = ("AEIOU".indexOf(requestedItem.prefix.charAt(0).toUpperCase()) < 0) ? "A" : "An";
+				this.props.showMessage({ speaker: constants.NARRATOR, line: <p>{prefix} {requestedItem.prefix} <font className={requestedItem.name}>{requestedItem.name}</font>. {requestedItem.description}</p> }, 0);
+				if (requestedItem.type === constants.WEAPON || requestedItem.type === constants.ARMOUR) {
+					this.props.showMessage({ speaker: constants.NARRATOR, line: <p>The stats are Strength: {requestedItem.stats.str}, Magic: {requestedItem.stats.mag}, Dexterity: {requestedItem.stats.dex}, and Defence: {requestedItem.stats.def}.</p> }, 0);
+				}
+			} else {
+				this.props.showMessage(messageGen.getNoSuchItemMessage(itemName), 0);
+			}
+		}
+	},
+	lookAround: function() {
+		// TODO: make it look around the tile you're currently in too
+
+		// We need to check what's in the four cardinal directions
+		var message = "";
+
+		// Make sure it's both on the map 
+		if (this.props.playerPos.y -1 >= 0 ) {
+			message += "To the north you see ";
+			message += (this.props.map[this.props.playerPos.y - 1][this.props.playerPos.x].description || this.props.map[this.props.playerPos.y - 1][this.props.playerPos.x].type) + ". ";
+		}
+		
+		if (this.props.playerPos.x + 1 < this.props.map[0].length) {
+			message += "To the east you see ";
+			message += (this.props.map[this.props.playerPos.y][this.props.playerPos.x + 1].description || this.props.map[this.props.playerPos.y][this.props.playerPos.x + 1].type) + ". ";
+		}
+		
+		if (this.props.playerPos.y + 1 < this.props.map.length) {
+			message += "To the south you see ";
+			message += (this.props.map[this.props.playerPos.y + 1][this.props.playerPos.x].description || this.props.map[this.props.playerPos.y + 1][this.props.playerPos.x].type) + ". ";
+		}
+	
+		if (this.props.playerPos.x -1 >= 0 ) {
+			message += "To the west you see ";
+			message += (this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].description || this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].type) + ". ";
+		}
+
+		this.props.showMessage({ speaker: constants.NARRATOR, line: <p>{message}</p> }, 0);
+	},
+	checkAndSetName: function(input) {
+		// Validate the length of the name
+		var message;
+		if (input.length > constants.MAX_NAME_LENGTH || input.length < constants.MIN_NAME_LENGTH) {
+			message = { speaker: constants.WIZARD, line: <p>Hmmm... are you sure about that? Around here, names are usually between {constants.MIN_NAME_LENGTH} and {constants.MAX_NAME_LENGTH} characters in length! How about trying again?</p> };
+		} else {
+			message = { speaker: constants.WIZARD, line: <p>{input} you say? Weird name... are you sure about that?</p> };
+			this.props.setName(input);
+			this.props.setInputExpected(constants.EXPECTING_CONF);
+		}
+		this.props.showMessage({ speaker: constants.PLAYER, line: <p>I'm {input}.</p> }, 0);
+		this.props.showMessage(message, 1000); // Display the message
+	},
+	checkAndSelectRace: function(input) {
+		var playerMessage;
+		var message;
+
+		var raceOptions = [];
+
+		for (var raceName in Classes) {
+			if (Classes.hasOwnProperty(raceName)) {
+				raceOptions.push(raceName);
+			}
+		}
+
+		// Check if it's a valid race
+		var valid = false;
+		var chosenRace;
+		for (var i = 0; i < raceOptions.length; ++i) {
+			if (input.toUpperCase().indexOf(raceOptions[i].toUpperCase()) > -1) { // Check if it's mentioned anywhere in the input
+				valid = true;
+				chosenRace = raceOptions[i];
+				break;
+			}
+		}
+
+		if (valid) {
+			var prefix = ("AEIOU".indexOf(input.charAt(0).toUpperCase()) < 0) ? "A" : "An";
+			playerMessage = { speaker: constants.PLAYER, line: <p>I'm {prefix.toLowerCase()} {chosenRace}... I think?</p> };
+			message = { speaker: constants.WIZARD, line: <p>Aha! {prefix} <font className={chosenRace}>{chosenRace}</font> eh? {Classes[chosenRace].description} Are you sure about this?</p>};
+			this.props.setStats(Classes[chosenRace].stats);
+			this.props.setInputExpected(constants.EXPECTING_CONF);
+		} else { // If it's not a valid race then we do a fail again
+			playerMessage = messageGen.getPlayerFail();
+			message = messageGen.getMultiChoiceFailMessage(this.props.input, raceOptions, this.props.name);
+		}
+
+		this.props.showMessage(playerMessage, 0);
+		this.props.showMessage(message, 1000); // Display the message
+	},
+	checkAndSelectStarterWeapon: function(input) {
+		var playerMessage;
+		var message;
+
+		var weaponOptions = [];
+
+		for (var weaponName in Weapons.starter) {
+			if (Weapons.starter.hasOwnProperty(weaponName)) {
+				weaponOptions.push(weaponName);
+			}
+		}
+
+		// Check validity
+		var valid = false;
+		var chosenWeapon; // An object
+
+		for (var i = 0; i < weaponOptions.length; ++i) {
+			if (input.toUpperCase().indexOf(weaponOptions[i].toUpperCase()) > -1) { // Check if it's mentioned anywhere in the input
+				valid = true;
+				chosenWeapon = Weapons.starter[weaponOptions[i]];
+				break;
+			}
+		}
+
+		if (valid) {
+			playerMessage = { speaker: constants.PLAYER, line: <p>I think I'll take the {chosenWeapon.name}.</p> };
+			message = { speaker: constants.WIZARD, line: <p>A fine choice! {chosenWeapon.description} Is this what you really want?</p> };
+			if (this.props.inventory.length > 0) { // Remove the item if it was added in a previous cycle
+				this.props.removeItem(this.props.inventory[this.props.inventory.length-1]);
+			}
+			this.props.addItem(chosenWeapon, 0);
+			this.props.setInputExpected(constants.EXPECTING_CONF);
+		} else {
+			playerMessage = messageGen.getPlayerFail();
+			message = messageGen.getMultiChoiceFailMessage(this.props.input, weaponOptions, this.props.name);
+		}
+
+		this.props.showMessage(playerMessage, 0);
+		this.props.showMessage(message, 1000); // Display the message
+	},
+	checkAndValidateConfirmation: function(input) {
+		var playerMessage;
+		var message;
+		if (input.toUpperCase() === "YES" || input.toUpperCase() === "Y") {
+			playerMessage = messageGen.getPlayerYes();
+			message = messageGen.getConfirmMessage(this.props.prevInput, this.props.name);
+			switch (this.props.prevInput) {
+				case constants.EXPECTING_NAME:
+					this.props.showMessage(messageGen.getRaceMessage(this.props.name, Classes), 2000);
+					this.props.setInputExpected(constants.EXPECTING_RACE);
+					break;
+				case constants.EXPECTING_RACE:
+					this.props.showMessage({ speaker: constants.NARRATOR, line: <p>Your status has been updated!</p> }, 2000);
+					this.props.setDisplayStats(true, 2000);
+					this.props.showMessage(messageGen.getWeaponMessage(this.props.name, Weapons.starter), 3000);
+					this.props.setInputExpected(constants.EXPECTING_WEAPON);
+					break;
+				case constants.EXPECTING_WEAPON:
+					var latestItem = this.props.inventory[this.props.inventory.length-1];
+					var prefix = ("AEIOU".indexOf(latestItem.name.charAt(0).toUpperCase()) < 0) ? "A" : "An";
+					var has = (latestItem.isPlural) ? "have" : "has";
+					this.props.showMessage({ speaker: constants.NARRATOR, line: <p>{prefix} {latestItem.prefix} <font className={latestItem.name}>{latestItem.name}</font> {has} been added to your inventory!</p> }, 2000);
+					this.props.setDisplayInventory(true, 2000)
+					this.props.showMessage({ speaker: constants.WIZARD, line: <p>Don't forget to equip it before you head out into the world by using <font className="confirm">equip {latestItem.name}</font>! Not my fault if you end up running around unarmed!</p> }, 3000);
+					this.props.showMessage({ speaker: constants.WIZARD, line: <p>Ah, I can see from the look on your face that you have questions. Out with it then!</p> }, 4000);
+					this.props.setInputExpected(constants.EXPECTING_ANYTHING);
+					break;
+				case constants.EXPECTING_RESET:
+					this.props.resetGame();
+					break;
+				default:
+					console.log("Missing case for confirmation.");
+					this.props.setInputExpected(constants.DISABLED);
+					break;
+			}
+		} else if (input.toUpperCase() === "NO" || input.toUpperCase() === "N") {
+			var options = [];
+
+			if (this.props.prevInput === constants.EXPECTING_RACE) {
+				options = Classes;
+			} else if (this.props.prevInput === constants.EXPECTING_WEAPON) {
+				for (var weaponName in Weapons.starter) {
+					if (Weapons.starter.hasOwnProperty(weaponName)) {
+						options.push(weaponName);
+					}
+				}
+			}
+
+			playerMessage = messageGen.getPlayerNo();
+			message = messageGen.getDenyMessage(this.props.prevInput, this.props.name, options);
+			this.props.setInputExpected(this.props.prevInput);
+		} else {
+			playerMessage = messageGen.getPlayerFail();
+			message = messageGen.getFailMessage(this.props.prevInput, this.props.name);
+		}
+		this.props.showMessage(playerMessage, 0);
+		this.props.showMessage(message, 1000); // Display the message
+	},
+	checkAndMovePlayer: function(input) {
+		var wrongWay = { speaker: constants.NARRATOR, line: <p>You can't go that way!</p> };
+
+		if (input.toUpperCase() === "N" || input.toUpperCase().indexOf("NORTH") > -1) {
+			// Make sure it's both on the map and that it's not an obstacle
+			if (this.props.playerPos.y -1 < 0 || this.props.map[this.props.playerPos.y - 1][this.props.playerPos.x].obstacle) {
+				this.props.showMessage(wrongWay, 0);
+			} else {
+				this.props.movePlayer({ x: 0, y: -1 });
+				this.props.showMessage({ speaker: constants.NARRATOR, line: <p>You move north.</p> }, 0);
+			}
+		} else if (input.toUpperCase() === "E" || input.toUpperCase().indexOf("EAST") > -1) {
+			if (this.props.playerPos.x + 1 > this.props.map[0].length - 1 || this.props.map[this.props.playerPos.y][this.props.playerPos.x + 1].obstacle) {
+				this.props.showMessage(wrongWay, 0);
+			} else {
+				this.props.movePlayer({ x: 1, y: 0 });
+				this.props.showMessage({ speaker: constants.NARRATOR, line: <p>You move east.</p> }, 0);
+			}
+		} else if (input.toUpperCase() === "S" || input.toUpperCase().indexOf("SOUTH") > -1) {
+			if (this.props.playerPos.y + 1 > this.props.map.length - 1 || this.props.map[this.props.playerPos.y + 1][this.props.playerPos.x].obstacle) {
+				this.props.showMessage(wrongWay, 0);
+			} else {
+				this.props.movePlayer({ x: 0, y: 1 });
+				this.props.showMessage({ speaker: constants.NARRATOR, line: <p>You move south.</p> }, 0);
+			}
+		} else if (input.toUpperCase() === "W" || input.toUpperCase().indexOf("WEST") > -1) {
+			if (this.props.playerPos.x -1 < 0 || this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].obstacle) {
+				this.props.showMessage(wrongWay, 0);
+			} else {
+				this.props.movePlayer({ x: -1, y: 0 });
+				this.props.showMessage({ speaker: constants.NARRATOR, line: <p>You move west.</p> }, 0);
+			}
+		}
+
+		// TODO: things like description when entering special new area
+	},
+	validateAndSendInput: function(input) { // TODO: IMPORANT - MAKE THIS METHOD MUCH SMALLER
+		if (input.split(" ")[0].toUpperCase() === "RESET") { // If they want to give up and reset the game
 			this.props.showMessage({ speaker: constants.PLAYER, line: <p>I can't take this anymore...</p> }, 0);
 			this.props.showMessage(messageGen.getResetMessage(this.props.name), 1000);
 			this.props.setInputExpected(constants.EXPECTING_RESET);
 			this.props.setInputExpected(constants.EXPECTING_CONF);
 			return;
-		} else if (input.split(" ")[0].toUpperCase() === "EQUIP" && this.props.inventory.length > 0) {
-			// If they're looking to equip and have an inventory
-			input = input.split(" ");
-
-			if (input.length > 1) {
-
-				var itemName = input[1];
-				for (var i = 2; i < input.length; ++i) {
-					itemName += " " + input[i];
-				}
-
-				var requestedItem = this.getRequestedItem(itemName);
-
-				if (requestedItem) {
-					if (requestedItem.equippable) {
-						this.props.equipItem(requestedItem);
-						this.props.showMessage({ speaker: constants.NARRATOR, line: <p>You equip the {requestedItem.prefix} <font className={requestedItem.name}>{requestedItem.name}</font>.</p> }, 0);
-					} else {
-						this.props.showMessage({ speaker: constants.NARRATOR, line: <p><font className={requestedItem.name}>{requestedItem.name}</font> cannot be equipped!</p> }, 0);
-					}
-				} else {
-					this.props.showMessage(messageGen.getNoSuchItemMessage(itemName), 0);
-				}
-			}
-
+		} else if (input.split(" ")[0].toUpperCase() === "EQUIP" && this.props.inventory.length > 0) {	// If they're looking to equip and have an inventory
+			this.attemptEquip(input);
 			return;
-		} else if (input.toUpperCase().indexOf("LOOK AT") > -1 && this.props.inventory.length > 0) {
-			input = input.split(" ");
-
-			if (input.length > 2) {
-				var itemName = input[2];
-				for (var i = 3; i < input.length; ++i) {
-					itemName += " " + input[i];
-				}
-
-				var requestedItem = this.getRequestedItem(itemName);
-
-				if (requestedItem) {
-					var prefix = ("AEIOU".indexOf(requestedItem.prefix.charAt(0).toUpperCase()) < 0) ? "A" : "An";
-					this.props.showMessage({ speaker: constants.NARRATOR, line: <p>{prefix} {requestedItem.prefix} <font className={requestedItem.name}>{requestedItem.name}</font>. {requestedItem.description}</p> }, 0);
-					if (requestedItem.type === constants.WEAPON || requestedItem.type === constants.ARMOUR) {
-						this.props.showMessage({ speaker: constants.NARRATOR, line: <p>The stats are Strength: {requestedItem.stats.str}, Magic: {requestedItem.stats.mag}, Dexterity: {requestedItem.stats.dex}, and Defence: {requestedItem.stats.def}.</p> }, 0);
-					}
-				} else {
-					this.props.showMessage(messageGen.getNoSuchItemMessage(itemName), 0);
-				}
-			}
-
+		} else if (input.toUpperCase().indexOf("LOOK AT") > -1 && this.props.inventory.length > 0) { // If they want to look at an item and have an inventory
+			this.attemptLookAt(input);
 			return;
-		} else if (input.toUpperCase().indexOf("LOOK AROUND") > -1 && this.props.input === constants.EXPECTING_MOVEMENT) {
-			// TODO make it look around the tile you're currently in too
-
-			// We need to check what's in the four cardinal directions
-			var message = "";
-
-			// Make sure it's both on the map 
-			if (this.props.playerPos.y -1 >= 0 ) {
-				message += "To the north you see ";
-				message += (this.props.map[this.props.playerPos.y - 1][this.props.playerPos.x].description || this.props.map[this.props.playerPos.y - 1][this.props.playerPos.x].type) + ". ";
-			}
-			
-			if (this.props.playerPos.x + 1 < this.props.map[0].length) {
-				message += "To the east you see ";
-				message += (this.props.map[this.props.playerPos.y][this.props.playerPos.x + 1].description || this.props.map[this.props.playerPos.y][this.props.playerPos.x + 1].type) + ". ";
-			}
-			
-			if (this.props.playerPos.y + 1 < this.props.map.length) {
-				message += "To the south you see ";
-				message += (this.props.map[this.props.playerPos.y + 1][this.props.playerPos.x].description || this.props.map[this.props.playerPos.y + 1][this.props.playerPos.x].type) + ". ";
-			}
-		
-			if (this.props.playerPos.x -1 >= 0 ) {
-				message += "To the west you see ";
-				message += (this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].description || this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].type) + ". ";
-			}
-
-			this.props.showMessage({ speaker: constants.NARRATOR, line: <p>{message}</p> }, 0);
-
+		} else if (input.toUpperCase().indexOf("LOOK AROUND") > -1 && this.props.input === constants.EXPECTING_MOVEMENT) { // If they want to look around
+			this.lookAround();
 			return;
 		}
 		switch (this.props.input) {
 			case constants.DISABLED:
 				break; // Should not be doing anything
 			case constants.EXPECTING_NAME:
-				// Validate the length of the name
-				var message;
-				if (input.length > constants.MAX_NAME_LENGTH || input.length < constants.MIN_NAME_LENGTH) {
-					message = { speaker: constants.WIZARD, line: <p>Hmmm... are you sure about that? Around here, names are usually between {constants.MIN_NAME_LENGTH} and {constants.MAX_NAME_LENGTH} characters in length! How about trying again?</p> };
-				} else {
-					message = { speaker: constants.WIZARD, line: <p>{input} you say? Weird name... are you sure about that?</p> };
-					this.props.setName(input);
-					this.props.setInputExpected(constants.EXPECTING_CONF);
-				}
-				this.props.showMessage({ speaker: constants.PLAYER, line: <p>I'm {input}.</p> }, 0);
-				this.props.showMessage(message, 1000); // Display the message
+				this.checkAndSetName(input);
 				break;
 			case constants.EXPECTING_RACE:
-				var playerMessage;
-				var message;
-
-				var raceOptions = [];
-
-				for (var raceName in Classes) {
-					if (Classes.hasOwnProperty(raceName)) {
-						raceOptions.push(raceName);
-					}
-				}
-
-				// Check if it's a valid race
-				var valid = false;
-				var chosenRace;
-				for (var i = 0; i < raceOptions.length; ++i) {
-					if (input.toUpperCase().indexOf(raceOptions[i].toUpperCase()) > -1) { // Check if it's mentioned anywhere in the input
-						valid = true;
-						chosenRace = raceOptions[i];
-						break;
-					}
-				}
-
-				if (valid) {
-					var prefix = ("AEIOU".indexOf(input.charAt(0).toUpperCase()) < 0) ? "A" : "An";
-					playerMessage = { speaker: constants.PLAYER, line: <p>I'm {prefix.toLowerCase()} {chosenRace}... I think?</p> };
-					message = { speaker: constants.WIZARD, line: <p>Aha! {prefix} <font className={chosenRace}>{chosenRace}</font> eh? {Classes[chosenRace].description} Are you sure about this?</p>};
-					this.props.setStats(Classes[chosenRace].stats);
-					this.props.setInputExpected(constants.EXPECTING_CONF);
-				} else { // If it's not a valid race then we do a fail again
-					playerMessage = messageGen.getPlayerFail();
-					message = messageGen.getMultiChoiceFailMessage(this.props.input, raceOptions, this.props.name);
-				}
-
-				this.props.showMessage(playerMessage, 0);
-				this.props.showMessage(message, 1000); // Display the message
+				this.checkAndSelectRace(input);
 				break;
 			case constants.EXPECTING_WEAPON:
-				var playerMessage;
-				var message;
-
-				var weaponOptions = [];
-
-				for (var weaponName in Weapons.starter) {
-					if (Weapons.starter.hasOwnProperty(weaponName)) {
-						weaponOptions.push(weaponName);
-					}
-				}
-
-				// Check validity
-				var valid = false;
-				var chosenWeapon; // An object
-
-				for (var i = 0; i < weaponOptions.length; ++i) {
-					if (input.toUpperCase().indexOf(weaponOptions[i].toUpperCase()) > -1) { // Check if it's mentioned anywhere in the input
-						valid = true;
-						chosenWeapon = Weapons.starter[weaponOptions[i]];
-						break;
-					}
-				}
-
-				if (valid) {
-					playerMessage = { speaker: constants.PLAYER, line: <p>I think I'll take the {chosenWeapon.name}.</p> };
-					message = { speaker: constants.WIZARD, line: <p>A fine choice! {chosenWeapon.description} Is this what you really want?</p> };
-					if (this.props.inventory.length > 0) { // Remove the item if it was added in a previous cycle
-						this.props.removeItem(this.props.inventory[this.props.inventory.length-1]);
-					}
-					this.props.addItem(chosenWeapon, 0);
-					this.props.setInputExpected(constants.EXPECTING_CONF);
-				} else {
-					playerMessage = messageGen.getPlayerFail();
-					message = messageGen.getMultiChoiceFailMessage(this.props.input, weaponOptions, this.props.name);
-				}
-
-				this.props.showMessage(playerMessage, 0);
-				this.props.showMessage(message, 1000); // Display the message
+				this.checkAndSelectStarterWeapon(input);
 				break;
-			case constants.EXPECTING_ANYTHING:
+			case constants.EXPECTING_ANYTHING: // Making fun of the player at the end of the Wizard's intro
 				this.props.showMessage(messageGen.getPlayerFail(), 0);
 				this.props.showMessage({ speaker: constants.WIZARD, line: <p>Oh, that's a pity... Well off with you then! Time to save the world or something!</p> }, 1000);
 				this.props.showMessage({ speaker: constants.NARRATOR, line: <p>With a strength belying his frail physique, the <font className={constants.WIZARD}>{constants.WIZARD}</font> thrusts you from his crumbling tower and out into the unknown world...</p> }, 2000);
@@ -251,98 +359,10 @@ var PlayerBar = React.createClass({
 				this.props.setInputExpected(constants.EXPECTING_MOVEMENT);
 				break;
 			case constants.EXPECTING_CONF:
-				var playerMessage;
-				var message;
-				if (input.toUpperCase() === "YES" || input.toUpperCase() === "Y") {
-					playerMessage = messageGen.getPlayerYes();
-					message = messageGen.getConfirmMessage(this.props.prevInput, this.props.name);
-					switch (this.props.prevInput) {
-						case constants.EXPECTING_NAME:
-							this.props.showMessage(messageGen.getRaceMessage(this.props.name, Classes), 2000);
-							this.props.setInputExpected(constants.EXPECTING_RACE);
-							break;
-						case constants.EXPECTING_RACE:
-							this.props.showMessage({ speaker: constants.NARRATOR, line: <p>Your status has been updated!</p> }, 2000);
-							this.props.setDisplayStats(true, 2000);
-							this.props.showMessage(messageGen.getWeaponMessage(this.props.name, Weapons.starter), 3000);
-							this.props.setInputExpected(constants.EXPECTING_WEAPON);
-							break;
-						case constants.EXPECTING_WEAPON:
-							var latestItem = this.props.inventory[this.props.inventory.length-1];
-							var prefix = ("AEIOU".indexOf(latestItem.name.charAt(0).toUpperCase()) < 0) ? "A" : "An";
-							var has = (latestItem.isPlural) ? "have" : "has";
-							this.props.showMessage({ speaker: constants.NARRATOR, line: <p>{prefix} {latestItem.prefix} <font className={latestItem.name}>{latestItem.name}</font> {has} been added to your inventory!</p> }, 2000);
-							this.props.setDisplayInventory(true, 2000)
-							this.props.showMessage({ speaker: constants.WIZARD, line: <p>Don't forget to equip it before you head out into the world by using <font className="confirm">equip {latestItem.name}</font>! Not my fault if you end up running around unarmed!</p> }, 3000);
-							this.props.showMessage({ speaker: constants.WIZARD, line: <p>Ah, I can see from the look on your face that you have questions. Out with it then!</p> }, 4000);
-							this.props.setInputExpected(constants.EXPECTING_ANYTHING);
-							break;
-						case constants.EXPECTING_RESET:
-							this.props.resetGame();
-							break;
-						default:
-							console.log("Missing case for confirmation.");
-							this.props.setInputExpected(constants.DISABLED);
-							break;
-					}
-				} else if (input.toUpperCase() === "NO" || input.toUpperCase() === "N") {
-					var options = [];
-
-					if (this.props.prevInput === constants.EXPECTING_RACE) {
-						options = Classes;
-					} else if (this.props.prevInput === constants.EXPECTING_WEAPON) {
-						for (var weaponName in Weapons.starter) {
-							if (Weapons.starter.hasOwnProperty(weaponName)) {
-								options.push(weaponName);
-							}
-						}
-					}
-
-					playerMessage = messageGen.getPlayerNo();
-					message = messageGen.getDenyMessage(this.props.prevInput, this.props.name, options);
-					this.props.setInputExpected(this.props.prevInput);
-				} else {
-					playerMessage = messageGen.getPlayerFail();
-					message = messageGen.getFailMessage(this.props.prevInput, this.props.name);
-				}
-				this.props.showMessage(playerMessage, 0);
-				this.props.showMessage(message, 1000); // Display the message
+				this.checkAndValidateConfirmation(input);
 				break;
 			case constants.EXPECTING_MOVEMENT:
-				var wrongWay = { speaker: constants.NARRATOR, line: <p>You can't go that way!</p> };
-
-				if (input.toUpperCase() === "N" || input.toUpperCase().indexOf("NORTH") > -1) {
-					// Make sure it's both on the map and that it's not an obstacle
-					if (this.props.playerPos.y -1 < 0 || this.props.map[this.props.playerPos.y - 1][this.props.playerPos.x].obstacle) {
-						this.props.showMessage(wrongWay, 0);
-					} else {
-						this.props.movePlayer({ x: 0, y: -1 });
-						this.props.showMessage({ speaker: "Narrator", line: <p>You move north.</p> }, 0);
-					}
-				} else if (input.toUpperCase() === "E" || input.toUpperCase().indexOf("EAST") > -1) {
-					if (this.props.playerPos.x + 1 > this.props.map[0].length - 1 || this.props.map[this.props.playerPos.y][this.props.playerPos.x + 1].obstacle) {
-						this.props.showMessage(wrongWay, 0);
-					} else {
-						this.props.movePlayer({ x: 1, y: 0 });
-						this.props.showMessage({ speaker: "Narrator", line: <p>You move east.</p> }, 0);
-					}
-				} else if (input.toUpperCase() === "S" || input.toUpperCase().indexOf("SOUTH") > -1) {
-					if (this.props.playerPos.y + 1 > this.props.map.length - 1 || this.props.map[this.props.playerPos.y + 1][this.props.playerPos.x].obstacle) {
-						this.props.showMessage(wrongWay, 0);
-					} else {
-						this.props.movePlayer({ x: 0, y: 1 });
-						this.props.showMessage({ speaker: "Narrator", line: <p>You move south.</p> }, 0);
-					}
-				} else if (input.toUpperCase() === "W" || input.toUpperCase().indexOf("WEST") > -1) {
-					if (this.props.playerPos.x -1 < 0 || this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].obstacle) {
-						this.props.showMessage(wrongWay, 0);
-					} else {
-						this.props.movePlayer({ x: -1, y: 0 });
-						this.props.showMessage({ speaker: "Narrator", line: <p>You move west.</p> }, 0);
-					}
-				}
-
-				// TODO
+				this.checkAndMovePlayer(input);
 				break;
 			default:
 				console.log("Missing input case for " + this.props.input);

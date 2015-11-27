@@ -1,6 +1,6 @@
 module.exports = {
 	generateMap: function() {
-		var mapSize = 9; // TODO change to be randomised
+		var mapSize = 9; // TODO: change to be randomised
 
 		var map = new Array(mapSize);
 
