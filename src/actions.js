@@ -54,11 +54,11 @@ module.exports = {
 	movePlayer: function(movement) {
 		return { type: constants.MOVE, movement: movement };
 	},
-	resetGame: function() {
+	resetGame: function(timeout) {
 		return function(dispatch) {
 			setTimeout(function() {
 				dispatch({ type: constants.RESET });
-			}, 5000);
+			}, timeout);
 		}
 	}
 };

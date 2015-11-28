@@ -43616,7 +43616,7 @@
 						this.props.setInputExpected(constants.EXPECTING_ANYTHING);
 						break;
 					case constants.EXPECTING_RESET:
-						this.props.resetGame();
+						this.props.resetGame(5000);
 						break;
 					default:
 						console.log("Missing case for confirmation.");
@@ -43792,8 +43792,8 @@
 			movePlayer: function movePlayer(movement) {
 				dispatch(actions.movePlayer(movement));
 			},
-			resetGame: function resetGame() {
-				dispatch(actions.resetGame());
+			resetGame: function resetGame(timeout) {
+				dispatch(actions.resetGame(timeout));
 			}
 		};
 	};
@@ -43862,11 +43862,11 @@
 		movePlayer: function movePlayer(movement) {
 			return { type: constants.MOVE, movement: movement };
 		},
-		resetGame: function resetGame() {
+		resetGame: function resetGame(timeout) {
 			return function (dispatch) {
 				setTimeout(function () {
 					dispatch({ type: constants.RESET });
-				}, 5000);
+				}, timeout);
 			};
 		}
 	};
@@ -57012,7 +57012,8 @@
 	    Grid = __webpack_require__(241).Grid,
 	    Row = __webpack_require__(241).Row,
 	    Col = __webpack_require__(241).Col,
-	    HelpList = __webpack_require__(508);
+	    HelpList = __webpack_require__(508),
+	    EmergencyReset = __webpack_require__(517);
 
 	var Help = React.createClass({
 		displayName: "Help",
@@ -57071,7 +57072,8 @@
 								"Commands"
 							)
 						),
-						rows
+						rows,
+						React.createElement(EmergencyReset, null)
 					)
 				)
 			);
@@ -57192,6 +57194,56 @@
 		"example": "look around",
 		"description": "Look around your current area, taking in what lies in the four cardinal directions."
 	};
+
+/***/ },
+/* 517 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var React = __webpack_require__(1),
+	    ReactDOM = __webpack_require__(208),
+	    ReactRedux = __webpack_require__(209),
+	    actions = __webpack_require__(489),
+	    Row = __webpack_require__(241).Row,
+	    Col = __webpack_require__(241).Col,
+	    Button = __webpack_require__(241).Button;
+
+	var EmergencyReset = React.createClass({
+		displayName: "EmergencyReset",
+
+		handleClick: function handleClick() {
+			localStorage.removeItem("Quest");
+			this.props.resetGame(0);
+		},
+		render: function render() {
+			return React.createElement(
+				Row,
+				null,
+				React.createElement(
+					Col,
+					{ md: 12, style: { textAlign: "center", marginTop: 5 } },
+					"Somehow manage to break everything? Never fear!",
+					React.createElement("br", null),
+					React.createElement(
+						Button,
+						{ bsStyle: "danger", style: { marginTop: 10 }, bsSize: "large", onClick: this.handleClick },
+						"Emergency Reset"
+					)
+				)
+			);
+		}
+	});
+
+	var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+		return {
+			resetGame: function resetGame(timeout) {
+				dispatch(actions.resetGame(timeout));
+			}
+		};
+	};
+
+	module.exports = ReactRedux.connect(null, mapDispatchToProps)(EmergencyReset);
 
 /***/ }
 /******/ ]);

@@ -3,7 +3,8 @@ var React = require("react"),
 	Grid = require("react-bootstrap").Grid,
 	Row = require("react-bootstrap").Row,
 	Col = require("react-bootstrap").Col,
-	HelpList = require("./../data/helplist");
+	HelpList = require("./../data/helplist"),
+	EmergencyReset = require("./emergencyreset");
 
 var Help = React.createClass({
 	displayName: "Help",
@@ -35,6 +36,7 @@ var Help = React.createClass({
 							</Col>
 						</Row>
 						{rows}
+						<EmergencyReset />
 					</Panel>
 				</Col>
 			</Grid>

@@ -249,7 +249,7 @@ var PlayerBar = React.createClass({
 					this.props.setInputExpected(constants.EXPECTING_ANYTHING);
 					break;
 				case constants.EXPECTING_RESET:
-					this.props.resetGame();
+					this.props.resetGame(5000);
 					break;
 				default:
 					console.log("Missing case for confirmation.");
@@ -417,8 +417,8 @@ var mapDispatchToProps = function (dispatch) {
 		movePlayer: function(movement) {
 			dispatch(actions.movePlayer(movement));
 		},
-		resetGame: function() {
-			dispatch(actions.resetGame());
+		resetGame: function(timeout) {
+			dispatch(actions.resetGame(timeout));
 		}
 	}
 };
