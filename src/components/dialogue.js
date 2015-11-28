@@ -8,7 +8,7 @@ var Dialogue = React.createClass({
 	displayName: "Dialogue",
 	propTypes: {
 		speaker: proptypes.string.isRequired,
-		line: proptypes.object.isRequired,
+		line: proptypes.array.isRequired,
 		name: proptypes.string.isRequired
 	},
 	render: function() {
@@ -19,13 +19,19 @@ var Dialogue = React.createClass({
 			name = "";
 		}
 
+		var line = [];
+
+		this.props.line.forEach(function(part, id) {
+			line.push(<span key={id} className={part.className}>{part.text}</span>);
+		}.bind(this));
+
 		return (
 			<Row className={this.props.speaker}>
 				<Col xs={4} md={1}>
 					{name}
 				</Col>
 				<Col xs={12} md={11}>
-					{this.props.line}
+					<p>{line}</p>
 				</Col>
 			</Row>
 		);

@@ -17,5 +17,15 @@ var rootReducer = Redux.combineReducers({
 	world: worldReducer
 });
 
-module.exports = Redux.applyMiddleware(thunk)(Redux.createStore)(rootReducer,initialState());
+const saveLocal = store => next => action => {
+	let result = next(action);
+	localStorage.setItem("Quest", JSON.stringify(store.getState()));
+  	return result;
+};
+
+const savedState = () => {
+	return JSON.parse(localStorage.getItem("Quest"));
+};
+
+module.exports = Redux.applyMiddleware(thunk, saveLocal)(Redux.createStore)(rootReducer, savedState() || initialState());
 

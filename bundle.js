@@ -25596,7 +25596,21 @@
 		world: worldReducer
 	});
 
-	module.exports = Redux.applyMiddleware(thunk)(Redux.createStore)(rootReducer, initialState());
+	var saveLocal = function saveLocal(store) {
+		return function (next) {
+			return function (action) {
+				var result = next(action);
+				localStorage.setItem("Quest", JSON.stringify(store.getState()));
+				return result;
+			};
+		};
+	};
+
+	var savedState = function savedState() {
+		return JSON.parse(localStorage.getItem("Quest"));
+	};
+
+	module.exports = Redux.applyMiddleware(thunk, saveLocal)(Redux.createStore)(rootReducer, savedState() || initialState());
 
 /***/ },
 /* 228 */
@@ -25621,11 +25635,7 @@
 				beforeResetIfConf: constants.EXPECTING_NAME
 			},
 			log: {
-				messages: [{ speaker: constants.WIZARD, line: React.createElement(
-						"p",
-						null,
-						"Hey you there... yes you! The one with the funny... well everything! You're finally awake? Can you speak? Tell me your name."
-					) }]
+				messages: [{ speaker: constants.WIZARD, line: [{ className: constants.WIZARD, text: "Hey you there... yes you! The one with the funny... well everything! You're finally awake? Can you speak? Tell me your name." }] }]
 			},
 			player: {
 				name: "???",
@@ -43296,7 +43306,7 @@
 		displayName: "Dialogue",
 		propTypes: {
 			speaker: proptypes.string.isRequired,
-			line: proptypes.object.isRequired,
+			line: proptypes.array.isRequired,
 			name: proptypes.string.isRequired
 		},
 		render: function render() {
@@ -43306,6 +43316,16 @@
 			} else if (name === "Narrator:") {
 				name = "";
 			}
+
+			var line = [];
+
+			this.props.line.forEach((function (part, id) {
+				line.push(React.createElement(
+					"span",
+					{ key: id, className: part.className },
+					part.text
+				));
+			}).bind(this));
 
 			return React.createElement(
 				Row,
@@ -43318,7 +43338,11 @@
 				React.createElement(
 					Col,
 					{ xs: 12, md: 11 },
-					this.props.line
+					React.createElement(
+						"p",
+						null,
+						line
+					)
 				)
 			);
 		}
@@ -43410,30 +43434,9 @@
 				if (requestedItem) {
 					if (requestedItem.equippable) {
 						this.props.equipItem(requestedItem);
-						this.props.showMessage({ speaker: constants.NARRATOR, line: React.createElement(
-								"p",
-								null,
-								"You equip the ",
-								requestedItem.prefix,
-								" ",
-								React.createElement(
-									"font",
-									{ className: requestedItem.name },
-									requestedItem.name
-								),
-								"."
-							) }, 0);
+						this.props.showMessage({ speaker: constants.NARRATOR, line: [{ text: "You equip the " + requestedItem.prefix + " " }, { className: requestedItem.name, text: requestedItem.name }, { text: "." }] }, 0);
 					} else {
-						this.props.showMessage({ speaker: constants.NARRATOR, line: React.createElement(
-								"p",
-								null,
-								React.createElement(
-									"font",
-									{ className: requestedItem.name },
-									requestedItem.name
-								),
-								" cannot be equipped!"
-							) }, 0);
+						this.props.showMessage({ speaker: constants.NARRATOR, line: [{ className: requestedItem.name, text: requestedItem.name }, { text: " cannot be equipped!" }] }, 0);
 					}
 				} else {
 					this.props.showMessage(messageGen.getNoSuchItemMessage(itemName), 0);
@@ -43453,35 +43456,9 @@
 
 				if (requestedItem) {
 					var prefix = "AEIOU".indexOf(requestedItem.prefix.charAt(0).toUpperCase()) < 0 ? "A" : "An";
-					this.props.showMessage({ speaker: constants.NARRATOR, line: React.createElement(
-							"p",
-							null,
-							prefix,
-							" ",
-							requestedItem.prefix,
-							" ",
-							React.createElement(
-								"font",
-								{ className: requestedItem.name },
-								requestedItem.name
-							),
-							". ",
-							requestedItem.description
-						) }, 0);
+					this.props.showMessage({ speaker: constants.NARRATOR, line: [{ text: prefix + " " + requestedItem.prefix + " " }, { className: requestedItem.name, text: requestedItem.name }, { text: ". " + requestedItem.description }] }, 0);
 					if (requestedItem.type === constants.WEAPON || requestedItem.type === constants.ARMOUR) {
-						this.props.showMessage({ speaker: constants.NARRATOR, line: React.createElement(
-								"p",
-								null,
-								"The stats are Strength: ",
-								requestedItem.stats.str,
-								", Magic: ",
-								requestedItem.stats.mag,
-								", Dexterity: ",
-								requestedItem.stats.dex,
-								", and Defence: ",
-								requestedItem.stats.def,
-								"."
-							) }, 0);
+						this.props.showMessage({ speaker: constants.NARRATOR, line: [{ text: "The stats are Strength: " + requestedItem.stats.str + ", Magic: " + requestedItem.stats.mag + ", Dexterity: " + requestedItem.stats.dex + ", and Defence: " + requestedItem.stats.def + "." }] }, 0);
 					}
 				} else {
 					this.props.showMessage(messageGen.getNoSuchItemMessage(itemName), 0);
@@ -43515,42 +43492,19 @@
 				message += (this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].description || this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].type) + ". ";
 			}
 
-			this.props.showMessage({ speaker: constants.NARRATOR, line: React.createElement(
-					"p",
-					null,
-					message
-				) }, 0);
+			this.props.showMessage({ speaker: constants.NARRATOR, line: [{ text: message }] }, 0);
 		},
 		checkAndSetName: function checkAndSetName(input) {
 			// Validate the length of the name
 			var message;
 			if (input.length > constants.MAX_NAME_LENGTH || input.length < constants.MIN_NAME_LENGTH) {
-				message = { speaker: constants.WIZARD, line: React.createElement(
-						"p",
-						null,
-						"Hmmm... are you sure about that? Around here, names are usually between ",
-						constants.MIN_NAME_LENGTH,
-						" and ",
-						constants.MAX_NAME_LENGTH,
-						" characters in length! How about trying again?"
-					) };
+				message = { speaker: constants.WIZARD, line: [{ text: "Hmmm... are you sure about that? Around here, names are usually between " + constants.MIN_NAME_LENGTH + " and " + constants.MAX_NAME_LENGTH + " characters in length! How about trying again?" }] };
 			} else {
-				message = { speaker: constants.WIZARD, line: React.createElement(
-						"p",
-						null,
-						input,
-						" you say? Weird name... are you sure about that?"
-					) };
+				message = { speaker: constants.WIZARD, line: [{ text: input + " you say? Weird name... are you sure about that?" }] };
 				this.props.setName(input);
 				this.props.setInputExpected(constants.EXPECTING_CONF);
 			}
-			this.props.showMessage({ speaker: constants.PLAYER, line: React.createElement(
-					"p",
-					null,
-					"I'm ",
-					input,
-					"."
-				) }, 0);
+			this.props.showMessage({ speaker: constants.PLAYER, line: [{ text: "I'm " + input + "." }] }, 0);
 			this.props.showMessage(message, 1000); // Display the message
 		},
 		checkAndSelectRace: function checkAndSelectRace(input) {
@@ -43579,30 +43533,8 @@
 
 			if (valid) {
 				var prefix = "AEIOU".indexOf(input.charAt(0).toUpperCase()) < 0 ? "A" : "An";
-				playerMessage = { speaker: constants.PLAYER, line: React.createElement(
-						"p",
-						null,
-						"I'm ",
-						prefix.toLowerCase(),
-						" ",
-						chosenRace,
-						"... I think?"
-					) };
-				message = { speaker: constants.WIZARD, line: React.createElement(
-						"p",
-						null,
-						"Aha! ",
-						prefix,
-						" ",
-						React.createElement(
-							"font",
-							{ className: chosenRace },
-							chosenRace
-						),
-						" eh? ",
-						Classes[chosenRace].description,
-						" Are you sure about this?"
-					) };
+				playerMessage = { speaker: constants.PLAYER, line: [{ text: "I'm " + prefix.toLowerCase() + " " + chosenRace + "... I think?" }] };
+				message = { speaker: constants.WIZARD, line: [{ text: "Aha! " + prefix + " " }, { className: chosenRace, text: chosenRace }, { text: " eh? " + Classes[chosenRace].description + " Are you sure about this?" }] };
 				this.props.setStats(Classes[chosenRace].stats);
 				this.props.setInputExpected(constants.EXPECTING_CONF);
 			} else {
@@ -43640,20 +43572,8 @@
 			}
 
 			if (valid) {
-				playerMessage = { speaker: constants.PLAYER, line: React.createElement(
-						"p",
-						null,
-						"I think I'll take the ",
-						chosenWeapon.name,
-						"."
-					) };
-				message = { speaker: constants.WIZARD, line: React.createElement(
-						"p",
-						null,
-						"A fine choice! ",
-						chosenWeapon.description,
-						" Is this what you really want?"
-					) };
+				playerMessage = { speaker: constants.PLAYER, line: [{ text: "I think I'll take the " + chosenWeapon.name + "." }] };
+				message = { speaker: constants.WIZARD, line: [{ text: "A fine choice! " + chosenWeapon.description + " Is this what you really want?" }] };
 				if (this.props.inventory.length > 0) {
 					// Remove the item if it was added in a previous cycle
 					this.props.removeItem(this.props.inventory[this.props.inventory.length - 1]);
@@ -43680,11 +43600,7 @@
 						this.props.setInputExpected(constants.EXPECTING_RACE);
 						break;
 					case constants.EXPECTING_RACE:
-						this.props.showMessage({ speaker: constants.NARRATOR, line: React.createElement(
-								"p",
-								null,
-								"Your status has been updated!"
-							) }, 2000);
+						this.props.showMessage({ speaker: constants.NARRATOR, line: [{ text: "Your status has been updated!" }] }, 2000);
 						this.props.setDisplayStats(true, 2000);
 						this.props.showMessage(messageGen.getWeaponMessage(this.props.name, Weapons.starter), 3000);
 						this.props.setInputExpected(constants.EXPECTING_WEAPON);
@@ -43693,40 +43609,10 @@
 						var latestItem = this.props.inventory[this.props.inventory.length - 1];
 						var prefix = "AEIOU".indexOf(latestItem.name.charAt(0).toUpperCase()) < 0 ? "A" : "An";
 						var has = latestItem.isPlural ? "have" : "has";
-						this.props.showMessage({ speaker: constants.NARRATOR, line: React.createElement(
-								"p",
-								null,
-								prefix,
-								" ",
-								latestItem.prefix,
-								" ",
-								React.createElement(
-									"font",
-									{ className: latestItem.name },
-									latestItem.name
-								),
-								" ",
-								has,
-								" been added to your inventory!"
-							) }, 2000);
+						this.props.showMessage({ speaker: constants.NARRATOR, line: [{ text: prefix + " " + latestItem.prefix + " " }, { className: latestItem.name, text: latestItem.name }, { text: " " + has + " been added to your inventory!" }] }, 2000);
 						this.props.setDisplayInventory(true, 2000);
-						this.props.showMessage({ speaker: constants.WIZARD, line: React.createElement(
-								"p",
-								null,
-								"Don't forget to equip it before you head out into the world by using ",
-								React.createElement(
-									"font",
-									{ className: "confirm" },
-									"equip ",
-									latestItem.name
-								),
-								"! Not my fault if you end up running around unarmed!"
-							) }, 3000);
-						this.props.showMessage({ speaker: constants.WIZARD, line: React.createElement(
-								"p",
-								null,
-								"Ah, I can see from the look on your face that you have questions. Out with it then!"
-							) }, 4000);
+						this.props.showMessage({ speaker: constants.WIZARD, line: [{ text: "Don't forget to equip it before you head out into the world by using " }, { className: "confirm", text: "equip " + latestItem.name }, { text: "! Not my fault if you end up running around unarmed!" }] }, 3000);
+						this.props.showMessage({ speaker: constants.WIZARD, line: [{ text: "Ah, I can see from the look on your face that you have questions. Out with it then!" }] }, 4000);
 						this.props.setInputExpected(constants.EXPECTING_ANYTHING);
 						break;
 					case constants.EXPECTING_RESET:
@@ -43761,11 +43647,7 @@
 			this.props.showMessage(message, 1000); // Display the message
 		},
 		checkAndMovePlayer: function checkAndMovePlayer(input) {
-			var wrongWay = { speaker: constants.NARRATOR, line: React.createElement(
-					"p",
-					null,
-					"You can't go that way!"
-				) };
+			var wrongWay = { speaker: constants.NARRATOR, line: [{ text: "You can't go that way!" }] };
 
 			if (input.toUpperCase() === "N" || input.toUpperCase().indexOf("NORTH") > -1) {
 				// Make sure it's both on the map and that it's not an obstacle
@@ -43773,44 +43655,28 @@
 					this.props.showMessage(wrongWay, 0);
 				} else {
 					this.props.movePlayer({ x: 0, y: -1 });
-					this.props.showMessage({ speaker: constants.NARRATOR, line: React.createElement(
-							"p",
-							null,
-							"You move north."
-						) }, 0);
+					this.props.showMessage({ speaker: constants.NARRATOR, line: [{ text: "You move north." }] }, 0);
 				}
 			} else if (input.toUpperCase() === "E" || input.toUpperCase().indexOf("EAST") > -1) {
 				if (this.props.playerPos.x + 1 > this.props.map[0].length - 1 || this.props.map[this.props.playerPos.y][this.props.playerPos.x + 1].obstacle) {
 					this.props.showMessage(wrongWay, 0);
 				} else {
 					this.props.movePlayer({ x: 1, y: 0 });
-					this.props.showMessage({ speaker: constants.NARRATOR, line: React.createElement(
-							"p",
-							null,
-							"You move east."
-						) }, 0);
+					this.props.showMessage({ speaker: constants.NARRATOR, line: [{ text: "You move east." }] }, 0);
 				}
 			} else if (input.toUpperCase() === "S" || input.toUpperCase().indexOf("SOUTH") > -1) {
 				if (this.props.playerPos.y + 1 > this.props.map.length - 1 || this.props.map[this.props.playerPos.y + 1][this.props.playerPos.x].obstacle) {
 					this.props.showMessage(wrongWay, 0);
 				} else {
 					this.props.movePlayer({ x: 0, y: 1 });
-					this.props.showMessage({ speaker: constants.NARRATOR, line: React.createElement(
-							"p",
-							null,
-							"You move south."
-						) }, 0);
+					this.props.showMessage({ speaker: constants.NARRATOR, line: [{ text: "You move south." }] }, 0);
 				}
 			} else if (input.toUpperCase() === "W" || input.toUpperCase().indexOf("WEST") > -1) {
 				if (this.props.playerPos.x - 1 < 0 || this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].obstacle) {
 					this.props.showMessage(wrongWay, 0);
 				} else {
 					this.props.movePlayer({ x: -1, y: 0 });
-					this.props.showMessage({ speaker: constants.NARRATOR, line: React.createElement(
-							"p",
-							null,
-							"You move west."
-						) }, 0);
+					this.props.showMessage({ speaker: constants.NARRATOR, line: [{ text: "You move west." }] }, 0);
 				}
 			}
 
@@ -43820,11 +43686,7 @@
 			// TODO: IMPORANT - MAKE THIS METHOD MUCH SMALLER
 			if (input.split(" ")[0].toUpperCase() === "RESET") {
 				// If they want to give up and reset the game
-				this.props.showMessage({ speaker: constants.PLAYER, line: React.createElement(
-						"p",
-						null,
-						"I can't take this anymore..."
-					) }, 0);
+				this.props.showMessage({ speaker: constants.PLAYER, line: [{ text: "I can't take this anymore..." }] }, 0);
 				this.props.showMessage(messageGen.getResetMessage(this.props.name), 1000);
 				this.props.setInputExpected(constants.EXPECTING_RESET);
 				this.props.setInputExpected(constants.EXPECTING_CONF);
@@ -43857,22 +43719,8 @@
 				case constants.EXPECTING_ANYTHING:
 					// Making fun of the player at the end of the Wizard's intro
 					this.props.showMessage(messageGen.getPlayerFail(), 0);
-					this.props.showMessage({ speaker: constants.WIZARD, line: React.createElement(
-							"p",
-							null,
-							"Oh, that's a pity... Well off with you then! Time to save the world or something!"
-						) }, 1000);
-					this.props.showMessage({ speaker: constants.NARRATOR, line: React.createElement(
-							"p",
-							null,
-							"With a strength belying his frail physique, the ",
-							React.createElement(
-								"font",
-								{ className: constants.WIZARD },
-								constants.WIZARD
-							),
-							" thrusts you from his crumbling tower and out into the unknown world..."
-						) }, 2000);
+					this.props.showMessage({ speaker: constants.WIZARD, line: [{ text: "Oh, that's a pity... Well off with you then! Time to save the world or something!" }] }, 1000);
+					this.props.showMessage({ speaker: constants.NARRATOR, line: [{ text: "With a strength belying his frail physique, the " }, { className: constants.WIZARD, text: constants.WIZARD }, { text: " thrusts you from his crumbling tower and out into the unknown world..." }] }, 2000);
 					this.props.showMessage(messageGen.getAfterWizardMessage(), 4000);
 					this.props.showMessage(messageGen.getMapIntroMessage(), 6000);
 					this.props.showMessage(messageGen.getMapAddedMessage(), 8000);
@@ -44036,72 +43884,34 @@
 		getConfirmMessage: function getConfirmMessage(prevInput, name, option) {
 			switch (prevInput) {
 				case constants.EXPECTING_NAME:
-					return { speaker: constants.WIZARD, line: React.createElement(
-							"p",
-							null,
-							"Great! Then I'll call you ",
-							name,
-							" from now on."
-						) };
+					return { speaker: constants.WIZARD, line: [{ className: constants.WIZARD, text: "Great! Then I'll call you " + name + " from now on." }] };
 				case constants.EXPECTING_RACE:
-					return { speaker: constants.WIZARD, line: React.createElement(
-							"p",
-							null,
-							"Excellent! At least it seems you're sure of something..."
-						) };
+					return { speaker: constants.WIZARD, line: [{ className: constants.WIZARD, text: "Excellent! At least it seems you're sure of something..." }] };
 				case constants.EXPECTING_WEAPON:
-					return { speaker: constants.WIZARD, line: React.createElement(
-							"p",
-							null,
-							"Fantastic! I'm sure it will serve you well in the trials to come."
-						) };
+					return { speaker: constants.WIZARD, line: [{ className: constants.WIZARD, text: "Fantastic! I'm sure it will serve you well in the trials to come." }] };
 				case constants.EXPECTING_RESET:
-					return { speaker: constants.FINAL_BOSS, line: React.createElement(
-							"p",
-							null,
-							"Ah well. Guess I win then?"
-						) };
+					return { speaker: constants.FINAL_BOSS, line: [{ className: constants.FINAL_BOSS, text: "Ah well. Guess I win then?" }] };
 				default:
 					console.log("Missing confirm message for " + prevInput);
-					return { speaker: constants.NARRATOR, line: React.createElement(
-							"p",
-							null,
-							"Whoops! Looks like some sort of error occurred... silly me!"
-						) };
+					return { speaker: constants.NARRATOR, line: [{ className: constants.NARRATOR, text: "Whoops! Looks like some sort of error occurred... silly me!" }] };
 			}
 		},
 		getDenyMessage: function getDenyMessage(prevInput, name, options) {
 			switch (prevInput) {
 				case constants.EXPECTING_NAME:
-					return { speaker: constants.WIZARD, line: React.createElement(
-							"p",
-							null,
-							"Alright, how about we try this again. What is your name?"
-						) };
+					return { speaker: constants.WIZARD, line: [{ className: constants.WIZARD, text: "Alright, how about we try this again. What is your name?" }] };
 				case constants.EXPECTING_RACE:
 					return this.getRaceMessage(name, options);
 				case constants.EXPECTING_WEAPON:
-					var lines = this.getMultiOptionLines(options);
-					return { speaker: constants.WIZARD, line: React.createElement(
-							"p",
-							null,
-							"Let's try again. Pick something to hit things with. ",
-							lines,
-							"?"
-						) };
+					var optionLines = this.getMultiOptionLines(options);
+					var line = [{ className: constants.WIZARD, text: "Let's try again. Pick something to hit things with. " }, { className: constants.WIZARD, text: "?" }];
+					line.splice.apply(line, [1, 0].concat(optionLines));
+					return { speaker: constants.WIZARD, line: line };
 				case constants.EXPECTING_RESET:
-					return { speaker: constants.FINAL_BOSS, line: React.createElement(
-							"p",
-							null,
-							"Well that's a relief! Better get back to what you were doing... I'll just be over here creating an oppressive reign of terror or whatever it is that I do..."
-						) };
+					return { speaker: constants.FINAL_BOSS, line: [{ className: constants.FINAL_BOSS, text: "Well that's a relief! Better get back to what you were doing... I'll just be over here creating an oppressive reign of terror or whatever it is that I do..." }] };
 				default:
 					console.log("Missing deny message for " + prevInput);
-					return { speaker: constants.NARRATOR, line: React.createElement(
-							"p",
-							null,
-							"Whoops! Looks like some sort of error occurred... silly me!"
-						) };
+					return { speaker: constants.NARRATOR, line: [{ className: constants.NARRATOR, text: "Whoops! Looks like some sort of error occurred... silly me!" }] };
 			}
 		},
 		getFailMessage: function getFailMessage(prevInput, name) {
@@ -44109,25 +43919,7 @@
 				case constants.EXPECTING_NAME:
 				case constants.EXPECTING_RACE:
 				case constants.EXPECTING_WEAPON:
-					var yes = React.createElement(
-						"font",
-						{ className: "confirm" },
-						"yes"
-					);
-					var no = React.createElement(
-						"font",
-						{ className: "deny" },
-						"no"
-					);
-					return { speaker: constants.WIZARD, line: React.createElement(
-							"p",
-							null,
-							"I'm sorry, I have no idea what you're trying to say... It's a ",
-							yes,
-							" or ",
-							no,
-							" question!"
-						) };
+					return { speaker: constants.WIZARD, line: [{ className: constants.WIZARD, text: "I'm sorry, I have no idea what you're trying to say... It's a " }, { className: "confirm", text: "yes" }, { className: constants.WIZARD, text: " or " }, { className: "deny", text: "no" }, { className: constants.WIZARD, text: " question!" }] };
 				case constants.EXPECTING_RESET:
 					var yes = React.createElement(
 						"font",
@@ -44139,22 +43931,10 @@
 						{ className: "deny" },
 						"no"
 					);
-					return { speaker: constants.FINAL_BOSS, line: React.createElement(
-							"p",
-							null,
-							"What on earth is that supposed to mean? All I need is a simple ",
-							yes,
-							" or ",
-							no,
-							"!"
-						) };
+					return { speaker: constants.FINAL_BOSS, line: [{ className: constants.FINAL_BOSS, text: "What on earth is that supposed to mean? All I need is a simple " }, { className: "confirm", text: "yes" }, { className: constants.FINAL_BOSS, text: " or " }, { className: "deny", text: "no" }, { className: constants.FINAL_BOSS, text: "!" }] };
 				default:
 					console.log("Missing fail message for " + prevInput + " confirmation.");
-					return { speaker: constants.NARRATOR, line: React.createElement(
-							"p",
-							null,
-							"Whoops! Looks like some sort of error occurred... silly me!"
-						) };
+					return { speaker: constants.NARRATOR, line: [{ className: constants.NARRATOR, text: "Whoops! Looks like some sort of error occurred... silly me!" }] };
 			}
 		},
 		getMultiChoiceFailMessage: function getMultiChoiceFailMessage(input, options, name) {
@@ -44162,21 +43942,12 @@
 				case constants.EXPECTING_WEAPON:
 				case constants.EXPECTING_RACE:
 					var optionLines = this.getMultiOptionLines(options);
-
-					return { speaker: constants.WIZARD, line: React.createElement(
-							"p",
-							null,
-							"I'm not sure what that's supposed to mean... The options are ",
-							optionLines,
-							"."
-						) };
+					var line = [{ className: constants.WIZARD, text: "I'm not sure what that's supposed to mean... The options are " }, { className: constants.WIZARD, text: "." }];
+					line.splice.apply(line, [1, 0].concat(optionLines));
+					return { speaker: constants.WIZARD, line: line };
 				default:
 					console.log("Missing npc fail message for: " + input);
-					return { speaker: constants.NARRATOR, line: React.createElement(
-							"p",
-							null,
-							"Whoops! Looks like some sort of error occurred... silly me!"
-						) };
+					return { speaker: constants.NARRATOR, line: [{ className: constants.NARRATOR, text: "Whoops! Looks like some sort of error occurred... silly me!" }] };
 			}
 		},
 		getMultiOptionLines: function getMultiOptionLines(options) {
@@ -44189,26 +43960,11 @@
 			options.forEach((function (option, id) {
 				if (!firstLine) {
 					var or = id === options.length - 1 ? "or " : "";
-					optionLines.push(React.createElement(
-						"font",
-						{ key: id },
-						comma,
-						" ",
-						or,
-						React.createElement(
-							"font",
-							{ className: option },
-							option
-						)
-					));
+					optionLines.push({ text: comma + " " + or + " " });
+					optionLines.push({ className: option, text: option });
 				} else {
 					firstLine = false;
-					optionLines.push(React.createElement(
-						"font",
-						{ className: option, key: id },
-						" ",
-						option
-					));
+					optionLines.push({ className: option, text: " " + option });
 				}
 			}).bind(this));
 
@@ -44226,44 +43982,20 @@
 					var race = classes[raceName];
 					var prefix = "AEIOU".indexOf(race.name.charAt(0).toUpperCase()) < 0 ? "A" : "An";
 					if (!firstLoop) {
-						races.push(React.createElement(
-							"font",
-							{ key: race.name },
-							prefix,
-							" ",
-							React.createElement(
-								"font",
-								{ className: race.name },
-								race.name
-							),
-							"? "
-						));
+						races.push({ text: prefix + " " });
+						races.push({ className: race.name, text: race.name });
+						races.push({ text: "? " });
 					} else {
-						races.push(React.createElement(
-							"font",
-							{ key: race.name },
-							"Are you ",
-							prefix.toLowerCase(),
-							" ",
-							React.createElement(
-								"font",
-								{ className: race.name },
-								race.name
-							),
-							"? "
-						));
+						races.push({ text: "Are you " + prefix.toLowerCase() + " " });
+						races.push({ className: race.name, text: race.name });
+						races.push({ text: "? " });
 						firstLoop = false;
 					}
 				}
 			}
-			return { speaker: constants.WIZARD, line: React.createElement(
-					"p",
-					null,
-					"So what are you ",
-					name,
-					"? ",
-					races
-				) };
+			var line = [{ text: "So what are you " + name + "? " }];
+			line.splice.apply(line, [1, 0].concat(races));
+			return { speaker: constants.WIZARD, line: line };
 		},
 		getWeaponMessage: function getWeaponMessage(name, starterWeapons) {
 			var weapons = [];
@@ -44277,154 +44009,50 @@
 					var choices = ["Maybe ", "Or perhaps ", ""];
 					var rand = Math.floor(Math.random() * choices.length);
 					prefix = rand === choices.length - 1 ? prefix : choices[rand] + prefix.toLowerCase();
-					weapons.push(React.createElement(
-						"font",
-						{ key: weaponName },
-						prefix,
-						" ",
-						React.createElement(
-							"font",
-							{ className: weaponName },
-							weaponName
-						),
-						"? "
-					));
+					weapons.push({ text: prefix + " " });
+					weapons.push({ className: weaponName, text: weaponName });
+					weapons.push({ text: "? " });
 				} else {
-					weapons.push(React.createElement(
-						"font",
-						{ key: weaponName },
-						"How about ",
-						prefix.toLowerCase(),
-						" ",
-						React.createElement(
-							"font",
-							{ className: weaponName },
-							weaponName
-						),
-						"? "
-					));
+					weapons.push({ text: "How about " + prefix.toLowerCase() + " " });
+					weapons.push({ className: weaponName, text: weaponName });
+					weapons.push({ text: "? " });
 					firstLoop = false;
 				}
 			}
-			return { speaker: constants.WIZARD, line: React.createElement(
-					"p",
-					null,
-					"Hmm... Come to think of it, we can't very well send you out unarmed now, can we? What's your weapon of choice? ",
-					weapons
-				) };
+			var line = [{ text: "Hmm... Come to think of it, we can't very well send you out unarmed now, can we? What's your weapon of choice? " }];
+			line.splice.apply(line, [1, 0].concat(weapons));
+			return { speaker: constants.WIZARD, line: line };
 		},
 		getPlayerYes: function getPlayerYes() {
-			return { speaker: constants.PLAYER, line: React.createElement(
-					"p",
-					null,
-					"Yes."
-				) };
+			return { speaker: constants.PLAYER, line: [{ text: "Yes" }] };
 		},
 		getPlayerNo: function getPlayerNo() {
-			return { speaker: constants.PLAYER, line: React.createElement(
-					"p",
-					null,
-					"No."
-				) };
+			return { speaker: constants.PLAYER, line: [{ text: "No" }] };
 		},
 		getPlayerFail: function getPlayerFail() {
-			var failLines = [React.createElement(
-				"p",
-				null,
-				"*incomprehensible garbling*"
-			), React.createElement(
-				"p",
-				null,
-				"*clucks like a chicken*"
-			)];
-			return { speaker: constants.PLAYER, line: failLines[Math.floor(Math.random() * failLines.length)] };
+			var failLines = ["*incomprehensible garbling*", "*clucks like a chicken*"];
+			return { speaker: constants.PLAYER, line: [{ className: constants.PLAYER, text: failLines[Math.floor(Math.random() * failLines.length)] }] };
 		},
 		getNoSuchItemMessage: function getNoSuchItemMessage(itemName) {
-			return { speaker: constants.NARRATOR, line: React.createElement(
-					"p",
-					null,
-					"You don't currently possess an item of name ",
-					React.createElement(
-						"font",
-						{ className: "deny" },
-						itemName
-					),
-					"!"
-				) };
+			return { speaker: constants.NARRATOR, line: [{ text: "You don't currently possess an item of name " }, { className: "deny", text: itemName }, { text: "!" }] };
 		},
 		getResetMessage: function getResetMessage(name) {
-			return { speaker: constants.FINAL_BOSS, line: React.createElement(
-					"p",
-					null,
-					"Whoa there ",
-					name,
-					"! Are you absolutely certain you want to throw in the towel and let me have my way with the world? That doesn't sound very fun..."
-				) };
+			return { speaker: constants.FINAL_BOSS, line: [{ text: "Whoa there " + name + "! Are you absolutely certain you want to throw in the towel and let me have my way with the world? That doesn't sound very fun..." }] };
 		},
 		getAfterWizardMessage: function getAfterWizardMessage() {
-			return { speaker: constants.NARRATOR, line: React.createElement(
-					"p",
-					null,
-					"Stepping forth into the blinding sunlight, you immediately find yourself confronted by a young ",
-					React.createElement(
-						"font",
-						{ className: constants.ELF },
-						constants.ELF
-					),
-					", suspended upside-down from the branches of a nearby tree."
-				) };
+			return { speaker: constants.NARRATOR, line: [{ text: "Stepping forth into the blinding sunlight, you immediately find yourself confronted by a young " }, { className: constants.ELF, text: constants.ELF }, { text: ", suspended upside-down from the branches of a nearby tree." }] };
 		},
 		getMapIntroMessage: function getMapIntroMessage() {
-			return { speaker: constants.ELF, line: React.createElement(
-					"p",
-					null,
-					"Oh. You must be the latest vic- uh... hero. ",
-					React.createElement(
-						"font",
-						{ className: constants.Player },
-						"Hero"
-					),
-					". Right. I don't really want to but I'm supposed to give you this ah uh... ",
-					React.createElement(
-						"font",
-						{ className: "Map" },
-						"Magic Map"
-					),
-					". As long as you draw on it while you walk, you should probably be able to navigate with it!"
-				) };
+			return { speaker: constants.ELF, line: [{ text: "Oh. You must be the latest vic- uh... hero. " }, { className: constants.PLAYER, text: "Hero" }, { text: ". Right. I don't really want to but I'm supposed to give you this ah uh... " }, { className: "Map", text: "Magic Map" }, { text: ". As long as you draw on it while you walk, you should probably be able to navigate with it!" }] };
 		},
 		getMapAddedMessage: function getMapAddedMessage() {
-			return { speaker: constants.NARRATOR, line: React.createElement(
-					"p",
-					null,
-					"A useless blank piece of pa- uh ",
-					React.createElement(
-						"font",
-						{ className: "Map" },
-						"Magic Map"
-					),
-					"! is forcibly inserted into your inventory!"
-				) };
+			return { speaker: constants.NARRATOR, line: [{ text: "A useless blank piece of pa- uh " }, { className: "Map", text: "Magic Map" }, { text: " is forcibly inserted into your inventory!" }] };
 		},
 		getMapContMessage: function getMapContMessage() {
-			return { speaker: constants.ELF, line: React.createElement(
-					"p",
-					null,
-					"Now remember, this doesn't mean we're friends or anything!"
-				) };
+			return { speaker: constants.ELF, line: [{ text: "Now remember, this doesn't mean we're friends or anything!" }] };
 		},
 		getElfLeaveMessage: function getElfLeaveMessage() {
-			return { speaker: constants.NARRATOR, line: React.createElement(
-					"p",
-					null,
-					"The ",
-					React.createElement(
-						"font",
-						{ className: constants.ELF },
-						constants.ELF
-					),
-					" gives you one last glance before pulling herself up into the tree and vanishing from sight, leaving you to wonder why she had ever appeared in the first place. You are now free to roam. Perhaps you should start by looking around?"
-				) };
+			return { speaker: constants.NARRATOR, line: [{ text: "The " }, { className: constants.ELF, text: constants.ELF }, { text: " gives you one last glance before pulling herself up into the tree and vanishing from sight, leaving you to wonder why she had ever appeared in the first place. You are now free to roam. Perhaps you should start by looking around?" }] };
 		}
 	};
 

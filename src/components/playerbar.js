@@ -71,9 +71,9 @@ var PlayerBar = React.createClass({
 			if (requestedItem) {
 				if (requestedItem.equippable) {
 					this.props.equipItem(requestedItem);
-					this.props.showMessage({ speaker: constants.NARRATOR, line: <p>You equip the {requestedItem.prefix} <font className={requestedItem.name}>{requestedItem.name}</font>.</p> }, 0);
+					this.props.showMessage({ speaker: constants.NARRATOR, line: [ { text: "You equip the " + requestedItem.prefix + " " }, { className: requestedItem.name, text: requestedItem.name }, { text: "." } ] }, 0);
 				} else {
-					this.props.showMessage({ speaker: constants.NARRATOR, line: <p><font className={requestedItem.name}>{requestedItem.name}</font> cannot be equipped!</p> }, 0);
+					this.props.showMessage({ speaker: constants.NARRATOR, line: [ { className: requestedItem.name, text: requestedItem.name }, { text: " cannot be equipped!" } ] }, 0);
 				}
 			} else {
 				this.props.showMessage(messageGen.getNoSuchItemMessage(itemName), 0);
@@ -93,9 +93,9 @@ var PlayerBar = React.createClass({
 
 			if (requestedItem) {
 				var prefix = ("AEIOU".indexOf(requestedItem.prefix.charAt(0).toUpperCase()) < 0) ? "A" : "An";
-				this.props.showMessage({ speaker: constants.NARRATOR, line: <p>{prefix} {requestedItem.prefix} <font className={requestedItem.name}>{requestedItem.name}</font>. {requestedItem.description}</p> }, 0);
+				this.props.showMessage({ speaker: constants.NARRATOR, line: [ { text: prefix + " " + requestedItem.prefix + " " }, { className: requestedItem.name, text: requestedItem.name }, { text: ". " + requestedItem.description } ] }, 0);
 				if (requestedItem.type === constants.WEAPON || requestedItem.type === constants.ARMOUR) {
-					this.props.showMessage({ speaker: constants.NARRATOR, line: <p>The stats are Strength: {requestedItem.stats.str}, Magic: {requestedItem.stats.mag}, Dexterity: {requestedItem.stats.dex}, and Defence: {requestedItem.stats.def}.</p> }, 0);
+					this.props.showMessage({ speaker: constants.NARRATOR, line: [ { text: "The stats are Strength: " + requestedItem.stats.str + ", Magic: " + requestedItem.stats.mag + ", Dexterity: " + requestedItem.stats.dex + ", and Defence: " + requestedItem.stats.def + "." } ] }, 0);
 				}
 			} else {
 				this.props.showMessage(messageGen.getNoSuchItemMessage(itemName), 0);
@@ -129,19 +129,19 @@ var PlayerBar = React.createClass({
 			message += (this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].description || this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].type) + ". ";
 		}
 
-		this.props.showMessage({ speaker: constants.NARRATOR, line: <p>{message}</p> }, 0);
+		this.props.showMessage({ speaker: constants.NARRATOR, line: [ { text: message } ] }, 0);
 	},
 	checkAndSetName: function(input) {
 		// Validate the length of the name
 		var message;
 		if (input.length > constants.MAX_NAME_LENGTH || input.length < constants.MIN_NAME_LENGTH) {
-			message = { speaker: constants.WIZARD, line: <p>Hmmm... are you sure about that? Around here, names are usually between {constants.MIN_NAME_LENGTH} and {constants.MAX_NAME_LENGTH} characters in length! How about trying again?</p> };
+			message = { speaker: constants.WIZARD, line: [ { text: "Hmmm... are you sure about that? Around here, names are usually between " + constants.MIN_NAME_LENGTH + " and " + constants.MAX_NAME_LENGTH + " characters in length! How about trying again?" } ] };
 		} else {
-			message = { speaker: constants.WIZARD, line: <p>{input} you say? Weird name... are you sure about that?</p> };
+			message = { speaker: constants.WIZARD, line: [ { text: input + " you say? Weird name... are you sure about that?" } ] };
 			this.props.setName(input);
 			this.props.setInputExpected(constants.EXPECTING_CONF);
 		}
-		this.props.showMessage({ speaker: constants.PLAYER, line: <p>I'm {input}.</p> }, 0);
+		this.props.showMessage({ speaker: constants.PLAYER, line: [ { text: "I'm " + input + "." } ] }, 0);
 		this.props.showMessage(message, 1000); // Display the message
 	},
 	checkAndSelectRace: function(input) {
@@ -169,8 +169,8 @@ var PlayerBar = React.createClass({
 
 		if (valid) {
 			var prefix = ("AEIOU".indexOf(input.charAt(0).toUpperCase()) < 0) ? "A" : "An";
-			playerMessage = { speaker: constants.PLAYER, line: <p>I'm {prefix.toLowerCase()} {chosenRace}... I think?</p> };
-			message = { speaker: constants.WIZARD, line: <p>Aha! {prefix} <font className={chosenRace}>{chosenRace}</font> eh? {Classes[chosenRace].description} Are you sure about this?</p>};
+			playerMessage = { speaker: constants.PLAYER, line: [ { text: "I'm " + prefix.toLowerCase() + " " + chosenRace + "... I think?" } ] };
+			message = { speaker: constants.WIZARD, line: [ { text: "Aha! " + prefix + " " }, { className: chosenRace, text: chosenRace }, { text: " eh? " + Classes[chosenRace].description + " Are you sure about this?" } ] };
 			this.props.setStats(Classes[chosenRace].stats);
 			this.props.setInputExpected(constants.EXPECTING_CONF);
 		} else { // If it's not a valid race then we do a fail again
@@ -206,8 +206,8 @@ var PlayerBar = React.createClass({
 		}
 
 		if (valid) {
-			playerMessage = { speaker: constants.PLAYER, line: <p>I think I'll take the {chosenWeapon.name}.</p> };
-			message = { speaker: constants.WIZARD, line: <p>A fine choice! {chosenWeapon.description} Is this what you really want?</p> };
+			playerMessage = { speaker: constants.PLAYER, line: [ { text: "I think I'll take the " + chosenWeapon.name + "." } ] };
+			message = { speaker: constants.WIZARD, line: [ { text: "A fine choice! " + chosenWeapon.description + " Is this what you really want?" } ] };
 			if (this.props.inventory.length > 0) { // Remove the item if it was added in a previous cycle
 				this.props.removeItem(this.props.inventory[this.props.inventory.length-1]);
 			}
@@ -233,7 +233,7 @@ var PlayerBar = React.createClass({
 					this.props.setInputExpected(constants.EXPECTING_RACE);
 					break;
 				case constants.EXPECTING_RACE:
-					this.props.showMessage({ speaker: constants.NARRATOR, line: <p>Your status has been updated!</p> }, 2000);
+					this.props.showMessage({ speaker: constants.NARRATOR, line: [ { text: "Your status has been updated!" } ] }, 2000);
 					this.props.setDisplayStats(true, 2000);
 					this.props.showMessage(messageGen.getWeaponMessage(this.props.name, Weapons.starter), 3000);
 					this.props.setInputExpected(constants.EXPECTING_WEAPON);
@@ -242,10 +242,10 @@ var PlayerBar = React.createClass({
 					var latestItem = this.props.inventory[this.props.inventory.length-1];
 					var prefix = ("AEIOU".indexOf(latestItem.name.charAt(0).toUpperCase()) < 0) ? "A" : "An";
 					var has = (latestItem.isPlural) ? "have" : "has";
-					this.props.showMessage({ speaker: constants.NARRATOR, line: <p>{prefix} {latestItem.prefix} <font className={latestItem.name}>{latestItem.name}</font> {has} been added to your inventory!</p> }, 2000);
+					this.props.showMessage({ speaker: constants.NARRATOR, line: [ { text: prefix + " " + latestItem.prefix + " " }, { className: latestItem.name, text: latestItem.name }, { text: " " + has + " been added to your inventory!" } ] }, 2000);
 					this.props.setDisplayInventory(true, 2000)
-					this.props.showMessage({ speaker: constants.WIZARD, line: <p>Don't forget to equip it before you head out into the world by using <font className="confirm">equip {latestItem.name}</font>! Not my fault if you end up running around unarmed!</p> }, 3000);
-					this.props.showMessage({ speaker: constants.WIZARD, line: <p>Ah, I can see from the look on your face that you have questions. Out with it then!</p> }, 4000);
+					this.props.showMessage({ speaker: constants.WIZARD, line: [ { text: "Don't forget to equip it before you head out into the world by using " }, { className: "confirm", text: "equip " + latestItem.name }, { text: "! Not my fault if you end up running around unarmed!" } ] }, 3000);
+					this.props.showMessage({ speaker: constants.WIZARD, line: [ { text: "Ah, I can see from the look on your face that you have questions. Out with it then!" } ] }, 4000);
 					this.props.setInputExpected(constants.EXPECTING_ANYTHING);
 					break;
 				case constants.EXPECTING_RESET:
@@ -280,7 +280,7 @@ var PlayerBar = React.createClass({
 		this.props.showMessage(message, 1000); // Display the message
 	},
 	checkAndMovePlayer: function(input) {
-		var wrongWay = { speaker: constants.NARRATOR, line: <p>You can't go that way!</p> };
+		var wrongWay = { speaker: constants.NARRATOR, line: [ { text: "You can't go that way!" } ] };
 
 		if (input.toUpperCase() === "N" || input.toUpperCase().indexOf("NORTH") > -1) {
 			// Make sure it's both on the map and that it's not an obstacle
@@ -288,28 +288,28 @@ var PlayerBar = React.createClass({
 				this.props.showMessage(wrongWay, 0);
 			} else {
 				this.props.movePlayer({ x: 0, y: -1 });
-				this.props.showMessage({ speaker: constants.NARRATOR, line: <p>You move north.</p> }, 0);
+				this.props.showMessage({ speaker: constants.NARRATOR, line: [ { text: "You move north." } ] }, 0);
 			}
 		} else if (input.toUpperCase() === "E" || input.toUpperCase().indexOf("EAST") > -1) {
 			if (this.props.playerPos.x + 1 > this.props.map[0].length - 1 || this.props.map[this.props.playerPos.y][this.props.playerPos.x + 1].obstacle) {
 				this.props.showMessage(wrongWay, 0);
 			} else {
 				this.props.movePlayer({ x: 1, y: 0 });
-				this.props.showMessage({ speaker: constants.NARRATOR, line: <p>You move east.</p> }, 0);
+				this.props.showMessage({ speaker: constants.NARRATOR, line: [ { text: "You move east." } ] }, 0);
 			}
 		} else if (input.toUpperCase() === "S" || input.toUpperCase().indexOf("SOUTH") > -1) {
 			if (this.props.playerPos.y + 1 > this.props.map.length - 1 || this.props.map[this.props.playerPos.y + 1][this.props.playerPos.x].obstacle) {
 				this.props.showMessage(wrongWay, 0);
 			} else {
 				this.props.movePlayer({ x: 0, y: 1 });
-				this.props.showMessage({ speaker: constants.NARRATOR, line: <p>You move south.</p> }, 0);
+				this.props.showMessage({ speaker: constants.NARRATOR, line: [ { text: "You move south." } ] }, 0);
 			}
 		} else if (input.toUpperCase() === "W" || input.toUpperCase().indexOf("WEST") > -1) {
 			if (this.props.playerPos.x -1 < 0 || this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].obstacle) {
 				this.props.showMessage(wrongWay, 0);
 			} else {
 				this.props.movePlayer({ x: -1, y: 0 });
-				this.props.showMessage({ speaker: constants.NARRATOR, line: <p>You move west.</p> }, 0);
+				this.props.showMessage({ speaker: constants.NARRATOR, line: [ { text: "You move west." } ] }, 0);
 			}
 		}
 
@@ -317,7 +317,7 @@ var PlayerBar = React.createClass({
 	},
 	validateAndSendInput: function(input) { // TODO: IMPORANT - MAKE THIS METHOD MUCH SMALLER
 		if (input.split(" ")[0].toUpperCase() === "RESET") { // If they want to give up and reset the game
-			this.props.showMessage({ speaker: constants.PLAYER, line: <p>I can't take this anymore...</p> }, 0);
+			this.props.showMessage({ speaker: constants.PLAYER, line: [ { text: "I can't take this anymore..." } ] }, 0);
 			this.props.showMessage(messageGen.getResetMessage(this.props.name), 1000);
 			this.props.setInputExpected(constants.EXPECTING_RESET);
 			this.props.setInputExpected(constants.EXPECTING_CONF);
@@ -346,8 +346,8 @@ var PlayerBar = React.createClass({
 				break;
 			case constants.EXPECTING_ANYTHING: // Making fun of the player at the end of the Wizard's intro
 				this.props.showMessage(messageGen.getPlayerFail(), 0);
-				this.props.showMessage({ speaker: constants.WIZARD, line: <p>Oh, that's a pity... Well off with you then! Time to save the world or something!</p> }, 1000);
-				this.props.showMessage({ speaker: constants.NARRATOR, line: <p>With a strength belying his frail physique, the <font className={constants.WIZARD}>{constants.WIZARD}</font> thrusts you from his crumbling tower and out into the unknown world...</p> }, 2000);
+				this.props.showMessage({ speaker: constants.WIZARD, line: [ { text: "Oh, that's a pity... Well off with you then! Time to save the world or something!" } ] }, 1000);
+				this.props.showMessage({ speaker: constants.NARRATOR, line: [ { text: "With a strength belying his frail physique, the " }, { className: constants.WIZARD, text: constants.WIZARD }, { text: " thrusts you from his crumbling tower and out into the unknown world..." } ] }, 2000);
 				this.props.showMessage(messageGen.getAfterWizardMessage(), 4000);
 				this.props.showMessage(messageGen.getMapIntroMessage(), 6000);
 				this.props.showMessage(messageGen.getMapAddedMessage(), 8000);

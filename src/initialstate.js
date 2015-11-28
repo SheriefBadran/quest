@@ -15,7 +15,7 @@ module.exports = function() { // Returns a function so it can't be modified acci
 		},
 		log: {
 			messages: [
-				{ speaker: constants.WIZARD, line: <p>Hey you there... yes you! The one with the funny... well everything! You're finally awake? Can you speak? Tell me your name.</p> },
+				{ speaker: constants.WIZARD, line: [ { className: constants.WIZARD, text: "Hey you there... yes you! The one with the funny... well everything! You're finally awake? Can you speak? Tell me your name." } ] },
 			]
 		},
 		player: {

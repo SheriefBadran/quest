@@ -5,32 +5,34 @@ module.exports = {
 	getConfirmMessage: function(prevInput, name, option) {
 		switch (prevInput) {
 			case constants.EXPECTING_NAME:
-				return { speaker: constants.WIZARD, line: <p>Great! Then I'll call you {name} from now on.</p> };
+				return { speaker: constants.WIZARD, line: [ { className: constants.WIZARD, text: "Great! Then I'll call you " + name + " from now on." } ] };
 			case constants.EXPECTING_RACE:
-				return { speaker: constants.WIZARD, line: <p>Excellent! At least it seems you're sure of something...</p> };
+				return { speaker: constants.WIZARD, line: [ { className: constants.WIZARD, text: "Excellent! At least it seems you're sure of something..." } ] };
 			case constants.EXPECTING_WEAPON:
-				return { speaker: constants.WIZARD, line: <p>Fantastic! I'm sure it will serve you well in the trials to come.</p> };
+				return { speaker: constants.WIZARD, line: [ { className: constants.WIZARD, text: "Fantastic! I'm sure it will serve you well in the trials to come." } ] };
 			case constants.EXPECTING_RESET:
-				return { speaker: constants.FINAL_BOSS, line: <p>Ah well. Guess I win then?</p> };
+				return { speaker: constants.FINAL_BOSS, line: [ { className: constants.FINAL_BOSS, text: "Ah well. Guess I win then?" } ] };
 			default:
 				console.log("Missing confirm message for " + prevInput);
-				return { speaker: constants.NARRATOR, line: <p>Whoops! Looks like some sort of error occurred... silly me!</p> };
+				return { speaker: constants.NARRATOR, line: [ { className: constants.NARRATOR, text: "Whoops! Looks like some sort of error occurred... silly me!" } ] };
 		}
 	},
 	getDenyMessage: function(prevInput, name, options) {
 		switch (prevInput) {
 			case constants.EXPECTING_NAME:
-				return { speaker: constants.WIZARD, line: <p>Alright, how about we try this again. What is your name?</p> };
+				return { speaker: constants.WIZARD, line: [ { className: constants.WIZARD, text: "Alright, how about we try this again. What is your name?" } ] };
 			case constants.EXPECTING_RACE:
 				return this.getRaceMessage(name, options);
 			case constants.EXPECTING_WEAPON:
-				var lines = this.getMultiOptionLines(options);
-				return { speaker: constants.WIZARD, line: <p>Let's try again. Pick something to hit things with. {lines}?</p> };
+				var optionLines = this.getMultiOptionLines(options);
+				var line = [ { className: constants.WIZARD, text: "Let's try again. Pick something to hit things with. " }, { className: constants.WIZARD, text: "?" } ];
+				line.splice.apply(line, [1, 0].concat(optionLines));
+				return { speaker: constants.WIZARD, line: line };
 			case constants.EXPECTING_RESET:
-				return { speaker: constants.FINAL_BOSS, line: <p>Well that's a relief! Better get back to what you were doing... I'll just be over here creating an oppressive reign of terror or whatever it is that I do...</p> };
+				return { speaker: constants.FINAL_BOSS, line: [ { className: constants.FINAL_BOSS, text: "Well that's a relief! Better get back to what you were doing... I'll just be over here creating an oppressive reign of terror or whatever it is that I do..." } ] };
 			default:
 				console.log("Missing deny message for " + prevInput);
-				return { speaker: constants.NARRATOR, line: <p>Whoops! Looks like some sort of error occurred... silly me!</p> };
+				return { speaker: constants.NARRATOR, line: [ { className: constants.NARRATOR, text: "Whoops! Looks like some sort of error occurred... silly me!" } ] };
 		}
 	},
 	getFailMessage: function(prevInput, name) {
@@ -38,16 +40,14 @@ module.exports = {
 			case constants.EXPECTING_NAME:
 			case constants.EXPECTING_RACE:
 			case constants.EXPECTING_WEAPON:
-				var yes = <font className="confirm">yes</font>;
-				var no = <font className="deny">no</font>
-				return { speaker: constants.WIZARD, line: <p>I'm sorry, I have no idea what you're trying to say... It's a {yes} or {no} question!</p> };
+				return { speaker: constants.WIZARD, line: [ { className: constants.WIZARD, text: "I'm sorry, I have no idea what you're trying to say... It's a " }, { className: "confirm", text: "yes" }, { className: constants.WIZARD, text: " or " }, { className: "deny", text: "no" }, { className: constants.WIZARD, text: " question!" } ] };
 			case constants.EXPECTING_RESET:
 				var yes = <font className="confirm">yes</font>;
 				var no = <font className="deny">no</font>		
-				return { speaker: constants.FINAL_BOSS, line: <p>What on earth is that supposed to mean? All I need is a simple {yes} or {no}!</p> };
+				return { speaker: constants.FINAL_BOSS, line: [ { className: constants.FINAL_BOSS, text: "What on earth is that supposed to mean? All I need is a simple " }, { className: "confirm", text: "yes" }, { className: constants.FINAL_BOSS, text: " or " }, { className: "deny", text: "no" }, { className: constants.FINAL_BOSS, text: "!" } ] };
 			default:
 				console.log("Missing fail message for " + prevInput + " confirmation.");
-				return { speaker: constants.NARRATOR, line: <p>Whoops! Looks like some sort of error occurred... silly me!</p> };
+				return { speaker: constants.NARRATOR, line: [ { className: constants.NARRATOR, text: "Whoops! Looks like some sort of error occurred... silly me!" } ] };
 		}
 	},
 	getMultiChoiceFailMessage: function(input, options, name) {
@@ -55,11 +55,12 @@ module.exports = {
 			case constants.EXPECTING_WEAPON:
 			case constants.EXPECTING_RACE:
 				var optionLines = this.getMultiOptionLines(options);
-
-				return {speaker: constants.WIZARD, line: <p>I'm not sure what that's supposed to mean... The options are {optionLines}.</p> };
+				var line = [ { className: constants.WIZARD, text: "I'm not sure what that's supposed to mean... The options are " }, { className: constants.WIZARD, text: "." } ];
+				line.splice.apply(line, [1, 0].concat(optionLines));
+				return {speaker: constants.WIZARD, line: line };
 			default:
 				console.log("Missing npc fail message for: " + input);
-				return { speaker: constants.NARRATOR, line: <p>Whoops! Looks like some sort of error occurred... silly me!</p> };
+				return { speaker: constants.NARRATOR, line: [ { className: constants.NARRATOR, text: "Whoops! Looks like some sort of error occurred... silly me!" } ] };
 		}
 	},
 	getMultiOptionLines: function(options) {
@@ -72,10 +73,11 @@ module.exports = {
 		options.forEach(function(option, id) {
 			if (!firstLine) {
 				var or = (id === options.length-1) ? "or " : "";
-				optionLines.push(<font key={id}>{comma} {or}<font className={option}>{option}</font></font>);
+				optionLines.push({ text: comma + " " + or + " " });
+				optionLines.push({ className: option, text: option });
 			} else {
 				firstLine = false;
-				optionLines.push(<font className={option} key={id}> {option}</font>);
+				optionLines.push({ className: option, text: " " + option });
 			}
 		}.bind(this));
 
@@ -93,14 +95,20 @@ module.exports = {
 				var race = classes[raceName];
 				var prefix = ("AEIOU".indexOf(race.name.charAt(0).toUpperCase()) < 0) ? "A" : "An";
 				if (!firstLoop) {
-					races.push(<font key={race.name}>{prefix} <font className={race.name}>{race.name}</font>? </font>);
+					races.push({ text: prefix + " " });
+					races.push({ className: race.name, text: race.name });
+					races.push({ text: "? "});
 				} else {
-					races.push(<font key={race.name}>Are you {prefix.toLowerCase()} <font className={race.name}>{race.name}</font>? </font>);
+					races.push({ text: "Are you " + prefix.toLowerCase() + " "});
+					races.push({ className: race.name, text: race.name });
+					races.push({ text: "? " });
 					firstLoop = false;
 				}
 			}
 		}
-		return { speaker: constants.WIZARD, line: <p>So what are you {name}? {races}</p> };
+		var line = [ { text: "So what are you " + name + "? " } ];
+		line.splice.apply(line, [1, 0].concat(races));
+		return { speaker: constants.WIZARD, line: line };
 	},
 	getWeaponMessage: function(name, starterWeapons) {
 		var weapons = [];
@@ -114,46 +122,52 @@ module.exports = {
 				var choices = ["Maybe ", "Or perhaps ", ""];
 				var rand = Math.floor(Math.random() * choices.length);
 				prefix = (rand === choices.length-1) ? prefix : choices[rand] + prefix.toLowerCase();
-				weapons.push(<font key={weaponName}>{prefix} <font className={weaponName}>{weaponName}</font>? </font>);
+				weapons.push({ text: prefix + " "});
+				weapons.push({ className: weaponName, text: weaponName });
+				weapons.push({ text: "? "});
 			} else {
-				weapons.push(<font key={weaponName}>How about {prefix.toLowerCase()} <font className={weaponName}>{weaponName}</font>? </font>);
+				weapons.push({ text: "How about " + prefix.toLowerCase() + " "});
+				weapons.push({ className: weaponName, text: weaponName });
+				weapons.push({ text: "? "});
 				firstLoop = false;
 			}
 		}
-		return { speaker: constants.WIZARD, line: <p>Hmm... Come to think of it, we can't very well send you out unarmed now, can we? What's your weapon of choice? {weapons}</p> };
+		var line = [ { text: "Hmm... Come to think of it, we can't very well send you out unarmed now, can we? What's your weapon of choice? " } ];
+		line.splice.apply(line, [1, 0].concat(weapons));
+		return { speaker: constants.WIZARD, line: line };
 	},
 	getPlayerYes: function() {
-		return { speaker: constants.PLAYER, line: <p>Yes.</p> };
+		return { speaker: constants.PLAYER, line: [ { text: "Yes" } ] };
 	},
 	getPlayerNo: function() {
-		return { speaker: constants.PLAYER, line: <p>No.</p> };
+		return { speaker: constants.PLAYER, line: [ { text: "No" } ] };
 	},
 	getPlayerFail: function() {
 		var failLines = [
-			<p>*incomprehensible garbling*</p>,
-			<p>*clucks like a chicken*</p>
+			"*incomprehensible garbling*",
+			"*clucks like a chicken*"
 		];
-		return { speaker: constants.PLAYER, line: failLines[Math.floor(Math.random() * failLines.length)] };
+		return { speaker: constants.PLAYER, line: [ { className: constants.PLAYER, text: failLines[Math.floor(Math.random() * failLines.length)] } ] };
 	},
 	getNoSuchItemMessage: function(itemName) {
-		return { speaker: constants.NARRATOR, line: <p>You don't currently possess an item of name <font className="deny">{itemName}</font>!</p> };
+		return { speaker: constants.NARRATOR, line: [ { text: "You don't currently possess an item of name " }, { className: "deny", text: itemName }, { text: "!" } ] };
 	},
 	getResetMessage: function(name) {
-		return { speaker: constants.FINAL_BOSS, line: <p>Whoa there {name}! Are you absolutely certain you want to throw in the towel and let me have my way with the world? That doesn't sound very fun...</p> };
+		return { speaker: constants.FINAL_BOSS, line: [ { text: "Whoa there " + name + "! Are you absolutely certain you want to throw in the towel and let me have my way with the world? That doesn't sound very fun..." } ] };
 	},
 	getAfterWizardMessage: function() {
-		return { speaker: constants.NARRATOR, line: <p>Stepping forth into the blinding sunlight, you immediately find yourself confronted by a young <font className={constants.ELF}>{constants.ELF}</font>, suspended upside-down from the branches of a nearby tree.</p> };
+		return { speaker: constants.NARRATOR, line: [ { text: "Stepping forth into the blinding sunlight, you immediately find yourself confronted by a young " }, { className: constants.ELF, text: constants.ELF }, { text: ", suspended upside-down from the branches of a nearby tree." } ] };
 	},
 	getMapIntroMessage: function() {
-		return { speaker: constants.ELF, line: <p>Oh. You must be the latest vic- uh... hero. <font className={constants.Player}>Hero</font>. Right. I don't really want to but I'm supposed to give you this ah uh... <font className="Map">Magic Map</font>. As long as you draw on it while you walk, you should probably be able to navigate with it!</p> };
+		return { speaker: constants.ELF, line: [ { text: "Oh. You must be the latest vic- uh... hero. " }, { className: constants.PLAYER, text: "Hero" }, { text: ". Right. I don't really want to but I'm supposed to give you this ah uh... " }, { className: "Map", text: "Magic Map" }, { text: ". As long as you draw on it while you walk, you should probably be able to navigate with it!" } ] };
 	},
 	getMapAddedMessage: function() {
-		return { speaker: constants.NARRATOR, line: <p>A useless blank piece of pa- uh <font className="Map">Magic Map</font>! is forcibly inserted into your inventory!</p> };
+		return { speaker: constants.NARRATOR, line: [ { text: "A useless blank piece of pa- uh " }, { className: "Map", text: "Magic Map" }, { text: " is forcibly inserted into your inventory!" } ] };
 	},
 	getMapContMessage: function() {
-		return { speaker: constants.ELF, line: <p>Now remember, this doesn't mean we're friends or anything!</p> };
+		return { speaker: constants.ELF, line: [ { text: "Now remember, this doesn't mean we're friends or anything!" } ] };
 	},
 	getElfLeaveMessage: function() {
-		return { speaker: constants.NARRATOR, line: <p>The <font className={constants.ELF}>{constants.ELF}</font> gives you one last glance before pulling herself up into the tree and vanishing from sight, leaving you to wonder why she had ever appeared in the first place. You are now free to roam. Perhaps you should start by looking around?</p> };
+		return { speaker: constants.NARRATOR, line: [ { text: "The " }, { className: constants.ELF, text: constants.ELF }, { text: " gives you one last glance before pulling herself up into the tree and vanishing from sight, leaving you to wonder why she had ever appeared in the first place. You are now free to roam. Perhaps you should start by looking around?" } ] };
 	}
 };

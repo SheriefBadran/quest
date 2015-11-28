@@ -23,7 +23,7 @@
     "webpack": "^1.12.9"
   },
   "scripts": {
-  	"build": "webpack",
+    "build": "webpack",
     "lint": "eslint src"
   }
 }
