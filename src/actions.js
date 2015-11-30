@@ -3,8 +3,9 @@ var constants = require("./constants");
 module.exports = {
 	showMessage: function(message, timeout) {
 		return function(dispatch) {
+				dispatch({ type: constants.QUEUE_MESSAGE, message: message });
 			setTimeout(function() {
-				dispatch({ type: constants.SHOW_MESSAGE, message: message });
+				dispatch({ type: constants.SHOW_MESSAGE });
 			}, timeout);
 		}
 	},
@@ -16,6 +17,7 @@ module.exports = {
 	},
 	setDisplayStats: function(display, timeout) {
 		return function(dispatch) {
+				dispatch({ type: constants.PREP_STATS, display: display });
 			setTimeout(function() {
 				dispatch({ type: constants.DISPLAY_STATS, display: display });
 			}, timeout);
@@ -26,8 +28,9 @@ module.exports = {
 	},
 	addItem: function(item, timeout) {
 		return function(dispatch) {
+				dispatch({ type: constants.QUEUE_ITEM, item: item });
 	 		setTimeout(function() {
-	 			dispatch({ type: constants.ADD_ITEM, item: item});
+	 			dispatch({ type: constants.ADD_ITEM });
 	 		}, timeout);
 	 	}
 	},
@@ -39,6 +42,7 @@ module.exports = {
 	},
 	setDisplayInventory: function(display, timeout) {
 	 	return function(dispatch) {
+	 			dispatch({ type: constants.PREP_INVENT, display: display });
 	 		setTimeout(function() {
 	 			dispatch({ type: constants.DISPLAY_INVENTORY, display: display });
 	 		}, timeout);
@@ -46,6 +50,7 @@ module.exports = {
 	},
 	addMap: function(map, position, timeout) {
 		return function(dispatch) {
+				dispatch({ type: constants.PREP_MAP, map: map, position: position });
 	 		setTimeout(function() {
 	 			dispatch({ type: constants.ADD_MAP, map: map, position: position });
 	 		}, timeout);

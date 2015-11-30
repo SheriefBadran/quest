@@ -12,11 +12,19 @@ module.exports = function (state, action) {
 			newState.stats.currenthp = newState.stats.hp;
 			newState.stats.currentmp = newState.stats.mp;
 			return newState;
+		case constants.PREP_STATS:
+			newState.prepStats = action.display;
+			return newState;
 		case constants.DISPLAY_STATS:
 			newState.displayStats = action.display;
+			delete newState.prepStats;
+			return newState;
+		case constants.QUEUE_ITEM:
+			newState.itemQueue = [...newState.itemQueue, action.item ];
 			return newState;
 		case constants.ADD_ITEM:
-			newState.inventory = [...newState.inventory, action.item];
+			var item = newState.itemQueue.shift();
+			newState.inventory = [...newState.inventory, item];
 			return newState;
 		case constants.REMOVE_ITEM:
 			newState.inventory = [...newState.inventory];
@@ -35,8 +43,12 @@ module.exports = function (state, action) {
 					break;
 			}
 			return newState;
+		case constants.PREP_INVENT:
+			newState.prepInvent = action.display;
+			return newState;
 		case constants.DISPLAY_INVENTORY:
 			newState.displayInventory = action.display;
+			delete newState.prepInvent;
 			return newState;
 		case constants.RESET:
 			return initialState().player;

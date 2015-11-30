@@ -14,6 +14,7 @@ module.exports = function() { // Returns a function so it can't be modified acci
 			beforeResetIfConf: constants.EXPECTING_NAME
 		},
 		log: {
+			queue: [ ],
 			messages: [
 				{ speaker: constants.WIZARD, line: [ { className: constants.WIZARD, text: "Hey you there... yes you! The one with the funny... well everything! You're finally awake? Can you speak? Tell me your name." } ] },
 			]
@@ -24,6 +25,7 @@ module.exports = function() { // Returns a function so it can't be modified acci
 			stats: {
 
 			},
+			itemQueue: [],
 			inventory: [],
 			displayInventory: false,
 			weapon: null,

@@ -4,8 +4,12 @@ var initialState = require("./../initialstate"),
 module.exports = function (state, action) {
 	var newState = Object.assign({}, state); // Copy to a new state so we don't screw up the old one
 	switch (action.type) {
-		case constants.SHOW_MESSAGE:
-			newState.messages = [...newState.messages, action.message];
+		case constants.QUEUE_MESSAGE: // Queue a message for showing
+			newState.queue = [...newState.queue, action.message ];
+			return newState;
+		case constants.SHOW_MESSAGE: // Take the message from the queue and show it
+			var item = newState.queue.shift();
+			newState.messages = [...newState.messages, item ];
 			return newState;
 		case constants.RESET:
 			return initialState().log;

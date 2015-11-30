@@ -227,6 +227,8 @@ var PlayerBar = React.createClass({
 		if (input.toUpperCase() === "YES" || input.toUpperCase() === "Y") {
 			playerMessage = messageGen.getPlayerYes();
 			message = messageGen.getConfirmMessage(this.props.prevInput, this.props.name);
+			this.props.showMessage(playerMessage, 0);
+			this.props.showMessage(message, 1000); // Display the message
 			switch (this.props.prevInput) {
 				case constants.EXPECTING_NAME:
 					this.props.showMessage(messageGen.getRaceMessage(this.props.name, Classes), 2000);
@@ -272,12 +274,14 @@ var PlayerBar = React.createClass({
 			playerMessage = messageGen.getPlayerNo();
 			message = messageGen.getDenyMessage(this.props.prevInput, this.props.name, options);
 			this.props.setInputExpected(this.props.prevInput);
+			this.props.showMessage(playerMessage, 0);
+			this.props.showMessage(message, 1000); // Display the message
 		} else {
 			playerMessage = messageGen.getPlayerFail();
 			message = messageGen.getFailMessage(this.props.prevInput, this.props.name);
+			this.props.showMessage(playerMessage, 0);
+			this.props.showMessage(message, 1000); // Display the message
 		}
-		this.props.showMessage(playerMessage, 0);
-		this.props.showMessage(message, 1000); // Display the message
 	},
 	checkAndMovePlayer: function(input) {
 		var wrongWay = { speaker: constants.NARRATOR, line: [ { text: "You can't go that way!" } ] };

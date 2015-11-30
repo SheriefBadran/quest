@@ -25607,7 +25607,41 @@
 	};
 
 	var savedState = function savedState() {
-		return JSON.parse(localStorage.getItem("Quest"));
+		var state = JSON.parse(localStorage.getItem("Quest"));
+		// Before we return the state, we need to check if there's anything in the queues that should be moved to display.
+		if (state) {
+			if (state.log.queue && state.log.queue.length > 0) {
+				state.log.queue.forEach((function (item) {
+					state.log.messages.push(item);
+				}).bind(undefined));
+				state.log.queue = [];
+			}
+
+			if (state.player.itemQueue && state.player.itemQueue.length > 0) {
+				state.player.itemQueue.forEach((function (item) {
+					state.player.inventory.push(item);
+				}).bind(undefined));
+				state.player.itemQueue = [];
+			}
+
+			if (state.player.prepStats) {
+				state.player.displayStats = state.player.prepStats;
+				delete state.player.prepStats;
+			}
+
+			if (state.player.prepInvent) {
+				state.player.displayInventory = state.player.prepInvent;
+				delete state.player.prepInvent;
+			}
+
+			if (state.world.prepMap) {
+				state.world.displayMap = true;
+				state.world.map = state.world.prepMap.map;
+				state.world.playerPos = state.world.prepMap.position;
+				delete state.world.prepMap;
+			}
+		}
+		return state;
 	};
 
 	module.exports = Redux.applyMiddleware(thunk, saveLocal)(Redux.createStore)(rootReducer, savedState() || initialState());
@@ -25635,12 +25669,14 @@
 				beforeResetIfConf: constants.EXPECTING_NAME
 			},
 			log: {
+				queue: [],
 				messages: [{ speaker: constants.WIZARD, line: [{ className: constants.WIZARD, text: "Hey you there... yes you! The one with the funny... well everything! You're finally awake? Can you speak? Tell me your name." }] }]
 			},
 			player: {
 				name: "???",
 				displayStats: false,
 				stats: {},
+				itemQueue: [],
 				inventory: [],
 				displayInventory: false,
 				weapon: null,
@@ -25691,15 +25727,20 @@
 		EXPECTING_MOVEMENT: "EXPECTING_MOVEMENT",
 
 		// Dispatch constants
+		QUEUE_MESSAGE: "QUEUE_MESSAGE",
 		SHOW_MESSAGE: "SEND_MESSAGE",
 		SET_NAME: "SET_NAME",
 		SET_STATS: "SET_STATS",
 		SET_INPUT: "SET_INPUT",
+		QUEUE_ITEM: "QUEUE_ITEM",
 		ADD_ITEM: "ADD_ITEM",
 		REMOVE_ITEM: "REMOVE_ITEM",
 		EQUIP_ITEM: "EQUIP_ITEM",
+		PREP_STATS: "PREP_STATS",
 		DISPLAY_STATS: "DISPLAY_STATS",
+		PREP_INVENT: "PREP_INVENT",
 		DISPLAY_INVENTORY: "DISPLAY_INVENTORY",
+		PREP_MAP: "PREP_MAP",
 		ADD_MAP: "ADD_MAP",
 		MOVE: "MOVE",
 		RESET: "RESET"
@@ -25721,8 +25762,14 @@
 	module.exports = function (state, action) {
 		var newState = _extends({}, state); // Copy to a new state so we don't screw up the old one
 		switch (action.type) {
+			case constants.QUEUE_MESSAGE:
+				// Queue a message for showing
+				newState.queue = [].concat(_toConsumableArray(newState.queue), [action.message]);
+				return newState;
 			case constants.SHOW_MESSAGE:
-				newState.messages = [].concat(_toConsumableArray(newState.messages), [action.message]);
+				// Take the message from the queue and show it
+				var item = newState.queue.shift();
+				newState.messages = [].concat(_toConsumableArray(newState.messages), [item]);
 				return newState;
 			case constants.RESET:
 				return initialState().log;
@@ -25755,11 +25802,19 @@
 				newState.stats.currenthp = newState.stats.hp;
 				newState.stats.currentmp = newState.stats.mp;
 				return newState;
+			case constants.PREP_STATS:
+				newState.prepStats = action.display;
+				return newState;
 			case constants.DISPLAY_STATS:
 				newState.displayStats = action.display;
+				delete newState.prepStats;
+				return newState;
+			case constants.QUEUE_ITEM:
+				newState.itemQueue = [].concat(_toConsumableArray(newState.itemQueue), [action.item]);
 				return newState;
 			case constants.ADD_ITEM:
-				newState.inventory = [].concat(_toConsumableArray(newState.inventory), [action.item]);
+				var item = newState.itemQueue.shift();
+				newState.inventory = [].concat(_toConsumableArray(newState.inventory), [item]);
 				return newState;
 			case constants.REMOVE_ITEM:
 				newState.inventory = [].concat(_toConsumableArray(newState.inventory));
@@ -25778,8 +25833,12 @@
 						break;
 				}
 				return newState;
+			case constants.PREP_INVENT:
+				newState.prepInvent = action.display;
+				return newState;
 			case constants.DISPLAY_INVENTORY:
 				newState.displayInventory = action.display;
+				delete newState.prepInvent;
 				return newState;
 			case constants.RESET:
 				return initialState().player;
@@ -25843,37 +25902,43 @@
 	    constants = __webpack_require__(229);
 
 	module.exports = function (state, action) {
-		var updateMapVisibility = function updateMapVisibility(newState) {
-			if (newState.playerPos.x > 0) {
-				newState.map[newState.playerPos.y][newState.playerPos.x - 1].seen = true;
+		var updateMapVisibility = function updateMapVisibility(map, playerPos) {
+			if (playerPos.x > 0) {
+				map[playerPos.y][playerPos.x - 1].seen = true;
 			}
-			if (newState.playerPos.y > 0) {
-				newState.map[newState.playerPos.y - 1][newState.playerPos.x].seen = true;
+			if (playerPos.y > 0) {
+				map[playerPos.y - 1][playerPos.x].seen = true;
 			}
-			if (newState.playerPos.x < newState.map[0].length - 1) {
-				newState.map[newState.playerPos.y][newState.playerPos.x + 1].seen = true;
+			if (playerPos.x < map[0].length - 1) {
+				map[playerPos.y][playerPos.x + 1].seen = true;
 			}
-			if (newState.playerPos.y < newState.map.length - 1) {
-				newState.map[newState.playerPos.y + 1][newState.playerPos.x].seen = true;
+			if (playerPos.y < map.length - 1) {
+				map[playerPos.y + 1][playerPos.x].seen = true;
 			}
-			return newState;
+			return map;
 		};
 
 		var newState = _extends({}, state); // Copy to a new state so we don't screw up the old one
 		switch (action.type) {
+			case constants.PREP_MAP:
+				newState.prepMap = { map: action.map, position: action.position };
+				newState.prepMap.map = updateMapVisibility(newState.prepMap.map, newState.prepMap.position);
+				return newState;
 			case constants.ADD_MAP:
 				newState.displayMap = true;
 				newState.map = action.map;
 				// Set player position
 				newState.playerPos = action.position;
 				// Make initially visible tiles visible
-				newState = updateMapVisibility(newState);
+				newState.map = updateMapVisibility(newState.map, newState.playerPos);
+				// Remove the prep item
+				delete newState.prepMap;
 				return newState;
 			case constants.MOVE:
 				// TODO: check validity of movement here too before making the move
 				var newPosition = { x: newState.playerPos.x + action.movement.x, y: newState.playerPos.y + action.movement.y };
 				newState.playerPos = newPosition;
-				newState = updateMapVisibility(newState);
+				newState.map = updateMapVisibility(newState.map, newState.playerPos);
 				return newState;
 			case constants.RESET:
 				return initialState().world;
@@ -43594,6 +43659,8 @@
 			if (input.toUpperCase() === "YES" || input.toUpperCase() === "Y") {
 				playerMessage = messageGen.getPlayerYes();
 				message = messageGen.getConfirmMessage(this.props.prevInput, this.props.name);
+				this.props.showMessage(playerMessage, 0);
+				this.props.showMessage(message, 1000); // Display the message
 				switch (this.props.prevInput) {
 					case constants.EXPECTING_NAME:
 						this.props.showMessage(messageGen.getRaceMessage(this.props.name, Classes), 2000);
@@ -43639,12 +43706,14 @@
 				playerMessage = messageGen.getPlayerNo();
 				message = messageGen.getDenyMessage(this.props.prevInput, this.props.name, options);
 				this.props.setInputExpected(this.props.prevInput);
+				this.props.showMessage(playerMessage, 0);
+				this.props.showMessage(message, 1000); // Display the message
 			} else {
-				playerMessage = messageGen.getPlayerFail();
-				message = messageGen.getFailMessage(this.props.prevInput, this.props.name);
-			}
-			this.props.showMessage(playerMessage, 0);
-			this.props.showMessage(message, 1000); // Display the message
+					playerMessage = messageGen.getPlayerFail();
+					message = messageGen.getFailMessage(this.props.prevInput, this.props.name);
+					this.props.showMessage(playerMessage, 0);
+					this.props.showMessage(message, 1000); // Display the message
+				}
 		},
 		checkAndMovePlayer: function checkAndMovePlayer(input) {
 			var wrongWay = { speaker: constants.NARRATOR, line: [{ text: "You can't go that way!" }] };
@@ -43811,8 +43880,9 @@
 	module.exports = {
 		showMessage: function showMessage(message, timeout) {
 			return function (dispatch) {
+				dispatch({ type: constants.QUEUE_MESSAGE, message: message });
 				setTimeout(function () {
-					dispatch({ type: constants.SHOW_MESSAGE, message: message });
+					dispatch({ type: constants.SHOW_MESSAGE });
 				}, timeout);
 			};
 		},
@@ -43824,6 +43894,7 @@
 		},
 		setDisplayStats: function setDisplayStats(display, timeout) {
 			return function (dispatch) {
+				dispatch({ type: constants.PREP_STATS, display: display });
 				setTimeout(function () {
 					dispatch({ type: constants.DISPLAY_STATS, display: display });
 				}, timeout);
@@ -43834,8 +43905,9 @@
 		},
 		addItem: function addItem(item, timeout) {
 			return function (dispatch) {
+				dispatch({ type: constants.QUEUE_ITEM, item: item });
 				setTimeout(function () {
-					dispatch({ type: constants.ADD_ITEM, item: item });
+					dispatch({ type: constants.ADD_ITEM });
 				}, timeout);
 			};
 		},
@@ -43847,6 +43919,7 @@
 		},
 		setDisplayInventory: function setDisplayInventory(display, timeout) {
 			return function (dispatch) {
+				dispatch({ type: constants.PREP_INVENT, display: display });
 				setTimeout(function () {
 					dispatch({ type: constants.DISPLAY_INVENTORY, display: display });
 				}, timeout);
@@ -43854,6 +43927,7 @@
 		},
 		addMap: function addMap(map, position, timeout) {
 			return function (dispatch) {
+				dispatch({ type: constants.PREP_MAP, map: map, position: position });
 				setTimeout(function () {
 					dispatch({ type: constants.ADD_MAP, map: map, position: position });
 				}, timeout);
