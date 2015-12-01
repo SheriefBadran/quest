@@ -43719,6 +43719,7 @@
 				}
 		},
 		checkAndMovePlayer: function checkAndMovePlayer(input) {
+			//TODO: Possibly remove the text saying which direction you moved
 			var wrongWay = { speaker: constants.NARRATOR, line: [{ text: "You can't go that way!" }] };
 
 			if (input.toUpperCase() === "N" || input.toUpperCase().indexOf("NORTH") > -1) {
@@ -57007,10 +57008,10 @@
 
 				// Keep the map from being offset weirdly if there aren't enough rows
 				if (minY === 0) {
-					var missingRows = 8 - maxY;
+					var missingRows = constants.VISUAL_MAP_WIDTH * 2 - maxY;
 					for (var y = 0; y < missingRows; ++y) {
 						var mapRow = [];
-						for (var x = 0; x < 9; ++x) {
+						for (var x = 0; x < constants.VISUAL_MAP_WIDTH * 2 + 1; ++x) {
 							mapRow.push(React.createElement(
 								"font",
 								{ key: x + "" + y },
@@ -57028,13 +57029,13 @@
 				// Keep the map from being offset weirdly if there aren't enough columns to the left
 				var leftOffset = 0;
 				if (minX === 0) {
-					leftOffset = 8 - maxX;
+					leftOffset = constants.VISUAL_MAP_WIDTH * 2 - maxX;
 				}
 
 				// Keep the map from being offset weirdly if there aren't enough columns to the right
 				var rightOffset = 0;
 				if (maxX === this.props.map[0].length - 1) {
-					rightOffset = 8 - (maxX - minX);
+					rightOffset = constants.VISUAL_MAP_WIDTH * 2 - (maxX - minX);
 				}
 
 				for (var y = minY; y <= maxY; ++y) {
