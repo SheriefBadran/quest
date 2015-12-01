@@ -25716,6 +25716,9 @@
 		WEAPON: "WEAPON",
 		ARMOUR: "ARMOUR",
 
+		// Map constants
+		VISUAL_MAP_WIDTH: 4,
+
 		// Input constants
 		DISABLED: "DISABLED",
 		EXPECTING_NAME: "EXPECTING_NAME",
@@ -56983,6 +56986,7 @@
 	var React = __webpack_require__(1),
 	    ReactRedux = __webpack_require__(209),
 	    proptypes = React.PropTypes,
+	    constants = __webpack_require__(229),
 	    Panel = __webpack_require__(241).Panel,
 	    Grid = __webpack_require__(241).Grid,
 	    Row = __webpack_require__(241).Row,
@@ -56996,9 +57000,54 @@
 
 				var rows = [];
 
-				for (var y = 0; y < this.props.map.length; ++y) {
+				var minX = this.props.player.x - constants.VISUAL_MAP_WIDTH > 0 ? this.props.player.x - constants.VISUAL_MAP_WIDTH : 0;
+				var maxX = this.props.player.x + constants.VISUAL_MAP_WIDTH < this.props.map[0].length - 1 ? this.props.player.x + constants.VISUAL_MAP_WIDTH : this.props.map[0].length - 1;
+				var minY = this.props.player.y - constants.VISUAL_MAP_WIDTH > 0 ? this.props.player.y - constants.VISUAL_MAP_WIDTH : 0;
+				var maxY = this.props.player.y + constants.VISUAL_MAP_WIDTH < this.props.map.length - 1 ? this.props.player.y + constants.VISUAL_MAP_WIDTH : this.props.map.length - 1;
+
+				// Keep the map from being offset weirdly if there aren't enough rows
+				if (minY === 0) {
+					var missingRows = 8 - maxY;
+					for (var y = 0; y < missingRows; ++y) {
+						var mapRow = [];
+						for (var x = 0; x < 9; ++x) {
+							mapRow.push(React.createElement(
+								"font",
+								{ key: x + "" + y },
+								" "
+							));
+						}
+						rows.push(React.createElement(
+							"p",
+							{ key: maxY + y + 1 },
+							mapRow
+						));
+					}
+				}
+
+				// Keep the map from being offset weirdly if there aren't enough columns to the left
+				var leftOffset = 0;
+				if (minX === 0) {
+					leftOffset = 8 - maxX;
+				}
+
+				// Keep the map from being offset weirdly if there aren't enough columns to the right
+				var rightOffset = 0;
+				if (maxX === this.props.map[0].length - 1) {
+					rightOffset = 8 - (maxX - minX);
+				}
+
+				for (var y = minY; y <= maxY; ++y) {
 					var mapRow = [];
-					for (var x = 0; x < this.props.map[y].length; ++x) {
+					for (var x = minX - leftOffset; x <= maxX + rightOffset; ++x) {
+						if (x < 0 || x >= this.props.map[0].length) {
+							mapRow.push(React.createElement(
+								"font",
+								{ key: x + "" + y },
+								" "
+							));
+							continue;
+						}
 						if (x === this.props.player.x && y === this.props.player.y) {
 							// Place the player character
 							mapRow.push(React.createElement(

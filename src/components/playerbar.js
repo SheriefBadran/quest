@@ -283,7 +283,7 @@ var PlayerBar = React.createClass({
 			this.props.showMessage(message, 1000); // Display the message
 		}
 	},
-	checkAndMovePlayer: function(input) {
+	checkAndMovePlayer: function(input) { //TODO: Possibly remove the text saying which direction you moved
 		var wrongWay = { speaker: constants.NARRATOR, line: [ { text: "You can't go that way!" } ] };
 
 		if (input.toUpperCase() === "N" || input.toUpperCase().indexOf("NORTH") > -1) {

@@ -15,6 +15,9 @@ module.exports = {
 	WEAPON: "WEAPON",
 	ARMOUR: "ARMOUR",
 
+	// Map constants
+	VISUAL_MAP_WIDTH: 4,
+
 	// Input constants
 	DISABLED: "DISABLED",
 	EXPECTING_NAME: "EXPECTING_NAME",
