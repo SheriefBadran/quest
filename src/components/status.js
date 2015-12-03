@@ -8,8 +8,8 @@ let React = require("react"),
 let Status = React.createClass({
 	displayName: "Status",
 	propTypes: {
-		name: proptypes.string.isRequired,
 		display: proptypes.bool.isRequired,
+		name: proptypes.string.isRequired,
 		stats: proptypes.object.isRequired
 	},
 	render() {
@@ -37,35 +37,35 @@ let Status = React.createClass({
 			return (
 				<Panel className="status-window">
 					<Grid fluid>
-						<Col xs={2} md={1}>
+						<Col md={1} xs={2}>
 							Name:<br />
 							Race:
 						</Col>
-						<Col xs={2} md={2}>
+						<Col md={2} xs={2}>
 							{this.props.name}<br />
 							<span className={this.props.stats.race}>{this.props.stats.race}</span>
 						</Col>
-						<Col xs={2} md={1}>
+						<Col md={1} xs={2}>
 							HP:<br />
 							MP:
 						</Col>
-						<Col xs={2} md={2}>
+						<Col md={2} xs={2}>
 							{this.props.stats.currenthp}/{this.props.stats.hp}<br />
 							{this.props.stats.currentmp}/{this.props.stats.mp}
 						</Col>
-						<Col xs={2} md={2}>
+						<Col md={2} xs={2}>
 							Strength:<br />
 							Magic:
 						</Col>
-						<Col xs={2} md={1}>
+						<Col md={1} xs={2}>
 							{str}<br />
 							{mag}
 						</Col>
-						<Col xs={2} md={2}>
+						<Col md={2} xs={2}>
 							Dexterity:<br />
 							Defence:
 						</Col>
-						<Col xs={2} md={1}>
+						<Col md={1} xs={2}>
 							{dex}<br />
 							{def}
 						</Col>

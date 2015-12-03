@@ -15,27 +15,27 @@ let React = require("react"),
 let PlayerBar = React.createClass({
 	displayName: "PlayerBar",
 	propTypes: {
+		addItem: proptypes.func.isRequired,
+		addMap: proptypes.func.isRequired,
+		equipItem: proptypes.func.isRequired,
 		input: proptypes.string.isRequired,
+		inventory: proptypes.array.isRequired,
 		name: proptypes.string.isRequired,
 		prevInput: proptypes.string.isRequired,
-		showMessage: proptypes.func.isRequired,
-		setName: proptypes.func.isRequired,
-		setInputExpected: proptypes.func.isRequired,
-		setStats: proptypes.func.isRequired,
-		setDisplayStats: proptypes.func.isRequired,
-		addItem: proptypes.func.isRequired,
 		removeItem: proptypes.func.isRequired,
-		equipItem: proptypes.func.isRequired,
-		inventory: proptypes.array.isRequired,
-		setDisplayInventory: proptypes.func.isRequired,
 		resetGame: proptypes.func.isRequired,
-		addMap: proptypes.func.isRequired
-	},
-	componentDidMount() {
- 		this.input.getInputDOMNode().focus();
+		setDisplayInventory: proptypes.func.isRequired,
+		setDisplayStats: proptypes.func.isRequired,
+		setInputExpected: proptypes.func.isRequired,
+		setName: proptypes.func.isRequired,
+		setStats: proptypes.func.isRequired,
+		showMessage: proptypes.func.isRequired
 	},
 	getInitialState() {
 		return { text: "" };
+	},
+	componentDidMount() {
+ 		this.refs.input.getInputDOMNode().focus();
 	},
 	handleChange(event) {
 		this.setState({ text: event.target.value });
@@ -403,8 +403,15 @@ let PlayerBar = React.createClass({
 	},
 	render() {
 		return (
-			<Input type="text" placeholder="Type here!" ref={(ref) => this.input = ref} disabled={this.props.input === constants.DISABLED}
-				value={this.state.text} onChange={this.handleChange} onKeyDown={this.handleSubmit} />
+			<Input 
+				disabled={this.props.input === constants.DISABLED} 
+				onChange={this.handleChange} 
+				onKeyDown={this.handleSubmit} 
+				placeholder="Type here!" 
+				ref="input" 
+				type="text"
+				value={this.state.text} 
+				/>
 		);
 	}
 });

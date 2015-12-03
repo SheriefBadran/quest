@@ -46,17 +46,17 @@ let Inventory = React.createClass({
 				<Panel className="inventory-window">
 					<Grid fluid>
 						<Row>
-						<Col xs={9} md={6}>Weapon: { weapon }</Col>
-						<Col xs={9} md={6}>Armour: { armour }</Col>
+						<Col md={6} xs={9}>Weapon: {weapon}</Col>
+						<Col md={6} xs={9}>Armour: {armour}</Col>
 						</Row>
 						<Row className="inventory-title">
-						<Col xs={18} md={12}>Inventory</Col>
+						<Col md={12} xs={18}>Inventory</Col>
 						</Row>
 						<Row>
-						<Col xs={4.5} md={3}>{col1}</Col>
-						<Col xs={4.5} md={3}>{col2}</Col>
-						<Col xs={4.5} md={3}>{col3}</Col>
-						<Col xs={4.5} md={3}>{col4}</Col>
+						<Col md={3} xs={4.5}>{col1}</Col>
+						<Col md={3} xs={4.5}>{col2}</Col>
+						<Col md={3} xs={4.5}>{col3}</Col>
+						<Col md={3} xs={4.5}>{col4}</Col>
 						</Row>
 					</Grid>
 				</Panel>

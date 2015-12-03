@@ -25984,7 +25984,7 @@
 /* 235 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 
 	var React = __webpack_require__(1),
 	    ReactRouter = __webpack_require__(157),
@@ -25996,9 +25996,9 @@
 
 	module.exports = React.createElement(
 	    Route,
-	    { path: '/', component: Wrap },
+	    { component: Wrap, path: "/" },
 	    React.createElement(IndexRoute, { component: quest }),
-	    React.createElement(Route, { path: '/help', component: help })
+	    React.createElement(Route, { component: help, path: "/help" })
 	);
 
 /***/ },
@@ -26026,7 +26026,7 @@
 	                null,
 	                React.createElement(
 	                    Col,
-	                    { mdOffset: 3, md: 6 },
+	                    { md: 6, mdOffset: 3 },
 	                    React.createElement(
 	                        Panel,
 	                        null,
@@ -43315,15 +43315,15 @@
 	var Log = React.createClass({
 		displayName: "Log",
 		propTypes: {
-			playername: proptypes.string.isRequired,
-			messages: proptypes.array.isRequired
+			messages: proptypes.array.isRequired,
+			playername: proptypes.string.isRequired
 		},
 		componentDidMount: function componentDidMount() {
-			var node = ReactDOM.findDOMNode(this.logpanel);
+			var node = ReactDOM.findDOMNode(this.refs.logpanel);
 			node.scrollTop = node.scrollHeight;
 		},
 		componentDidUpdate: function componentDidUpdate() {
-			var node = ReactDOM.findDOMNode(this.logpanel);
+			var node = ReactDOM.findDOMNode(this.refs.logpanel);
 			node.scrollTop = node.scrollHeight;
 		},
 		render: function render() {
@@ -43331,17 +43331,15 @@
 
 			var lines = this.props.messages.map(function (message, id) {
 				return React.createElement(Dialogue, {
-					speaker: message.speaker,
-					line: message.line,
 					key: id,
-					playername: _this.props.playername
+					line: message.line,
+					playername: _this.props.playername,
+					speaker: message.speaker
 				});
 			});
 			return React.createElement(
 				Panel,
-				{ className: "log-box", ref: function ref(_ref) {
-						return _this.logpanel = _ref;
-					} },
+				{ className: "log-box", ref: "logpanel" },
 				React.createElement(
 					Grid,
 					{ fluid: true },
@@ -43379,7 +43377,7 @@
 		var line = props.line.map(function (part, id) {
 			return React.createElement(
 				"span",
-				{ key: id, className: part.className },
+				{ className: part.className, key: id },
 				part.text
 			);
 		});
@@ -43390,12 +43388,12 @@
 			{ className: props.speaker },
 			React.createElement(
 				Col,
-				{ xs: 4, md: 1 },
+				{ md: 1, xs: 4 },
 				displayname
 			),
 			React.createElement(
 				Col,
-				{ xs: 12, md: 11 },
+				{ md: 11, xs: 12 },
 				React.createElement(
 					"p",
 					null,
@@ -43406,9 +43404,9 @@
 	};
 
 	Dialogue.propTypes = {
-		speaker: proptypes.string.isRequired,
 		line: proptypes.array.isRequired,
-		playername: proptypes.string.isRequired
+		playername: proptypes.string.isRequired,
+		speaker: proptypes.string.isRequired
 	};
 
 	module.exports = Dialogue;
@@ -43436,27 +43434,27 @@
 	var PlayerBar = React.createClass({
 		displayName: "PlayerBar",
 		propTypes: {
+			addItem: proptypes.func.isRequired,
+			addMap: proptypes.func.isRequired,
+			equipItem: proptypes.func.isRequired,
 			input: proptypes.string.isRequired,
+			inventory: proptypes.array.isRequired,
 			name: proptypes.string.isRequired,
 			prevInput: proptypes.string.isRequired,
-			showMessage: proptypes.func.isRequired,
-			setName: proptypes.func.isRequired,
-			setInputExpected: proptypes.func.isRequired,
-			setStats: proptypes.func.isRequired,
-			setDisplayStats: proptypes.func.isRequired,
-			addItem: proptypes.func.isRequired,
 			removeItem: proptypes.func.isRequired,
-			equipItem: proptypes.func.isRequired,
-			inventory: proptypes.array.isRequired,
-			setDisplayInventory: proptypes.func.isRequired,
 			resetGame: proptypes.func.isRequired,
-			addMap: proptypes.func.isRequired
-		},
-		componentDidMount: function componentDidMount() {
-			this.input.getInputDOMNode().focus();
+			setDisplayInventory: proptypes.func.isRequired,
+			setDisplayStats: proptypes.func.isRequired,
+			setInputExpected: proptypes.func.isRequired,
+			setName: proptypes.func.isRequired,
+			setStats: proptypes.func.isRequired,
+			showMessage: proptypes.func.isRequired
 		},
 		getInitialState: function getInitialState() {
 			return { text: "" };
+		},
+		componentDidMount: function componentDidMount() {
+			this.refs.input.getInputDOMNode().focus();
 		},
 		handleChange: function handleChange(event) {
 			this.setState({ text: event.target.value });
@@ -43834,12 +43832,15 @@
 			}
 		},
 		render: function render() {
-			var _this = this;
-
-			return React.createElement(Input, { type: "text", placeholder: "Type here!", ref: function ref(_ref) {
-					return _this.input = _ref;
-				}, disabled: this.props.input === constants.DISABLED,
-				value: this.state.text, onChange: this.handleChange, onKeyDown: this.handleSubmit });
+			return React.createElement(Input, {
+				disabled: this.props.input === constants.DISABLED,
+				onChange: this.handleChange,
+				onKeyDown: this.handleSubmit,
+				placeholder: "Type here!",
+				ref: "input",
+				type: "text",
+				value: this.state.text
+			});
 		}
 	});
 
@@ -56839,8 +56840,8 @@
 	var Status = React.createClass({
 		displayName: "Status",
 		propTypes: {
-			name: proptypes.string.isRequired,
 			display: proptypes.bool.isRequired,
+			name: proptypes.string.isRequired,
 			stats: proptypes.object.isRequired
 		},
 		render: function render() {
@@ -56873,14 +56874,14 @@
 						{ fluid: true },
 						React.createElement(
 							Col,
-							{ xs: 2, md: 1 },
+							{ md: 1, xs: 2 },
 							"Name:",
 							React.createElement("br", null),
 							"Race:"
 						),
 						React.createElement(
 							Col,
-							{ xs: 2, md: 2 },
+							{ md: 2, xs: 2 },
 							this.props.name,
 							React.createElement("br", null),
 							React.createElement(
@@ -56891,14 +56892,14 @@
 						),
 						React.createElement(
 							Col,
-							{ xs: 2, md: 1 },
+							{ md: 1, xs: 2 },
 							"HP:",
 							React.createElement("br", null),
 							"MP:"
 						),
 						React.createElement(
 							Col,
-							{ xs: 2, md: 2 },
+							{ md: 2, xs: 2 },
 							this.props.stats.currenthp,
 							"/",
 							this.props.stats.hp,
@@ -56909,28 +56910,28 @@
 						),
 						React.createElement(
 							Col,
-							{ xs: 2, md: 2 },
+							{ md: 2, xs: 2 },
 							"Strength:",
 							React.createElement("br", null),
 							"Magic:"
 						),
 						React.createElement(
 							Col,
-							{ xs: 2, md: 1 },
+							{ md: 1, xs: 2 },
 							str,
 							React.createElement("br", null),
 							mag
 						),
 						React.createElement(
 							Col,
-							{ xs: 2, md: 2 },
+							{ md: 2, xs: 2 },
 							"Dexterity:",
 							React.createElement("br", null),
 							"Defence:"
 						),
 						React.createElement(
 							Col,
-							{ xs: 2, md: 1 },
+							{ md: 1, xs: 2 },
 							dex,
 							React.createElement("br", null),
 							def
@@ -57026,13 +57027,13 @@
 							null,
 							React.createElement(
 								Col,
-								{ xs: 9, md: 6 },
+								{ md: 6, xs: 9 },
 								"Weapon: ",
 								weapon
 							),
 							React.createElement(
 								Col,
-								{ xs: 9, md: 6 },
+								{ md: 6, xs: 9 },
 								"Armour: ",
 								armour
 							)
@@ -57042,7 +57043,7 @@
 							{ className: "inventory-title" },
 							React.createElement(
 								Col,
-								{ xs: 18, md: 12 },
+								{ md: 12, xs: 18 },
 								"Inventory"
 							)
 						),
@@ -57051,22 +57052,22 @@
 							null,
 							React.createElement(
 								Col,
-								{ xs: 4.5, md: 3 },
+								{ md: 3, xs: 4.5 },
 								col1
 							),
 							React.createElement(
 								Col,
-								{ xs: 4.5, md: 3 },
+								{ md: 3, xs: 4.5 },
 								col2
 							),
 							React.createElement(
 								Col,
-								{ xs: 4.5, md: 3 },
+								{ md: 3, xs: 4.5 },
 								col3
 							),
 							React.createElement(
 								Col,
-								{ xs: 4.5, md: 3 },
+								{ md: 3, xs: 4.5 },
 								col4
 							)
 						)
@@ -57158,7 +57159,7 @@
 							// Place the player character
 							mapRow.push(React.createElement(
 								"span",
-								{ key: x + "" + y, className: "Player" },
+								{ className: "Player", key: x + "" + y },
 								"☺"
 							));
 							continue;
@@ -57184,28 +57185,28 @@
 							case "grasslands":
 								mapRow.push(React.createElement(
 									"span",
-									{ key: x + "" + y, className: "grass" },
+									{ className: "grass", key: x + "" + y },
 									"#"
 								));
 								break;
 							case "Mountain":
 								mapRow.push(React.createElement(
 									"span",
-									{ key: x + "" + y, className: "cliff" },
+									{ className: "cliff", key: x + "" + y },
 									"▲"
 								));
 								break;
 							case "Water":
 								mapRow.push(React.createElement(
 									"span",
-									{ key: x + "" + y, className: "water" },
+									{ className: "water", key: x + "" + y },
 									"♒"
 								));
 								break;
 							case "Wizard":
 								mapRow.push(React.createElement(
 									"span",
-									{ key: x + "" + y, className: "Wizard" },
+									{ className: "Wizard", key: x + "" + y },
 									"Π"
 								));
 								break;
@@ -57245,13 +57246,13 @@
 	"use strict";
 
 	var React = __webpack_require__(1),
-	    proptypes = React.PropTypes,
 	    Panel = __webpack_require__(241).Panel,
 	    Grid = __webpack_require__(241).Grid,
 	    Row = __webpack_require__(241).Row,
 	    Col = __webpack_require__(241).Col,
 	    HelpList = __webpack_require__(510),
-	    EmergencyReset = __webpack_require__(519);
+	    EmergencyReset = __webpack_require__(519),
+	    HelpItem = __webpack_require__(520);
 
 	var Help = React.createClass({
 		displayName: "Help",
@@ -57278,7 +57279,7 @@
 				{ fluid: true },
 				React.createElement(
 					Col,
-					{ mdOffset: 3, md: 6 },
+					{ md: 6, mdOffset: 3 },
 					React.createElement(
 						Panel,
 						{ className: "help-grid" },
@@ -57316,32 +57317,6 @@
 			);
 		}
 	});
-
-	var HelpItem = function HelpItem(props) {
-		return React.createElement(
-			Row,
-			{ className: "help-row" },
-			React.createElement(
-				Col,
-				{ className: "help-command", md: 6 },
-				React.createElement(
-					"span",
-					{ className: "command-style" },
-					props.command
-				)
-			),
-			React.createElement(
-				Col,
-				{ md: 6 },
-				props.description
-			)
-		);
-	};
-
-	HelpItem.propTypes = {
-		command: proptypes.string.isRequired,
-		description: proptypes.object.isRequired
-	};
 
 	module.exports = Help;
 
@@ -57468,7 +57443,7 @@
 					React.createElement("br", null),
 					React.createElement(
 						Button,
-						{ bsStyle: "danger", style: { marginTop: 10 }, bsSize: "large", onClick: this.handleClick },
+						{ bsSize: "large", bsStyle: "danger", onClick: this.handleClick, style: { marginTop: 10 } },
 						"Emergency Reset"
 					)
 				)
@@ -57485,6 +57460,47 @@
 	};
 
 	module.exports = ReactRedux.connect(null, mapDispatchToProps)(EmergencyReset);
+
+/***/ },
+/* 520 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	// Help item class used by "help.js"
+
+	var React = __webpack_require__(1),
+	    proptypes = React.PropTypes,
+	    Row = __webpack_require__(241).Row,
+	    Col = __webpack_require__(241).Col;
+
+	var HelpItem = function HelpItem(props) {
+		return React.createElement(
+			Row,
+			{ className: "help-row" },
+			React.createElement(
+				Col,
+				{ className: "help-command", md: 6 },
+				React.createElement(
+					"span",
+					{ className: "command-style" },
+					props.command
+				)
+			),
+			React.createElement(
+				Col,
+				{ md: 6 },
+				props.description
+			)
+		);
+	};
+
+	HelpItem.propTypes = {
+		command: proptypes.string.isRequired,
+		description: proptypes.object.isRequired
+	};
+
+	module.exports = HelpItem;
 
 /***/ }
 /******/ ]);

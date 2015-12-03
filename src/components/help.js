@@ -1,11 +1,11 @@
 let React = require("react"),
-	proptypes = React.PropTypes,
 	Panel = require("react-bootstrap").Panel,
 	Grid = require("react-bootstrap").Grid,
 	Row = require("react-bootstrap").Row,
 	Col = require("react-bootstrap").Col,
 	HelpList = require("./../data/helplist"),
-	EmergencyReset = require("./emergencyreset");
+	EmergencyReset = require("./emergencyreset"),
+	HelpItem = require("./helpitem");
 
 let Help = React.createClass({
 	displayName: "Help",
@@ -18,7 +18,7 @@ let Help = React.createClass({
 
 		return (
 			<Grid fluid>
-				<Col mdOffset={3} md={6}>
+				<Col md={6} mdOffset={3}>
 					<Panel className="help-grid">
 						<Row className="help-head">
 							<Col md={12}>Instructions</Col>
@@ -37,19 +37,5 @@ let Help = React.createClass({
 		);
 	}
 });
-
-let HelpItem = (props)=> {
-	return (
-		<Row className="help-row">
-			<Col className="help-command" md={6}><span className="command-style">{props.command}</span></Col>
-			<Col md={6}>{props.description}</Col>
-		</Row>
-	);
-};
-
-HelpItem.propTypes = {
-	command: proptypes.string.isRequired,
-	description: proptypes.object.isRequired
-};
 
 module.exports = Help;

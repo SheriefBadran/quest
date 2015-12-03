@@ -15,22 +15,22 @@ let Dialogue = (props)=> {
 
 	// Build the line out of the provided parts in order to allow for word-specific styling
 	let line = props.line.map(
-		(part,id)=> <span key={id} className={part.className}>{part.text}</span>
+		(part,id)=> <span className={part.className} key={id}>{part.text}</span>
 	);
 
 	// Return a row with displayname and the built line
 	return (
 		<Row className={props.speaker}>
-			<Col xs={4} md={1}>{displayname}</Col>
-			<Col xs={12} md={11}><p>{line}</p></Col>
+			<Col md={1} xs={4}>{displayname}</Col>
+			<Col md={11} xs={12}><p>{line}</p></Col>
 		</Row>
 	);
 };
 
 Dialogue.propTypes = {
-	speaker: proptypes.string.isRequired,
 	line: proptypes.array.isRequired,
-	playername: proptypes.string.isRequired
+	playername: proptypes.string.isRequired,
+	speaker: proptypes.string.isRequired
 };
 
 module.exports = Dialogue;

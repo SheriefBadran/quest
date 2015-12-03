@@ -14,9 +14,9 @@ let EmergencyReset = React.createClass({
 	render() {
 		return (
 			<Row>
-				<Col md={12} style={ { textAlign: "center", marginTop: 5 } }>
+				<Col md={12} style={{ textAlign: "center", marginTop: 5 }}>
 					Somehow manage to break everything? Never fear!<br />
-					<Button bsStyle="danger" style={{marginTop: 10}} bsSize="large" onClick={this.handleClick}>Emergency Reset</Button>
+					<Button bsSize="large" bsStyle="danger" onClick={this.handleClick} style={{marginTop: 10}}>Emergency Reset</Button>
 				</Col>
 			</Row>
 		);

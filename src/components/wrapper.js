@@ -1,4 +1,4 @@
-let React = require('react'),
+let React = require("react"),
 	Navigation = require("./navigation"),
 	Panel = require("react-bootstrap").Panel,
 	Grid = require("react-bootstrap").Grid,
@@ -10,7 +10,7 @@ let Wrapper = (props)=> {
         <div className="wrapper">
         <Grid fluid>
             <Row>
-        	<Col mdOffset={3} md={6}>
+        	<Col md={6} mdOffset={3}>
         		<Panel>
         			<Navigation />
         		</Panel>

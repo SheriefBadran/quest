@@ -1,14 +1,14 @@
-let React = require('react'),
-    ReactRouter = require('react-router'),
+let React = require("react"),
+    ReactRouter = require("react-router"),
     Route = ReactRouter.Route,
     IndexRoute = ReactRouter.IndexRoute,
-    Wrap = require('./components/wrapper'),
-    quest = require('./components/quest'),
-    help = require('./components/help');
+    Wrap = require("./components/wrapper"),
+    quest = require("./components/quest"),
+    help = require("./components/help");
 
 module.exports = (
-    <Route path='/' component={Wrap}>
+    <Route component={Wrap} path="/">
         <IndexRoute component={quest} />
-        <Route path="/help" component={help} />
+        <Route component={help} path="/help" />
     </Route>
 );

@@ -51,7 +51,7 @@ let WorldMap = React.createClass({
 					}
 					if (x === this.props.player.x && y === this.props.player.y) {
 						// Place the player character
-						mapRow.push(<span key={x + "" + y} className="Player">☺</span>);
+						mapRow.push(<span className="Player" key={x + "" + y}>☺</span>);
 						continue;
 					}
 					if (!this.props.map[y][x].seen) { // If the area has not been seen it should be hidden
@@ -64,16 +64,16 @@ let WorldMap = React.createClass({
 					}
 					switch (this.props.map[y][x].type) { // TODO: remove this switch statement and just use a map to get symbols with type as key
 						case "grasslands":
-							mapRow.push(<span key={x + "" + y} className="grass">#</span>);
+							mapRow.push(<span className="grass" key={x + "" + y}>#</span>);
 							break;
 						case "Mountain":
-							mapRow.push(<span key={x + "" + y} className="cliff">▲</span>);
+							mapRow.push(<span className="cliff" key={x + "" + y}>▲</span>);
 							break;
 						case "Water":
-							mapRow.push(<span key={x + "" + y} className="water">♒</span>);
+							mapRow.push(<span className="water" key={x + "" + y}>♒</span>);
 							break;
 						case "Wizard":
-							mapRow.push(<span key={x + "" + y} className="Wizard">Π</span>);
+							mapRow.push(<span className="Wizard" key={x + "" + y}>Π</span>);
 							break;
 						default:
 							console.log("Something went wrong in map drawing.");

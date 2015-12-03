@@ -11,26 +11,26 @@ let React = require("react"),
 let Log = React.createClass({
 	displayName: "Log",
 	propTypes: {
-		playername: proptypes.string.isRequired,
-		messages: proptypes.array.isRequired
+		messages: proptypes.array.isRequired,
+		playername: proptypes.string.isRequired
 	},
 	componentDidMount() {
- 		let node = ReactDOM.findDOMNode(this.logpanel);
+ 		let node = ReactDOM.findDOMNode(this.refs.logpanel);
 		node.scrollTop = node.scrollHeight;
 	},
 	componentDidUpdate() {
- 		let node = ReactDOM.findDOMNode(this.logpanel);
+ 		let node = ReactDOM.findDOMNode(this.refs.logpanel);
 		node.scrollTop = node.scrollHeight;
 	},
 	render() {
 		let lines = this.props.messages.map((message, id)=> <Dialogue
-			speaker={message.speaker}
-			line={message.line}
 			key={id}
+			line={message.line}
 			playername={this.props.playername}
+			speaker={message.speaker}
 		/>);
 		return (
-			<Panel className="log-box" ref={(ref) => this.logpanel = ref} >
+			<Panel className="log-box" ref="logpanel">
 				<Grid fluid>
 					{lines}
 				</Grid>

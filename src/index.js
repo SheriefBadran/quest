@@ -4,12 +4,12 @@ then use React and React-DOM to render it.
 */
 
 let React = require("react"),
-    ReactRouter = require('react-router'),
+    ReactRouter = require("react-router"),
     Router = ReactRouter.Router,
 	ReactDOM = require("react-dom"),
 	Provider = require("react-redux").Provider,
 	store = require("./store"),
-	routes = require('./routes');
+	routes = require("./routes");
 
 ReactDOM.render(
 	<Provider store={store}>
