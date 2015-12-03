@@ -31,7 +31,7 @@ module.exports = function() { // Returns a function so it can't be modified acci
 			armour: null
 		},
 		world: {
-			version: "0.1.2.27",
+			version: "0.1.2.34",
 			displayMap: false,
 			map: [[]],
 			playerPos: {

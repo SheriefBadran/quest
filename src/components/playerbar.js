@@ -1,4 +1,4 @@
-var React = require("react"),
+let React = require("react"),
 	ReactDOM = require("react-dom"),
 	ReactRedux = require("react-redux"),
 	actions = require("./../actions"),
@@ -9,9 +9,10 @@ var React = require("react"),
 	Classes = require("./../data/class"),
 	Weapons = require("./../data/weapon"),
 	Items = require("./../data/item"),
-	MapGen = require("./mapgen");
+	MapGen = require("./mapgen"),
+	NPCs = require("./../data/npc");
 
-var PlayerBar = React.createClass({
+let PlayerBar = React.createClass({
 	displayName: "PlayerBar",
 	propTypes: {
 		input: proptypes.string.isRequired,
@@ -30,16 +31,16 @@ var PlayerBar = React.createClass({
 		resetGame: proptypes.func.isRequired,
 		addMap: proptypes.func.isRequired
 	},
-	componentDidMount: function() {
+	componentDidMount() {
  		this.input.getInputDOMNode().focus();
 	},
-	getInitialState: function() {
+	getInitialState() {
 		return { text: "" };
 	},
-	handleChange: function(event) {
+	handleChange(event) {
 		this.setState({ text: event.target.value });
 	},
-	handleSubmit: function(event) {
+	handleSubmit(event) {
 		if (event.keyCode == 13) { // If it's enter key
 			if (this.state.text) {
 				this.validateAndSendInput(this.state.text);
@@ -47,8 +48,8 @@ var PlayerBar = React.createClass({
 			}
 		}
 	},
-	getRequestedItem: function(itemName) {
-		var requestedItem = null;
+	getRequestedItem(itemName) {
+		let requestedItem = null;
 		this.props.inventory.forEach(function(item) {
 			if (item.name.toUpperCase() === itemName.toUpperCase()) {
 				requestedItem = item;
@@ -56,17 +57,17 @@ var PlayerBar = React.createClass({
 		}.bind(this));
 		return requestedItem;
 	},
-	attemptEquip: function(input) {
+	attemptEquip(input) {
 		input = input.split(" ");
 
 		if (input.length > 1) {
 
-			var itemName = input[1];
-			for (var i = 2; i < input.length; ++i) {
+			let itemName = input[1];
+			for (let i = 2; i < input.length; ++i) {
 				itemName += " " + input[i];
 			}
 
-			var requestedItem = this.getRequestedItem(itemName);
+			let requestedItem = this.getRequestedItem(itemName);
 
 			if (requestedItem) {
 				if (requestedItem.equippable) {
@@ -80,19 +81,19 @@ var PlayerBar = React.createClass({
 			}
 		}
 	},
-	attemptLookAt: function(input) {
+	attemptLookAt(input) {
 		input = input.split(" ");
 
 		if (input.length > 2) {
-			var itemName = input[2];
-			for (var i = 3; i < input.length; ++i) {
+			let itemName = input[2];
+			for (let i = 3; i < input.length; ++i) {
 				itemName += " " + input[i];
 			}
 
-			var requestedItem = this.getRequestedItem(itemName);
+			let requestedItem = this.getRequestedItem(itemName);
 
 			if (requestedItem) {
-				var prefix = ("AEIOU".indexOf(requestedItem.prefix.charAt(0).toUpperCase()) < 0) ? "A" : "An";
+				let prefix = ("AEIOU".indexOf(requestedItem.prefix.charAt(0).toUpperCase()) < 0) ? "A" : "An";
 				this.props.showMessage({ speaker: constants.NARRATOR, line: [ { text: prefix + " " + requestedItem.prefix + " " }, { className: requestedItem.name, text: requestedItem.name }, { text: ". " + requestedItem.description } ] }, 0);
 				if (requestedItem.type === constants.WEAPON || requestedItem.type === constants.ARMOUR) {
 					this.props.showMessage({ speaker: constants.NARRATOR, line: [ { text: "The stats are Strength: " + requestedItem.stats.str + ", Magic: " + requestedItem.stats.mag + ", Dexterity: " + requestedItem.stats.dex + ", and Defence: " + requestedItem.stats.def + "." } ] }, 0);
@@ -102,11 +103,11 @@ var PlayerBar = React.createClass({
 			}
 		}
 	},
-	lookAround: function() {
+	lookAround() {
 		// TODO: make it look around the tile you're currently in too
 
 		// We need to check what's in the four cardinal directions
-		var message = "";
+		let message = "";
 
 		// Make sure it's both on the map 
 		if (this.props.playerPos.y -1 >= 0 ) {
@@ -130,15 +131,15 @@ var PlayerBar = React.createClass({
 		}
 
 		if (this.props.map[this.props.playerPos.y][this.props.playerPos.x].encounter) {
-			var encounter = this.props.map[this.props.playerPos.y][this.props.playerPos.x].encounter;
+			let encounter = NPCs.all[this.props.map[this.props.playerPos.y][this.props.playerPos.x].encounter];
 			this.props.showMessage({ speaker: constants.NARRATOR, line: encounter.description }, 0);
 		}
 
 		this.props.showMessage({ speaker: constants.NARRATOR, line: [ { text: message } ] }, 0);
 	},
-	checkAndSetName: function(input) {
+	checkAndSetName(input) {
 		// Validate the length of the name
-		var message;
+		let message;
 		if (input.length > constants.MAX_NAME_LENGTH || input.length < constants.MIN_NAME_LENGTH) {
 			message = { speaker: constants.WIZARD, line: [ { text: "Hmmm... are you sure about that? Around here, names are usually between " + constants.MIN_NAME_LENGTH + " and " + constants.MAX_NAME_LENGTH + " characters in length! How about trying again?" } ] };
 		} else {
@@ -149,22 +150,22 @@ var PlayerBar = React.createClass({
 		this.props.showMessage({ speaker: constants.PLAYER, line: [ { text: "I'm " + input + "." } ] }, 0);
 		this.props.showMessage(message, 1000); // Display the message
 	},
-	checkAndSelectRace: function(input) {
-		var playerMessage;
-		var message;
+	checkAndSelectRace(input) {
+		let playerMessage;
+		let message;
 
-		var raceOptions = [];
+		let raceOptions = [];
 
-		for (var raceName in Classes) {
+		for (let raceName in Classes) {
 			if (Classes.hasOwnProperty(raceName)) {
 				raceOptions.push(raceName);
 			}
 		}
 
 		// Check if it's a valid race
-		var valid = false;
-		var chosenRace;
-		for (var i = 0; i < raceOptions.length; ++i) {
+		let valid = false;
+		let chosenRace;
+		for (let i = 0; i < raceOptions.length; ++i) {
 			if (input.toUpperCase().indexOf(raceOptions[i].toUpperCase()) > -1) { // Check if it's mentioned anywhere in the input
 				valid = true;
 				chosenRace = raceOptions[i];
@@ -173,7 +174,7 @@ var PlayerBar = React.createClass({
 		}
 
 		if (valid) {
-			var prefix = ("AEIOU".indexOf(input.charAt(0).toUpperCase()) < 0) ? "A" : "An";
+			let prefix = ("AEIOU".indexOf(input.charAt(0).toUpperCase()) < 0) ? "A" : "An";
 			playerMessage = { speaker: constants.PLAYER, line: [ { text: "I'm " + prefix.toLowerCase() + " " + chosenRace + "... I think?" } ] };
 			message = { speaker: constants.WIZARD, line: [ { text: "Aha! " + prefix + " " }, { className: chosenRace, text: chosenRace }, { text: " eh? " + Classes[chosenRace].description + " Are you sure about this?" } ] };
 			this.props.setStats(Classes[chosenRace].stats);
@@ -186,23 +187,23 @@ var PlayerBar = React.createClass({
 		this.props.showMessage(playerMessage, 0);
 		this.props.showMessage(message, 1000); // Display the message
 	},
-	checkAndSelectStarterWeapon: function(input) {
-		var playerMessage;
-		var message;
+	checkAndSelectStarterWeapon(input) {
+		let playerMessage;
+		let message;
 
-		var weaponOptions = [];
+		let weaponOptions = [];
 
-		for (var weaponName in Weapons.starter) {
+		for (let weaponName in Weapons.starter) {
 			if (Weapons.starter.hasOwnProperty(weaponName)) {
 				weaponOptions.push(weaponName);
 			}
 		}
 
 		// Check validity
-		var valid = false;
-		var chosenWeapon; // An object
+		let valid = false;
+		let chosenWeapon; // An object
 
-		for (var i = 0; i < weaponOptions.length; ++i) {
+		for (let i = 0; i < weaponOptions.length; ++i) {
 			if (input.toUpperCase().indexOf(weaponOptions[i].toUpperCase()) > -1) { // Check if it's mentioned anywhere in the input
 				valid = true;
 				chosenWeapon = Weapons.starter[weaponOptions[i]];
@@ -226,9 +227,9 @@ var PlayerBar = React.createClass({
 		this.props.showMessage(playerMessage, 0);
 		this.props.showMessage(message, 1000); // Display the message
 	},
-	checkAndValidateConfirmation: function(input) {
-		var playerMessage;
-		var message;
+	checkAndValidateConfirmation(input) {
+		let playerMessage;
+		let message;
 		if (input.toUpperCase() === "YES" || input.toUpperCase() === "Y") {
 			playerMessage = messageGen.getPlayerYes();
 			message = messageGen.getConfirmMessage(this.props.prevInput, this.props.name);
@@ -246,9 +247,9 @@ var PlayerBar = React.createClass({
 					this.props.setInputExpected(constants.EXPECTING_WEAPON);
 					break;
 				case constants.EXPECTING_WEAPON:
-					var latestItem = this.props.inventory[this.props.inventory.length-1];
-					var prefix = ("AEIOU".indexOf(latestItem.name.charAt(0).toUpperCase()) < 0) ? "A" : "An";
-					var has = (latestItem.isPlural) ? "have" : "has";
+					let latestItem = this.props.inventory[this.props.inventory.length-1];
+					let prefix = ("AEIOU".indexOf(latestItem.name.charAt(0).toUpperCase()) < 0) ? "A" : "An";
+					let has = (latestItem.isPlural) ? "have" : "has";
 					this.props.showMessage({ speaker: constants.NARRATOR, line: [ { text: prefix + " " + latestItem.prefix + " " }, { className: latestItem.name, text: latestItem.name }, { text: " " + has + " been added to your inventory!" } ] }, 2000);
 					this.props.setDisplayInventory(true, 2000)
 					this.props.showMessage({ speaker: constants.WIZARD, line: [ { text: "Don't forget to equip it before you head out into the world by using " }, { className: "confirm", text: "equip " + latestItem.name }, { text: "! Not my fault if you end up running around unarmed!" } ] }, 3000);
@@ -264,12 +265,12 @@ var PlayerBar = React.createClass({
 					break;
 			}
 		} else if (input.toUpperCase() === "NO" || input.toUpperCase() === "N") {
-			var options = [];
+			let options = [];
 
 			if (this.props.prevInput === constants.EXPECTING_RACE) {
 				options = Classes;
 			} else if (this.props.prevInput === constants.EXPECTING_WEAPON) {
-				for (var weaponName in Weapons.starter) {
+				for (let weaponName in Weapons.starter) {
 					if (Weapons.starter.hasOwnProperty(weaponName)) {
 						options.push(weaponName);
 					}
@@ -288,10 +289,10 @@ var PlayerBar = React.createClass({
 			this.props.showMessage(message, 1000); // Display the message
 		}
 	},
-	checkAndMovePlayer: function(input) { //TODO: Possibly remove the text saying which direction you moved
-		var wrongWay = { speaker: constants.NARRATOR, line: [ { text: "You can't go that way!" } ] };
+	checkAndMovePlayer(input) { //TODO: Possibly remove the text saying which direction you moved
+		let wrongWay = { speaker: constants.NARRATOR, line: [ { text: "You can't go that way!" } ] };
 
-		var movement = { x: 0, y: 0 };
+		let movement = { x: 0, y: 0 };
 
 		if (input.toUpperCase() === "N" || input.toUpperCase().indexOf("NORTH") > -1) {
 			// Make sure it's both on the map and that it's not an obstacle
@@ -328,7 +329,7 @@ var PlayerBar = React.createClass({
 			this.props.movePlayer(movement);
 
 			if (this.props.map[this.props.playerPos.y + movement.y][this.props.playerPos.x + movement.x].encounter) {
-				var encounter = this.props.map[this.props.playerPos.y + movement.y][this.props.playerPos.x + movement.x].encounter;
+				let encounter = NPCs.all[this.props.map[this.props.playerPos.y + movement.y][this.props.playerPos.x + movement.x].encounter];
 				this.props.showMessage({ speaker: constants.NARRATOR, line: encounter.description }, 0);
 				encounter.seen = true;
 			}
@@ -336,7 +337,7 @@ var PlayerBar = React.createClass({
 
 		// TODO: things like description when entering special new area
 	},
-	validateAndSendInput: function(input) { // TODO: IMPORANT - MAKE THIS METHOD MUCH SMALLER
+	validateAndSendInput(input) { // TODO: IMPORANT - MAKE THIS METHOD MUCH SMALLER
 		if (input.split(" ")[0].toUpperCase() === "RESET") { // If they want to give up and reset the game
 			this.props.showMessage({ speaker: constants.PLAYER, line: [ { text: "I can't take this anymore..." } ] }, 0);
 			this.props.showMessage(messageGen.getResetMessage(this.props.name), 1000);
@@ -353,10 +354,10 @@ var PlayerBar = React.createClass({
 			this.lookAround();
 			return;
 		} else if (this.props.map[0].length > 0 && this.props.map[this.props.playerPos.y][this.props.playerPos.x].encounter) {
-			var encounter = this.props.map[this.props.playerPos.y][this.props.playerPos.x].encounter;
+			let encounter = NPCs.all[this.props.map[this.props.playerPos.y][this.props.playerPos.x].encounter];
 			if (input.toUpperCase().indexOf("TALK") > -1) {
 				this.props.showMessage({ speaker: constants.NARRATOR, line: [ { text: "You attempt to strike up a conversation with the " }, { className: encounter.name, text: encounter.name }, { text: "." } ] }, 0);
-				var randomResponse = encounter.talk[Math.floor(Math.random() * encounter.talk.length)];
+				let randomResponse = encounter.talk[Math.floor(Math.random() * encounter.talk.length)];
 				this.props.showMessage({ speaker: encounter.name, line: randomResponse }, 1000);
 			}
 
@@ -383,7 +384,7 @@ var PlayerBar = React.createClass({
 				this.props.showMessage(messageGen.getMapIntroMessage(), 6000);
 				this.props.showMessage(messageGen.getMapAddedMessage(), 8000);
 				this.props.addItem(Items.map, 8000);
-				var map = MapGen.generateMap();
+				let map = MapGen.generateMap();
 				this.props.addMap(map.map, map.start, 8000);
 				this.props.showMessage(messageGen.getMapContMessage(), 9000);
 				this.props.showMessage(messageGen.getElfLeaveMessage(), 11000);
@@ -400,7 +401,7 @@ var PlayerBar = React.createClass({
 				break;;
 		}
 	},
-	render: function() {
+	render() {
 		return (
 			<Input type="text" placeholder="Type here!" ref={(ref) => this.input = ref} disabled={this.props.input === constants.DISABLED}
 				value={this.state.text} onChange={this.handleChange} onKeyDown={this.handleSubmit} />
@@ -408,47 +409,47 @@ var PlayerBar = React.createClass({
 	}
 });
 
-var mapStateToProps = function (state) {
+let mapStateToProps = (state)=> {
 	return { input: state.input.awaiting, prevInput: state.input.previous, name: state.player.name, inventory: state.player.inventory, map: state.world.map,
 				playerPos: state.world.playerPos };
 };
 
-var mapDispatchToProps = function (dispatch) {
+let mapDispatchToProps = (dispatch)=> {
 	return {
-		showMessage: function(message, timeout) {
+		showMessage(message, timeout) {
 			dispatch(actions.showMessage(message, timeout));
 		},
-		setName: function(name) {
+		setName(name) {
 			dispatch(actions.setName(name));
 		},
-		setStats: function(stats) {
+		setStats(stats) {
 			dispatch(actions.setStats(stats));
 		},
-		setInputExpected: function(inputType) {
+		setInputExpected(inputType) {
 			dispatch(actions.setInputExpected(inputType));
 		},
-		setDisplayStats: function(display, timeout) {
+		setDisplayStats(display, timeout) {
 			dispatch(actions.setDisplayStats(display, timeout));
 		},
-		addItem: function(item, timeout) {
+		addItem(item, timeout) {
 			dispatch(actions.addItem(item, timeout));
 		},
-		removeItem: function(item) {
+		removeItem(item) {
 			dispatch(actions.removeItem(item));
 		},
-		equipItem: function(item) {
+		equipItem(item) {
 			dispatch(actions.equipItem(item));
 		},
-		setDisplayInventory: function(display, timeout) {
+		setDisplayInventory(display, timeout) {
 			dispatch(actions.setDisplayInventory(display, timeout));
 		},
-		addMap: function(map, position, timeout) {
+		addMap(map, position, timeout) {
 			dispatch(actions.addMap(map, position, timeout));
 		},
-		movePlayer: function(movement) {
+		movePlayer(movement) {
 			dispatch(actions.movePlayer(movement));
 		},
-		resetGame: function(timeout) {
+		resetGame(timeout) {
 			dispatch(actions.resetGame(timeout));
 		}
 	}

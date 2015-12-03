@@ -25690,7 +25690,7 @@
 				armour: null
 			},
 			world: {
-				version: "0.1.2.27",
+				version: "0.1.2.34",
 				displayMap: false,
 				map: [[]],
 				playerPos: {
@@ -43430,7 +43430,8 @@
 	    Classes = __webpack_require__(491),
 	    Weapons = __webpack_require__(495),
 	    Items = __webpack_require__(501),
-	    MapGen = __webpack_require__(503);
+	    MapGen = __webpack_require__(503),
+	    NPCs = __webpack_require__(504);
 
 	var PlayerBar = React.createClass({
 		displayName: "PlayerBar",
@@ -43552,7 +43553,7 @@
 			}
 
 			if (this.props.map[this.props.playerPos.y][this.props.playerPos.x].encounter) {
-				var encounter = this.props.map[this.props.playerPos.y][this.props.playerPos.x].encounter;
+				var encounter = NPCs.all[this.props.map[this.props.playerPos.y][this.props.playerPos.x].encounter];
 				this.props.showMessage({ speaker: constants.NARRATOR, line: encounter.description }, 0);
 			}
 
@@ -43560,7 +43561,7 @@
 		},
 		checkAndSetName: function checkAndSetName(input) {
 			// Validate the length of the name
-			var message;
+			var message = undefined;
 			if (input.length > constants.MAX_NAME_LENGTH || input.length < constants.MIN_NAME_LENGTH) {
 				message = { speaker: constants.WIZARD, line: [{ text: "Hmmm... are you sure about that? Around here, names are usually between " + constants.MIN_NAME_LENGTH + " and " + constants.MAX_NAME_LENGTH + " characters in length! How about trying again?" }] };
 			} else {
@@ -43572,8 +43573,8 @@
 			this.props.showMessage(message, 1000); // Display the message
 		},
 		checkAndSelectRace: function checkAndSelectRace(input) {
-			var playerMessage;
-			var message;
+			var playerMessage = undefined;
+			var message = undefined;
 
 			var raceOptions = [];
 
@@ -43585,7 +43586,7 @@
 
 			// Check if it's a valid race
 			var valid = false;
-			var chosenRace;
+			var chosenRace = undefined;
 			for (var i = 0; i < raceOptions.length; ++i) {
 				if (input.toUpperCase().indexOf(raceOptions[i].toUpperCase()) > -1) {
 					// Check if it's mentioned anywhere in the input
@@ -43611,8 +43612,8 @@
 			this.props.showMessage(message, 1000); // Display the message
 		},
 		checkAndSelectStarterWeapon: function checkAndSelectStarterWeapon(input) {
-			var playerMessage;
-			var message;
+			var playerMessage = undefined;
+			var message = undefined;
 
 			var weaponOptions = [];
 
@@ -43624,7 +43625,7 @@
 
 			// Check validity
 			var valid = false;
-			var chosenWeapon; // An object
+			var chosenWeapon = undefined; // An object
 
 			for (var i = 0; i < weaponOptions.length; ++i) {
 				if (input.toUpperCase().indexOf(weaponOptions[i].toUpperCase()) > -1) {
@@ -43653,8 +43654,8 @@
 			this.props.showMessage(message, 1000); // Display the message
 		},
 		checkAndValidateConfirmation: function checkAndValidateConfirmation(input) {
-			var playerMessage;
-			var message;
+			var playerMessage = undefined;
+			var message = undefined;
 			if (input.toUpperCase() === "YES" || input.toUpperCase() === "Y") {
 				playerMessage = messageGen.getPlayerYes();
 				message = messageGen.getConfirmMessage(this.props.prevInput, this.props.name);
@@ -43755,7 +43756,7 @@
 				this.props.movePlayer(movement);
 
 				if (this.props.map[this.props.playerPos.y + movement.y][this.props.playerPos.x + movement.x].encounter) {
-					var encounter = this.props.map[this.props.playerPos.y + movement.y][this.props.playerPos.x + movement.x].encounter;
+					var encounter = NPCs.all[this.props.map[this.props.playerPos.y + movement.y][this.props.playerPos.x + movement.x].encounter];
 					this.props.showMessage({ speaker: constants.NARRATOR, line: encounter.description }, 0);
 					encounter.seen = true;
 				}
@@ -43785,7 +43786,7 @@
 				this.lookAround();
 				return;
 			} else if (this.props.map[0].length > 0 && this.props.map[this.props.playerPos.y][this.props.playerPos.x].encounter) {
-				var encounter = this.props.map[this.props.playerPos.y][this.props.playerPos.x].encounter;
+				var encounter = NPCs.all[this.props.map[this.props.playerPos.y][this.props.playerPos.x].encounter];
 				if (input.toUpperCase().indexOf("TALK") > -1) {
 					this.props.showMessage({ speaker: constants.NARRATOR, line: [{ text: "You attempt to strike up a conversation with the " }, { className: encounter.name, text: encounter.name }, { text: "." }] }, 0);
 					var randomResponse = encounter.talk[Math.floor(Math.random() * encounter.talk.length)];
@@ -56730,7 +56731,7 @@
 			}
 
 			map[5][4] = { type: "Wizard", seen: true, obstacle: true, description: "the crumbling ruins of an old tower. You probably shouldn't go back there" };
-			map[0][2].encounter = NPCs.random.elf;
+			map[0][2].encounter = NPCs.random.elf.id;
 
 			var playerPos = { x: 4, y: 4 };
 
@@ -56744,13 +56745,26 @@
 
 	"use strict";
 
-	var NPCS = {
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _ = __webpack_require__(496);
+
+	var NPCs = {
 		random: {
 			elf: __webpack_require__(505)
-		}
+		},
+		all: {}
 	};
 
-	module.exports = NPCS;
+	NPCs.all = _extends(NPCs.random); // Copy all he NPCs to the all category
+
+	NPCs.all = _.reduce(NPCs.all, function (ret, data, id) {
+		// Add an id corresponding to the key to each NPC
+		ret[id].id = id;
+		return ret;
+	}, NPCs.all);
+
+	module.exports = NPCs;
 
 /***/ },
 /* 505 */
