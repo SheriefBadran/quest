@@ -25640,6 +25640,13 @@
 				state.world.playerPos = state.world.prepMap.position;
 				delete state.world.prepMap;
 			}
+
+			// If the version is not correct, we remove the localStorage and return default state to ensure nothing is broken during development
+			//TODO: Make this unnecessary
+			if (state.world.version !== initialState().world.version) {
+				localStorage.removeItem("Quest");
+				return;
+			}
 		}
 		return state;
 	};
@@ -25683,6 +25690,7 @@
 				armour: null
 			},
 			world: {
+				version: "0.1.2.27",
 				displayMap: false,
 				map: [[]],
 				playerPos: {
@@ -25984,7 +25992,7 @@
 	    IndexRoute = ReactRouter.IndexRoute,
 	    Wrap = __webpack_require__(236),
 	    quest = __webpack_require__(485),
-	    help = __webpack_require__(507);
+	    help = __webpack_require__(509);
 
 	module.exports = React.createElement(
 	    Route,
@@ -43240,9 +43248,9 @@
 	var React = __webpack_require__(1),
 	    Log = __webpack_require__(486),
 	    PlayerBar = __webpack_require__(488),
-	    Status = __webpack_require__(504),
-	    Inventory = __webpack_require__(505),
-	    WorldMap = __webpack_require__(506),
+	    Status = __webpack_require__(506),
+	    Inventory = __webpack_require__(507),
+	    WorldMap = __webpack_require__(508),
 	    Grid = __webpack_require__(241).Grid,
 	    Row = __webpack_require__(241).Row,
 	    Col = __webpack_require__(241).Col;
@@ -43555,6 +43563,11 @@
 				message += (this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].description || this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].type) + ". ";
 			}
 
+			if (this.props.map[this.props.playerPos.y][this.props.playerPos.x].encounter) {
+				var encounter = this.props.map[this.props.playerPos.y][this.props.playerPos.x].encounter;
+				this.props.showMessage({ speaker: constants.NARRATOR, line: encounter.description }, 0);
+			}
+
 			this.props.showMessage({ speaker: constants.NARRATOR, line: [{ text: message }] }, 0);
 		},
 		checkAndSetName: function checkAndSetName(input) {
@@ -43717,34 +43730,46 @@
 			//TODO: Possibly remove the text saying which direction you moved
 			var wrongWay = { speaker: constants.NARRATOR, line: [{ text: "You can't go that way!" }] };
 
+			var movement = { x: 0, y: 0 };
+
 			if (input.toUpperCase() === "N" || input.toUpperCase().indexOf("NORTH") > -1) {
 				// Make sure it's both on the map and that it's not an obstacle
 				if (this.props.playerPos.y - 1 < 0 || this.props.map[this.props.playerPos.y - 1][this.props.playerPos.x].obstacle) {
 					this.props.showMessage(wrongWay, 0);
 				} else {
-					this.props.movePlayer({ x: 0, y: -1 });
+					movement = { x: 0, y: -1 };
 					this.props.showMessage({ speaker: constants.NARRATOR, line: [{ text: "You move north." }] }, 0);
 				}
 			} else if (input.toUpperCase() === "E" || input.toUpperCase().indexOf("EAST") > -1) {
 				if (this.props.playerPos.x + 1 > this.props.map[0].length - 1 || this.props.map[this.props.playerPos.y][this.props.playerPos.x + 1].obstacle) {
 					this.props.showMessage(wrongWay, 0);
 				} else {
-					this.props.movePlayer({ x: 1, y: 0 });
+					movement = { x: 1, y: 0 };
 					this.props.showMessage({ speaker: constants.NARRATOR, line: [{ text: "You move east." }] }, 0);
 				}
 			} else if (input.toUpperCase() === "S" || input.toUpperCase().indexOf("SOUTH") > -1) {
 				if (this.props.playerPos.y + 1 > this.props.map.length - 1 || this.props.map[this.props.playerPos.y + 1][this.props.playerPos.x].obstacle) {
 					this.props.showMessage(wrongWay, 0);
 				} else {
-					this.props.movePlayer({ x: 0, y: 1 });
+					movement = { x: 0, y: 1 };
 					this.props.showMessage({ speaker: constants.NARRATOR, line: [{ text: "You move south." }] }, 0);
 				}
 			} else if (input.toUpperCase() === "W" || input.toUpperCase().indexOf("WEST") > -1) {
 				if (this.props.playerPos.x - 1 < 0 || this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].obstacle) {
 					this.props.showMessage(wrongWay, 0);
 				} else {
-					this.props.movePlayer({ x: -1, y: 0 });
+					movement = { x: -1, y: 0 };
 					this.props.showMessage({ speaker: constants.NARRATOR, line: [{ text: "You move west." }] }, 0);
+				}
+			}
+
+			if (movement.x !== 0 || movement.y !== 0) {
+				this.props.movePlayer(movement);
+
+				if (this.props.map[this.props.playerPos.y + movement.y][this.props.playerPos.x + movement.x].encounter) {
+					var encounter = this.props.map[this.props.playerPos.y + movement.y][this.props.playerPos.x + movement.x].encounter;
+					this.props.showMessage({ speaker: constants.NARRATOR, line: encounter.description }, 0);
+					encounter.seen = true;
 				}
 			}
 
@@ -43771,6 +43796,15 @@
 				// If they want to look around
 				this.lookAround();
 				return;
+			} else if (this.props.map[0].length > 0 && this.props.map[this.props.playerPos.y][this.props.playerPos.x].encounter) {
+				var encounter = this.props.map[this.props.playerPos.y][this.props.playerPos.x].encounter;
+				if (input.toUpperCase().indexOf("TALK") > -1) {
+					this.props.showMessage({ speaker: constants.NARRATOR, line: [{ text: "You attempt to strike up a conversation with the " }, { className: encounter.name, text: encounter.name }, { text: "." }] }, 0);
+					var randomResponse = encounter.talk[Math.floor(Math.random() * encounter.talk.length)];
+					this.props.showMessage({ speaker: encounter.name, line: randomResponse }, 1000);
+				}
+
+				//TODO: Encounter stuff!
 			}
 			switch (this.props.input) {
 				case constants.DISABLED:
@@ -56678,9 +56712,11 @@
 
 /***/ },
 /* 503 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+
+	var NPCs = __webpack_require__(504);
 
 	module.exports = {
 		generateMap: function generateMap() {
@@ -56705,6 +56741,7 @@
 			}
 
 			map[5][4] = { type: "Wizard", seen: true, obstacle: true, description: "the crumbling ruins of an old tower. You probably shouldn't go back there" };
+			map[0][2].encounter = NPCs.random.elf;
 
 			var playerPos = { x: 4, y: 4 };
 
@@ -56714,6 +56751,77 @@
 
 /***/ },
 /* 504 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var NPCS = {
+		random: {
+			elf: __webpack_require__(505)
+		}
+	};
+
+	module.exports = NPCS;
+
+/***/ },
+/* 505 */
+/***/ function(module, exports) {
+
+	module.exports = {
+		"name": "Elf",
+		"description": [
+			{
+				"text": "Before you stands a beautiful young "
+			},
+			{
+				"className": "Elf",
+				"text": "Elf"
+			},
+			{
+				"text": ". Her eyes suggest she hates you."
+			}
+		],
+		"icon": "E",
+		"attacked": [
+			[
+				{
+					"text": "Ow! That hurts! Why would you do that?!"
+				}
+			],
+			[
+				{
+					"text": "Hey! What are you doing?!"
+				}
+			],
+			[
+				{
+					"text": "Why? *sniff*"
+				}
+			]
+		],
+		"talk": [
+			[
+				{
+					"text": "You again? What do you want?"
+				}
+			],
+			[
+				{
+					"text": "I have no interest in talking with you."
+				}
+			]
+		],
+		"flee": [
+			[
+				{
+					"text": "That's right! You can't take me!"
+				}
+			]
+		]
+	};
+
+/***/ },
+/* 506 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -56839,7 +56947,7 @@
 	module.exports = ReactRedux.connect(mapStateToProps)(Status);
 
 /***/ },
-/* 505 */
+/* 507 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -56974,7 +57082,7 @@
 	module.exports = ReactRedux.connect(mapStateToProps)(Inventory);
 
 /***/ },
-/* 506 */
+/* 508 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -57008,7 +57116,7 @@
 						var mapRow = [];
 						for (var x = 0; x < constants.VISUAL_MAP_WIDTH * 2 + 1; ++x) {
 							mapRow.push(React.createElement(
-								"font",
+								"span",
 								{ key: x + "" + y },
 								" "
 							));
@@ -57038,7 +57146,7 @@
 					for (var x = minX - leftOffset; x <= maxX + rightOffset; ++x) {
 						if (x < 0 || x >= this.props.map[0].length) {
 							mapRow.push(React.createElement(
-								"font",
+								"span",
 								{ key: x + "" + y },
 								" "
 							));
@@ -57047,7 +57155,7 @@
 						if (x === this.props.player.x && y === this.props.player.y) {
 							// Place the player character
 							mapRow.push(React.createElement(
-								"font",
+								"span",
 								{ key: x + "" + y, className: "Player" },
 								"☺"
 							));
@@ -57056,37 +57164,45 @@
 						if (!this.props.map[y][x].seen) {
 							// If the area has not been seen it should be hidden
 							mapRow.push(React.createElement(
-								"font",
+								"span",
 								{ key: x + "" + y },
 								" "
+							));
+							continue;
+						}
+						if (this.props.map[y][x].encounter && this.props.map[y][x].encounter.seen) {
+							mapRow.push(React.createElement(
+								"span",
+								{ key: x + "" + y },
+								this.props.map[y][x].encounter.icon
 							));
 							continue;
 						}
 						switch (this.props.map[y][x].type) {// TODO: remove this switch statement and just use a map to get symbols with type as key
 							case "grasslands":
 								mapRow.push(React.createElement(
-									"font",
+									"span",
 									{ key: x + "" + y, className: "grass" },
 									"#"
 								));
 								break;
 							case "Mountain":
 								mapRow.push(React.createElement(
-									"font",
+									"span",
 									{ key: x + "" + y, className: "cliff" },
 									"▲"
 								));
 								break;
 							case "Water":
 								mapRow.push(React.createElement(
-									"font",
+									"span",
 									{ key: x + "" + y, className: "water" },
 									"♒"
 								));
 								break;
 							case "Wizard":
 								mapRow.push(React.createElement(
-									"font",
+									"span",
 									{ key: x + "" + y, className: "Wizard" },
 									"Π"
 								));
@@ -57121,7 +57237,7 @@
 	module.exports = ReactRedux.connect(mapStateToProps)(WorldMap);
 
 /***/ },
-/* 507 */
+/* 509 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -57131,8 +57247,8 @@
 	    Grid = __webpack_require__(241).Grid,
 	    Row = __webpack_require__(241).Row,
 	    Col = __webpack_require__(241).Col,
-	    HelpList = __webpack_require__(508),
-	    EmergencyReset = __webpack_require__(517);
+	    HelpList = __webpack_require__(510),
+	    EmergencyReset = __webpack_require__(519);
 
 	var Help = React.createClass({
 		displayName: "Help",
@@ -57223,19 +57339,19 @@
 	module.exports = Help;
 
 /***/ },
-/* 508 */
+/* 510 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
 	var _ = __webpack_require__(496);
 
-	var HelpList = [__webpack_require__(509), __webpack_require__(510), __webpack_require__(511), __webpack_require__(512), __webpack_require__(513), __webpack_require__(514), __webpack_require__(515), __webpack_require__(516)];
+	var HelpList = [__webpack_require__(511), __webpack_require__(512), __webpack_require__(513), __webpack_require__(514), __webpack_require__(515), __webpack_require__(516), __webpack_require__(517), __webpack_require__(518)];
 
 	module.exports = _.sortBy(HelpList, "name");
 
 /***/ },
-/* 509 */
+/* 511 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -57245,7 +57361,7 @@
 	};
 
 /***/ },
-/* 510 */
+/* 512 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -57255,7 +57371,7 @@
 	};
 
 /***/ },
-/* 511 */
+/* 513 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -57265,7 +57381,7 @@
 	};
 
 /***/ },
-/* 512 */
+/* 514 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -57275,7 +57391,7 @@
 	};
 
 /***/ },
-/* 513 */
+/* 515 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -57285,7 +57401,7 @@
 	};
 
 /***/ },
-/* 514 */
+/* 516 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -57295,7 +57411,7 @@
 	};
 
 /***/ },
-/* 515 */
+/* 517 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -57305,7 +57421,7 @@
 	};
 
 /***/ },
-/* 516 */
+/* 518 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -57315,7 +57431,7 @@
 	};
 
 /***/ },
-/* 517 */
+/* 519 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";

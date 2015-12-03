@@ -1,3 +1,5 @@
+var NPCs = require("./../data/npc");
+
 module.exports = {
 	generateMap: function() {
 		var mapSize = 9; // TODO: change to be randomised
@@ -21,6 +23,7 @@ module.exports = {
 		}
 
 		map[5][4] = { type: "Wizard", seen: true, obstacle: true, description: "the crumbling ruins of an old tower. You probably shouldn't go back there" };
+		map[0][2].encounter = NPCs.random.elf;
 
 		var playerPos = { x: 4, y: 4 };
 

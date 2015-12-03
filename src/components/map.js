@@ -24,7 +24,7 @@ var WorldMap = React.createClass({
 				for (var y = 0; y < missingRows; ++y) {
 					var mapRow = [];
 					for (var x = 0; x < (constants.VISUAL_MAP_WIDTH*2)+1; ++x) {
-						mapRow.push(<font key={x + "" + y}>&nbsp;</font>);
+						mapRow.push(<span key={x + "" + y}>&nbsp;</span>);
 					}
 					rows.push(<p key={maxY + y + 1}>{mapRow}</p>);
 				}
@@ -46,30 +46,34 @@ var WorldMap = React.createClass({
 				var mapRow = [];
 				for (var x = minX - leftOffset; x <= maxX + rightOffset; ++x) {
 					if (x < 0 || x >= this.props.map[0].length) {
-						mapRow.push(<font key={x + "" + y}>&nbsp;</font>);
+						mapRow.push(<span key={x + "" + y}>&nbsp;</span>);
 						continue;
 					}
 					if (x === this.props.player.x && y === this.props.player.y) {
 						// Place the player character
-						mapRow.push(<font key={x + "" + y} className="Player">☺</font>);
+						mapRow.push(<span key={x + "" + y} className="Player">☺</span>);
 						continue;
 					}
 					if (!this.props.map[y][x].seen) { // If the area has not been seen it should be hidden
-						mapRow.push(<font key={x + "" + y}>&nbsp;</font>);
+						mapRow.push(<span key={x + "" + y}>&nbsp;</span>);
+						continue;
+					}
+					if (this.props.map[y][x].encounter && this.props.map[y][x].encounter.seen) {
+						mapRow.push(<span key={x + "" + y}>{this.props.map[y][x].encounter.icon}</span>);
 						continue;
 					}
 					switch (this.props.map[y][x].type) { // TODO: remove this switch statement and just use a map to get symbols with type as key
 						case "grasslands":
-							mapRow.push(<font key={x + "" + y} className="grass">#</font>);
+							mapRow.push(<span key={x + "" + y} className="grass">#</span>);
 							break;
 						case "Mountain":
-							mapRow.push(<font key={x + "" + y} className="cliff">▲</font>);
+							mapRow.push(<span key={x + "" + y} className="cliff">▲</span>);
 							break;
 						case "Water":
-							mapRow.push(<font key={x + "" + y} className="water">♒</font>);
+							mapRow.push(<span key={x + "" + y} className="water">♒</span>);
 							break;
 						case "Wizard":
-							mapRow.push(<font key={x + "" + y} className="Wizard">Π</font>);
+							mapRow.push(<span key={x + "" + y} className="Wizard">Π</span>);
 							break;
 						default:
 							console.log("Something went wrong in map drawing.");
