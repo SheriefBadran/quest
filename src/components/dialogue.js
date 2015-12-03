@@ -1,45 +1,36 @@
-var React = require("react"),
-	ReactRedux = require("react-redux"),
+// This component displays a single line in the game log window. Used in `log.js`.
+
+let React = require("react"),
 	proptypes = React.PropTypes,
 	Row = require("react-bootstrap").Row,
 	Col = require("react-bootstrap").Col;
 
-var Dialogue = React.createClass({
-	displayName: "Dialogue",
-	propTypes: {
-		speaker: proptypes.string.isRequired,
-		line: proptypes.array.isRequired,
-		name: proptypes.string.isRequired
-	},
-	render: function() {
-		var name = this.props.speaker + ":";
-		if (name === "Player:") {
-			name = this.props.name + ":";
-		} else if (name === "Narrator:") {
-			name = "";
-		}
+let Dialogue = (props)=> {
 
-		var line = [];
+	// Figure out what name to display, if any
+	let displayname = 
+		props.speaker === "Player" ? props.playername + ": "
+		: props.speaker === "Narrator" ? ""
+		: props.speaker + ": ";
 
-		this.props.line.forEach(function(part, id) {
-			line.push(<span key={id} className={part.className}>{part.text}</span>);
-		}.bind(this));
+	// Build the line out of the provided parts in order to allow for word-specific styling
+	let line = props.line.map(
+		(part,id)=> <span key={id} className={part.className}>{part.text}</span>
+	);
 
-		return (
-			<Row className={this.props.speaker}>
-				<Col xs={4} md={1}>
-					{name}
-				</Col>
-				<Col xs={12} md={11}>
-					<p>{line}</p>
-				</Col>
-			</Row>
-		);
-	}
-});
-
-var mapStateToProps = function (state) {
-	return { name: state.player.name };
+	// Return a row with displayname and the built line
+	return (
+		<Row className={props.speaker}>
+			<Col xs={4} md={1}>{displayname}</Col>
+			<Col xs={12} md={11}><p>{line}</p></Col>
+		</Row>
+	);
 };
 
-module.exports = ReactRedux.connect(mapStateToProps)(Dialogue);
+Dialogue.propTypes = {
+	speaker: proptypes.string.isRequired,
+	line: proptypes.array.isRequired,
+	playername: proptypes.string.isRequired
+};
+
+module.exports = Dialogue;
