@@ -9,6 +9,7 @@
     "babel-preset-es2015": "^6.1.18",
     "babel-preset-react": "^6.1.2",
     "chai": "^3.4.1",
+    "coveralls": "^2.11.4",
     "eslint": "^1.8.0",
     "eslint-plugin-react": "^3.7.1",
     "history": "^1.13.0",
