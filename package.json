@@ -1,4 +1,5 @@
 {
+  "version": "0.1.2",
   "devDependencies": {
     "babel-core": "^6.2.1",
     "babel-eslint": "^4.1.4",
@@ -25,5 +26,9 @@
   "scripts": {
     "build": "webpack",
     "lint": "eslint src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MoombaDS/quest.git"
   }
 }

@@ -1,4 +1,4 @@
-# Quest
+# Quest [![Build Status](https://travis-ci.org/MoombaDS/quest.svg?branch=gh-pages)](https://travis-ci.org/MoombaDS/quest)
 
 ### Try it out!
 
