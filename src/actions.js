@@ -1,67 +1,67 @@
-var constants = require("./constants");
+let constants = require("./constants");
 
 module.exports = {
-	showMessage: function(message, timeout) {
-		return function(dispatch) {
+	showMessage(message, timeout) {
+		return (dispatch)=> {
 				dispatch({ type: constants.QUEUE_MESSAGE, message: message });
-			setTimeout(function() {
+			setTimeout(()=> {
 				dispatch({ type: constants.SHOW_MESSAGE });
 			}, timeout);
 		}
 	},
-	setName: function(name) {
+	setName(name) {
 		return { type: constants.SET_NAME, name: name };
 	},
-	setStats: function(stats) {
+	setStats(stats) {
 		return { type: constants.SET_STATS, stats: stats };
 	},
-	setDisplayStats: function(display, timeout) {
-		return function(dispatch) {
+	setDisplayStats(display, timeout) {
+		return (dispatch)=> {
 				dispatch({ type: constants.PREP_STATS, display: display });
-			setTimeout(function() {
+			setTimeout(()=> {
 				dispatch({ type: constants.DISPLAY_STATS, display: display });
 			}, timeout);
 		}
 	},
-	setInputExpected: function(inputType) {
+	setInputExpected(inputType) {
 		return { type: constants.SET_INPUT, input: inputType };
 	},
-	addItem: function(item, timeout) {
-		return function(dispatch) {
+	addItem(item, timeout) {
+		return (dispatch)=> {
 				dispatch({ type: constants.QUEUE_ITEM, item: item });
-	 		setTimeout(function() {
+	 		setTimeout(()=> {
 	 			dispatch({ type: constants.ADD_ITEM });
 	 		}, timeout);
 	 	}
 	},
-	removeItem: function(item) {
+	removeItem(item) {
 		return { type:constants.REMOVE_ITEM, item: item };
 	},
-	equipItem: function(item) {
+	equipItem(item) {
 		return { type:constants.EQUIP_ITEM, item: item };
 	},
-	setDisplayInventory: function(display, timeout) {
-	 	return function(dispatch) {
+	setDisplayInventory(display, timeout) {
+	 	return (dispatch)=> {
 	 			dispatch({ type: constants.PREP_INVENT, display: display });
-	 		setTimeout(function() {
+	 		setTimeout(()=> {
 	 			dispatch({ type: constants.DISPLAY_INVENTORY, display: display });
 	 		}, timeout);
 	 	}
 	},
-	addMap: function(map, position, timeout) {
-		return function(dispatch) {
+	addMap(map, position, timeout) {
+		return (dispatch)=> {
 				dispatch({ type: constants.PREP_MAP, map: map, position: position });
-	 		setTimeout(function() {
+	 		setTimeout(()=> {
 	 			dispatch({ type: constants.ADD_MAP, map: map, position: position });
 	 		}, timeout);
 	 	}
 	},
-	movePlayer: function(movement) {
+	movePlayer(movement) {
 		return { type: constants.MOVE, movement: movement };
 	},
-	resetGame: function(timeout) {
-		return function(dispatch) {
-			setTimeout(function() {
+	resetGame(timeout) {
+		return (dispatch)=> {
+			setTimeout(()=> {
 				dispatch({ type: constants.RESET });
 			}, timeout);
 		}

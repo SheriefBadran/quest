@@ -1,4 +1,4 @@
-var Items = {
+let Items = {
 		map: require("./items/map.json")
 }
 

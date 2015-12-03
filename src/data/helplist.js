@@ -1,6 +1,6 @@
-var _ = require("lodash");
+let _ = require("lodash");
 
-var HelpList = [ 
+let HelpList = [ 
 	require("./helpitems/equip.json"), 
 	require("./helpitems/reset.json"), 
 	require("./helpitems/lookat.json"),

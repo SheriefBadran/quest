@@ -2,7 +2,7 @@
 Redux Store
 */
 
-var Redux = require("redux"),
+let Redux = require("redux"),
 	initialState = require("./initialstate"),
 	messageReducer = require("./reducers/messageReducer"),
 	playerReducer = require("./reducers/playerReducer"),
@@ -10,7 +10,7 @@ var Redux = require("redux"),
 	worldReducer = require("./reducers/worldReducer"),
 	thunk = require("redux-thunk"); // for asynch actions
 
-var rootReducer = Redux.combineReducers({
+let rootReducer = Redux.combineReducers({
 	log: messageReducer,
 	player: playerReducer,
 	input: inputReducer,
@@ -24,7 +24,7 @@ const saveLocal = store => next => action => {
 };
 
 const savedState = () => {
-	var state = JSON.parse(localStorage.getItem("Quest"));
+	let state = JSON.parse(localStorage.getItem("Quest"));
 	// Before we return the state, we need to check if there's anything in the queues that should be moved to display.
 	if (state) {
 		if (state.log.queue && state.log.queue.length > 0) {

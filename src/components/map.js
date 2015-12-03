@@ -1,4 +1,4 @@
-var React = require("react"),
+let React = require("react"),
 	ReactRedux = require("react-redux"),
 	proptypes = React.PropTypes,
 	constants = require("../constants"),
@@ -7,23 +7,23 @@ var React = require("react"),
 	Row = require("react-bootstrap").Row,
 	Col = require("react-bootstrap").Col;
 
-var WorldMap = React.createClass({
-	render: function() {
+let WorldMap = React.createClass({
+	render() {
 		if (this.props.display) {
 
-			var rows = [];
+			let rows = [];
 
-			var minX = (this.props.player.x - (constants.VISUAL_MAP_WIDTH) > 0) ? this.props.player.x - (constants.VISUAL_MAP_WIDTH) : 0;
-			var maxX = (this.props.player.x + (constants.VISUAL_MAP_WIDTH) < this.props.map[0].length-1) ? this.props.player.x + (constants.VISUAL_MAP_WIDTH) : this.props.map[0].length-1;
-			var minY = (this.props.player.y - (constants.VISUAL_MAP_WIDTH) > 0) ? this.props.player.y - (constants.VISUAL_MAP_WIDTH) : 0;
-			var maxY = (this.props.player.y + (constants.VISUAL_MAP_WIDTH) < this.props.map.length-1) ? this.props.player.y + (constants.VISUAL_MAP_WIDTH) : this.props.map.length-1;
+			let minX = (this.props.player.x - (constants.VISUAL_MAP_WIDTH) > 0) ? this.props.player.x - (constants.VISUAL_MAP_WIDTH) : 0;
+			let maxX = (this.props.player.x + (constants.VISUAL_MAP_WIDTH) < this.props.map[0].length-1) ? this.props.player.x + (constants.VISUAL_MAP_WIDTH) : this.props.map[0].length-1;
+			let minY = (this.props.player.y - (constants.VISUAL_MAP_WIDTH) > 0) ? this.props.player.y - (constants.VISUAL_MAP_WIDTH) : 0;
+			let maxY = (this.props.player.y + (constants.VISUAL_MAP_WIDTH) < this.props.map.length-1) ? this.props.player.y + (constants.VISUAL_MAP_WIDTH) : this.props.map.length-1;
 
 			// Keep the map from being offset weirdly if there aren't enough rows
 			if (minY === 0) {
-				var missingRows = (constants.VISUAL_MAP_WIDTH*2) - maxY;
-				for (var y = 0; y < missingRows; ++y) {
-					var mapRow = [];
-					for (var x = 0; x < (constants.VISUAL_MAP_WIDTH*2)+1; ++x) {
+				let missingRows = (constants.VISUAL_MAP_WIDTH*2) - maxY;
+				for (let y = 0; y < missingRows; ++y) {
+					let mapRow = [];
+					for (let x = 0; x < (constants.VISUAL_MAP_WIDTH*2)+1; ++x) {
 						mapRow.push(<span key={x + "" + y}>&nbsp;</span>);
 					}
 					rows.push(<p key={maxY + y + 1}>{mapRow}</p>);
@@ -31,20 +31,20 @@ var WorldMap = React.createClass({
 			}
 
 			// Keep the map from being offset weirdly if there aren't enough columns to the left
-			var leftOffset = 0;
+			let leftOffset = 0;
 			if (minX === 0) {
 				leftOffset = (constants.VISUAL_MAP_WIDTH*2) - maxX;
 			}
 
 			// Keep the map from being offset weirdly if there aren't enough columns to the right
-			var rightOffset = 0;
+			let rightOffset = 0;
 			if (maxX === this.props.map[0].length-1) {
 				rightOffset = (constants.VISUAL_MAP_WIDTH*2) - (maxX - minX);
 			}
 
-			for (var y = minY; y <= maxY; ++y) {
-				var mapRow = [];
-				for (var x = minX - leftOffset; x <= maxX + rightOffset; ++x) {
+			for (let y = minY; y <= maxY; ++y) {
+				let mapRow = [];
+				for (let x = minX - leftOffset; x <= maxX + rightOffset; ++x) {
 					if (x < 0 || x >= this.props.map[0].length) {
 						mapRow.push(<span key={x + "" + y}>&nbsp;</span>);
 						continue;
@@ -96,7 +96,7 @@ var WorldMap = React.createClass({
 	}
 });
 
-var mapStateToProps = function (state) {
+let mapStateToProps = (state)=> {
 	return { display: state.world.displayMap, map: state.world.map, player: state.world.playerPos };
 };
 

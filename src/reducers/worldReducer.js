@@ -1,8 +1,8 @@
-var initialState = require("./../initialstate"),
+let initialState = require("./../initialstate"),
 	constants = require("./../constants");
 
-module.exports = function (state, action) {
-	var updateMapVisibility = function(map, playerPos) {
+module.exports = (state, action)=> {
+	let updateMapVisibility = (map, playerPos)=> {
 		if (playerPos.x > 0) {
 			map[playerPos.y][playerPos.x-1].seen = true;
 		}
@@ -18,7 +18,7 @@ module.exports = function (state, action) {
 		return map;
 	};
 
-	var newState = Object.assign({}, state); // Copy to a new state so we don't screw up the old one
+	let newState = Object.assign({}, state); // Copy to a new state so we don't screw up the old one
 	switch (action.type) {
 		case constants.PREP_MAP:
 			newState.prepMap = { map: action.map, position: action.position };
@@ -36,7 +36,7 @@ module.exports = function (state, action) {
 			return newState;
 		case constants.MOVE:
 			// TODO: check validity of movement here too before making the move
-			var newPosition = { x: newState.playerPos.x + action.movement.x, y: newState.playerPos.y + action.movement.y };
+			let newPosition = { x: newState.playerPos.x + action.movement.x, y: newState.playerPos.y + action.movement.y };
 			newState.playerPos = newPosition;
 			newState.map = updateMapVisibility(newState.map, newState.playerPos);
 			return newState;

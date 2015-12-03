@@ -1,4 +1,4 @@
-var React = require('react'),
+let React = require('react'),
     ReactRouter = require('react-router'),
     Route = ReactRouter.Route,
     IndexRoute = ReactRouter.IndexRoute,

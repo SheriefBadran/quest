@@ -1,4 +1,4 @@
-var constants = require("./constants"),
+let constants = require("./constants"),
 	React = require("react");
 
 module.exports = function() { // Returns a function so it can't be modified accidentally

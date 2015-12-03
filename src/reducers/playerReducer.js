@@ -1,8 +1,8 @@
-var initialState = require("./../initialstate"),
+let initialState = require("./../initialstate"),
 	constants = require("./../constants");
 
-module.exports = function (state, action) {
-	var newState = Object.assign({}, state); // Copy to a new state so we don't screw up the old one
+module.exports = (state, action)=> {
+	let newState = Object.assign({}, state); // Copy to a new state so we don't screw up the old one
 	switch (action.type) {
 		case constants.SET_NAME:
 			newState.name = action.name;
@@ -23,7 +23,7 @@ module.exports = function (state, action) {
 			newState.itemQueue = [...newState.itemQueue, action.item ];
 			return newState;
 		case constants.ADD_ITEM:
-			var item = newState.itemQueue.shift();
+			let item = newState.itemQueue.shift();
 			newState.inventory = [...newState.inventory, item];
 			return newState;
 		case constants.REMOVE_ITEM:

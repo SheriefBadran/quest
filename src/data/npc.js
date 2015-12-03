@@ -1,4 +1,4 @@
-var NPCS = {
+let NPCS = {
 		random: {
 			elf: require("./npcs/elf.json")
 		}

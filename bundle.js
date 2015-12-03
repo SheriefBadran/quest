@@ -26014,50 +26014,46 @@
 	    Row = __webpack_require__(241).Row,
 	    Col = __webpack_require__(241).Col;
 
-	var Wrapper = React.createClass({
-	    displayName: "Wrapper",
-
-	    render: function render() {
-	        return React.createElement(
-	            "div",
-	            { className: "wrapper" },
+	var Wrapper = function Wrapper(props) {
+	    return React.createElement(
+	        "div",
+	        { className: "wrapper" },
+	        React.createElement(
+	            Grid,
+	            { fluid: true },
 	            React.createElement(
-	                Grid,
-	                { fluid: true },
+	                Row,
+	                null,
 	                React.createElement(
-	                    Row,
-	                    null,
+	                    Col,
+	                    { mdOffset: 3, md: 6 },
 	                    React.createElement(
-	                        Col,
-	                        { mdOffset: 3, md: 6 },
-	                        React.createElement(
-	                            Panel,
-	                            null,
-	                            React.createElement(Navigation, null)
-	                        )
+	                        Panel,
+	                        null,
+	                        React.createElement(Navigation, null)
 	                    )
-	                ),
+	                )
+	            ),
+	            React.createElement(
+	                Row,
+	                null,
 	                React.createElement(
-	                    Row,
-	                    null,
+	                    Col,
+	                    { md: 12 },
 	                    React.createElement(
-	                        Col,
-	                        { md: 12 },
+	                        Panel,
+	                        null,
 	                        React.createElement(
-	                            Panel,
-	                            null,
-	                            React.createElement(
-	                                "div",
-	                                { className: "text-center" },
-	                                this.props.children
-	                            )
+	                            "div",
+	                            { className: "text-center" },
+	                            props.children
 	                        )
 	                    )
 	                )
 	            )
-	        );
-	    }
-	});
+	        )
+	    );
+	};
 
 	module.exports = Wrapper;
 
@@ -26070,47 +26066,43 @@
 	var React = __webpack_require__(1),
 	    LinkContainer = __webpack_require__(238).LinkContainer,
 	    IndexLinkContainer = __webpack_require__(238).IndexLinkContainer,
-	    Button = __webpack_require__(241).Button,
 	    NavItem = __webpack_require__(241).NavItem,
 	    Nav = __webpack_require__(241).Nav,
 	    ButtonGroup = __webpack_require__(241).ButtonGroup;
 
-	var Navigation = React.createClass({
-		displayName: "Navigation",
-		render: function render() {
-			return React.createElement(
-				"div",
-				null,
+	var Navigation = function Navigation(props) {
+		return React.createElement(
+			"div",
+			null,
+			React.createElement(
+				Nav,
+				{ bsStyle: "pills" },
 				React.createElement(
-					Nav,
-					{ bsStyle: "pills" },
-					React.createElement(
-						IndexLinkContainer,
-						{ to: "/" },
-						React.createElement(
-							NavItem,
-							null,
-							"Home"
-						)
-					),
-					React.createElement(
-						LinkContainer,
-						{ to: "/help" },
-						React.createElement(
-							NavItem,
-							null,
-							"Help"
-						)
-					),
+					IndexLinkContainer,
+					{ to: "/" },
 					React.createElement(
 						NavItem,
-						{ href: "https://github.com/MoombaDS/quest", target: "_blank" },
-						"Source Code"
+						null,
+						"Home"
 					)
+				),
+				React.createElement(
+					LinkContainer,
+					{ to: "/help" },
+					React.createElement(
+						NavItem,
+						null,
+						"Help"
+					)
+				),
+				React.createElement(
+					NavItem,
+					{ href: "https://github.com/MoombaDS/quest", target: "_blank" },
+					"Source Code"
 				)
-			);
-		}
-	});
+			)
+		);
+	};
 
 	module.exports = Navigation;
 
@@ -43254,56 +43246,53 @@
 	    Row = __webpack_require__(241).Row,
 	    Col = __webpack_require__(241).Col;
 
-	var Quest = React.createClass({
-		displayName: "Quest",
-		render: function render() {
-			return React.createElement(
-				Grid,
-				{ fluid: true },
+	var Quest = function Quest(props) {
+		return React.createElement(
+			Grid,
+			{ fluid: true },
+			React.createElement(
+				Row,
+				null,
 				React.createElement(
-					Row,
-					null,
-					React.createElement(
-						Col,
-						{ md: 6, mdOffset: 3 },
-						React.createElement(Status, null)
-					)
-				),
-				React.createElement(
-					Row,
-					null,
-					React.createElement(
-						Col,
-						{ md: 6, mdOffset: 3 },
-						React.createElement(Log, null)
-					),
-					React.createElement(
-						Col,
-						{ md: 3 },
-						React.createElement(WorldMap, null)
-					)
-				),
-				React.createElement(
-					Row,
-					null,
-					React.createElement(
-						Col,
-						{ md: 6, mdOffset: 3 },
-						React.createElement(PlayerBar, null)
-					)
-				),
-				React.createElement(
-					Row,
-					null,
-					React.createElement(
-						Col,
-						{ md: 6, mdOffset: 3 },
-						React.createElement(Inventory, null)
-					)
+					Col,
+					{ md: 6, mdOffset: 3 },
+					React.createElement(Status, null)
 				)
-			);
-		}
-	});
+			),
+			React.createElement(
+				Row,
+				null,
+				React.createElement(
+					Col,
+					{ md: 6, mdOffset: 3 },
+					React.createElement(Log, null)
+				),
+				React.createElement(
+					Col,
+					{ md: 3 },
+					React.createElement(WorldMap, null)
+				)
+			),
+			React.createElement(
+				Row,
+				null,
+				React.createElement(
+					Col,
+					{ md: 6, mdOffset: 3 },
+					React.createElement(PlayerBar, null)
+				)
+			),
+			React.createElement(
+				Row,
+				null,
+				React.createElement(
+					Col,
+					{ md: 6, mdOffset: 3 },
+					React.createElement(Inventory, null)
+				)
+			)
+		);
+	};
 
 	module.exports = Quest;
 
@@ -44063,6 +44052,7 @@
 
 			var comma = options.length > 2 ? "," : "";
 
+			//TODO: Change this to use map somehow
 			options.forEach((function (option, id) {
 				if (!firstLine) {
 					var or = id === options.length - 1 ? "or " : "";
@@ -56880,7 +56870,7 @@
 							this.props.name,
 							React.createElement("br", null),
 							React.createElement(
-								"font",
+								"span",
 								{ className: this.props.stats.race },
 								this.props.stats.race
 							)
@@ -57097,7 +57087,6 @@
 
 	var WorldMap = React.createClass({
 		displayName: "WorldMap",
-
 		render: function render() {
 			if (this.props.display) {
 
@@ -57242,6 +57231,7 @@
 	"use strict";
 
 	var React = __webpack_require__(1),
+	    proptypes = React.PropTypes,
 	    Panel = __webpack_require__(241).Panel,
 	    Grid = __webpack_require__(241).Grid,
 	    Row = __webpack_require__(241).Row,
@@ -57252,23 +57242,22 @@
 	var Help = React.createClass({
 		displayName: "Help",
 		render: function render() {
-			var rows = [];
-
-			HelpList.forEach((function (item, id) {
-				var desc = React.createElement(
-					"p",
-					null,
-					item.description,
-					React.createElement("br", null),
-					"ex: ",
-					React.createElement(
-						"font",
-						{ className: "command-style" },
-						item.example
-					)
-				);
-				rows.push(React.createElement(HelpItem, { command: item.name, description: desc, key: id }));
-			}).bind(this));
+			var rows = HelpList.map(function (item, id) {
+				return React.createElement(HelpItem, { command: item.name,
+					description: React.createElement(
+						"p",
+						null,
+						item.description,
+						React.createElement("br", null),
+						"ex: ",
+						React.createElement(
+							"span",
+							{ className: "command-style" },
+							item.example
+						)
+					),
+					key: id });
+			});
 
 			return React.createElement(
 				Grid,
@@ -57322,7 +57311,7 @@
 				Col,
 				{ className: "help-command", md: 6 },
 				React.createElement(
-					"font",
+					"span",
 					{ className: "command-style" },
 					props.command
 				)
@@ -57333,6 +57322,11 @@
 				props.description
 			)
 		);
+	};
+
+	HelpItem.propTypes = {
+		command: proptypes.string.isRequired,
+		description: proptypes.object.isRequired
 	};
 
 	module.exports = Help;
@@ -57445,7 +57439,6 @@
 
 	var EmergencyReset = React.createClass({
 		displayName: "EmergencyReset",
-
 		handleClick: function handleClick() {
 			localStorage.removeItem("Quest");
 			this.props.resetGame(0);

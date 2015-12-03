@@ -3,7 +3,7 @@ This is the entry point for the app! From here we merely import our routes defin
 then use React and React-DOM to render it.
 */
 
-var React = require("react"),
+let React = require("react"),
     ReactRouter = require('react-router'),
     Router = ReactRouter.Router,
 	ReactDOM = require("react-dom"),

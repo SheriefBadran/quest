@@ -1,4 +1,4 @@
-var React = require("react"),
+let React = require("react"),
 	Log = require("./log"),
 	PlayerBar = require("./playerbar"),
 	Status = require("./status"),
@@ -8,37 +8,34 @@ var React = require("react"),
 	Row = require("react-bootstrap").Row,
 	Col = require("react-bootstrap").Col;
 
-var Quest = React.createClass({
-	displayName: "Quest",
-	render: function() {
-		return (
-			<Grid fluid>
-				<Row>
-					<Col md={6} mdOffset={3}>
-						<Status />
-					</Col>
-				</Row>
-				<Row>
-					<Col md={6} mdOffset={3}>
-						<Log />
-					</Col>
-					<Col md={3}>
-						<WorldMap />
-					</Col>
-				</Row>
-				<Row>
-					<Col md={6} mdOffset={3}>
-						<PlayerBar />
-					</Col>
-				</Row>
-				<Row>
-					<Col md={6} mdOffset={3}>
-						<Inventory />
-					</Col>
-				</Row>
-			</Grid>
-		);
-	}
-});
+let Quest = (props)=> {
+	return (
+		<Grid fluid>
+			<Row>
+				<Col md={6} mdOffset={3}>
+					<Status />
+				</Col>
+			</Row>
+			<Row>
+				<Col md={6} mdOffset={3}>
+					<Log />
+				</Col>
+				<Col md={3}>
+					<WorldMap />
+				</Col>
+			</Row>
+			<Row>
+				<Col md={6} mdOffset={3}>
+					<PlayerBar />
+				</Col>
+			</Row>
+			<Row>
+				<Col md={6} mdOffset={3}>
+					<Inventory />
+				</Col>
+			</Row>
+		</Grid>
+	);
+};
 
 module.exports = Quest;

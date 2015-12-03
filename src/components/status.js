@@ -1,24 +1,24 @@
-var React = require("react"),
+let React = require("react"),
 	ReactRedux = require("react-redux"),
 	proptypes = React.PropTypes,
 	Panel = require("react-bootstrap").Panel,
 	Grid = require("react-bootstrap").Grid,
 	Col = require("react-bootstrap").Col;
 
-var Status = React.createClass({
+let Status = React.createClass({
 	displayName: "Status",
 	propTypes: {
 		name: proptypes.string.isRequired,
 		display: proptypes.bool.isRequired,
 		stats: proptypes.object.isRequired
 	},
-	render: function() {
+	render() {
 		if (this.props.display) {
 
-			var str = this.props.stats.str;
-			var mag = this.props.stats.mag;
-			var dex = this.props.stats.dex;
-			var def = this.props.stats.def;
+			let str = this.props.stats.str;
+			let mag = this.props.stats.mag;
+			let dex = this.props.stats.dex;
+			let def = this.props.stats.def;
 
 			if (this.props.weapon) {
 				str += this.props.weapon.stats.str;
@@ -43,7 +43,7 @@ var Status = React.createClass({
 						</Col>
 						<Col xs={2} md={2}>
 							{this.props.name}<br />
-							<font className={this.props.stats.race}>{this.props.stats.race}</font>
+							<span className={this.props.stats.race}>{this.props.stats.race}</span>
 						</Col>
 						<Col xs={2} md={1}>
 							HP:<br />
@@ -80,7 +80,7 @@ var Status = React.createClass({
 	}
 });
 
-var mapStateToProps = function (state) {
+let mapStateToProps = (state)=> {
 	return { name: state.player.name, display: state.player.displayStats, stats: state.player.stats, weapon: state.player.weapon, armour: state.player.armour };
 };
 

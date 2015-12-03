@@ -1,4 +1,4 @@
-var React = require("react"),
+let React = require("react"),
 	ReactDOM = require("react-dom"),
 	ReactRedux = require("react-redux"),
 	actions = require("./../actions"),
@@ -6,12 +6,12 @@ var React = require("react"),
 	Col = require("react-bootstrap").Col,
 	Button = require("react-bootstrap").Button;
 
-var EmergencyReset = React.createClass({
-	handleClick: function() {
+let EmergencyReset = React.createClass({
+	handleClick() {
 		localStorage.removeItem("Quest");
 		this.props.resetGame(0);
 	},
-	render: function() {
+	render() {
 		return (
 			<Row>
 				<Col md={12} style={ { textAlign: "center", marginTop: 5 } }>
@@ -23,9 +23,9 @@ var EmergencyReset = React.createClass({
 	}
 });
 
-var mapDispatchToProps = function (dispatch) {
+let mapDispatchToProps = (dispatch)=> {
 	return {
-		resetGame: function(timeout) {
+		resetGame(timeout) {
 			dispatch(actions.resetGame(timeout));
 		}
 	}
