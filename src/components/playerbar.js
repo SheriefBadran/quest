@@ -129,6 +129,11 @@ var PlayerBar = React.createClass({
 			message += (this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].description || this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].type) + ". ";
 		}
 
+		if (this.props.map[this.props.playerPos.y][this.props.playerPos.x].encounter) {
+			var encounter = this.props.map[this.props.playerPos.y][this.props.playerPos.x].encounter;
+			this.props.showMessage({ speaker: constants.NARRATOR, line: encounter.description }, 0);
+		}
+
 		this.props.showMessage({ speaker: constants.NARRATOR, line: [ { text: message } ] }, 0);
 	},
 	checkAndSetName: function(input) {
@@ -286,34 +291,46 @@ var PlayerBar = React.createClass({
 	checkAndMovePlayer: function(input) { //TODO: Possibly remove the text saying which direction you moved
 		var wrongWay = { speaker: constants.NARRATOR, line: [ { text: "You can't go that way!" } ] };
 
+		var movement = { x: 0, y: 0 };
+
 		if (input.toUpperCase() === "N" || input.toUpperCase().indexOf("NORTH") > -1) {
 			// Make sure it's both on the map and that it's not an obstacle
 			if (this.props.playerPos.y -1 < 0 || this.props.map[this.props.playerPos.y - 1][this.props.playerPos.x].obstacle) {
 				this.props.showMessage(wrongWay, 0);
 			} else {
-				this.props.movePlayer({ x: 0, y: -1 });
+				movement = { x: 0, y: -1 };
 				this.props.showMessage({ speaker: constants.NARRATOR, line: [ { text: "You move north." } ] }, 0);
 			}
 		} else if (input.toUpperCase() === "E" || input.toUpperCase().indexOf("EAST") > -1) {
 			if (this.props.playerPos.x + 1 > this.props.map[0].length - 1 || this.props.map[this.props.playerPos.y][this.props.playerPos.x + 1].obstacle) {
 				this.props.showMessage(wrongWay, 0);
 			} else {
-				this.props.movePlayer({ x: 1, y: 0 });
+				movement = { x: 1, y: 0 };
 				this.props.showMessage({ speaker: constants.NARRATOR, line: [ { text: "You move east." } ] }, 0);
 			}
 		} else if (input.toUpperCase() === "S" || input.toUpperCase().indexOf("SOUTH") > -1) {
 			if (this.props.playerPos.y + 1 > this.props.map.length - 1 || this.props.map[this.props.playerPos.y + 1][this.props.playerPos.x].obstacle) {
 				this.props.showMessage(wrongWay, 0);
 			} else {
-				this.props.movePlayer({ x: 0, y: 1 });
+				movement = { x: 0, y: 1 };
 				this.props.showMessage({ speaker: constants.NARRATOR, line: [ { text: "You move south." } ] }, 0);
 			}
 		} else if (input.toUpperCase() === "W" || input.toUpperCase().indexOf("WEST") > -1) {
 			if (this.props.playerPos.x -1 < 0 || this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].obstacle) {
 				this.props.showMessage(wrongWay, 0);
 			} else {
-				this.props.movePlayer({ x: -1, y: 0 });
+				movement = { x: -1, y: 0 };
 				this.props.showMessage({ speaker: constants.NARRATOR, line: [ { text: "You move west." } ] }, 0);
+			}
+		}
+
+		if (movement.x !== 0 || movement.y !== 0 ) {
+			this.props.movePlayer(movement);
+
+			if (this.props.map[this.props.playerPos.y + movement.y][this.props.playerPos.x + movement.x].encounter) {
+				var encounter = this.props.map[this.props.playerPos.y + movement.y][this.props.playerPos.x + movement.x].encounter;
+				this.props.showMessage({ speaker: constants.NARRATOR, line: encounter.description }, 0);
+				encounter.seen = true;
 			}
 		}
 
@@ -335,6 +352,16 @@ var PlayerBar = React.createClass({
 		} else if (input.toUpperCase().indexOf("LOOK AROUND") > -1 && this.props.input === constants.EXPECTING_MOVEMENT) { // If they want to look around
 			this.lookAround();
 			return;
+		} else if (this.props.map[0].length > 0 && this.props.map[this.props.playerPos.y][this.props.playerPos.x].encounter) {
+			var encounter = this.props.map[this.props.playerPos.y][this.props.playerPos.x].encounter;
+			if (input.toUpperCase().indexOf("TALK") > -1) {
+				this.props.showMessage({ speaker: constants.NARRATOR, line: [ { text: "You attempt to strike up a conversation with the " }, { className: encounter.name, text: encounter.name }, { text: "." } ] }, 0);
+				var randomResponse = encounter.talk[Math.floor(Math.random() * encounter.talk.length)];
+				this.props.showMessage({ speaker: encounter.name, line: randomResponse }, 1000);
+			}
+
+
+			//TODO: Encounter stuff!
 		}
 		switch (this.props.input) {
 			case constants.DISABLED:

@@ -57,6 +57,13 @@ const savedState = () => {
 			state.world.playerPos = state.world.prepMap.position;
 			delete state.world.prepMap;
 		}
+
+		// If the version is not correct, we remove the localStorage and return default state to ensure nothing is broken during development
+		//TODO: Make this unnecessary
+		if (state.world.version !== initialState().world.version) {
+			localStorage.removeItem("Quest");
+			return;
+		}
 	}
 	return state;
 };

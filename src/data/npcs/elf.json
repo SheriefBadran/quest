@@ -1,15 +1,17 @@
 {
 	"name": "Elf",
-	"description": "Before you stands a beautiful young Elf. Her eyes suggest she hates you.",
+	"description": [ { "text": "Before you stands a beautiful young " }, { "className": "Elf", "text": "Elf" }, { "text": ". Her eyes suggest she hates you." } ],
+	"icon": "E",
 	"attacked": [ 
-		"Ow! That hurts! Why would you do that?!", 
-		"Hey! What are you doing?!", 
-		"Why? *sniff*" 
+		[ { "text": "Ow! That hurts! Why would you do that?!" } ], 
+		[ { "text": "Hey! What are you doing?!" } ], 
+		[ { "text": "Why? *sniff*"  } ]
 		],
 	"talk": [ 
-		"You again? What do you want?" 
+		[ { "text": "You again? What do you want?" } ],
+		[ { "text": "I have no interest in talking with you." } ]
 		],
 	"flee": [ 
-		"That's right! You can't take me!" 
+		[ { "text": "That's right! You can't take me!" } ]
 		]
 }
