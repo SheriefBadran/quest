@@ -1,4 +1,4 @@
-var React = require("react"),
+let React = require("react"),
 	ReactDOM = require("react-dom"),
 	ReactRedux = require("react-redux"),
 	proptypes = React.PropTypes,
@@ -8,27 +8,27 @@ var React = require("react"),
 	Col = require("react-bootstrap").Col,
 	Dialogue = require("./dialogue");
 
-var Log = React.createClass({
+let Log = React.createClass({
 	displayName: "Log",
 	propTypes: {
-		name: proptypes.string.isRequired,
+		playername: proptypes.string.isRequired,
 		messages: proptypes.array.isRequired
 	},
-	componentDidMount: function() {
- 		var node = ReactDOM.findDOMNode(this.logpanel);
+	componentDidMount() {
+ 		let node = ReactDOM.findDOMNode(this.logpanel);
 		node.scrollTop = node.scrollHeight;
 	},
-	componentDidUpdate: function() {
- 		var node = ReactDOM.findDOMNode(this.logpanel);
+	componentDidUpdate() {
+ 		let node = ReactDOM.findDOMNode(this.logpanel);
 		node.scrollTop = node.scrollHeight;
 	},
-	render: function() {
-		var lines = [];
-
-		this.props.messages.forEach(function(message, id) {
-			lines.push(<Dialogue speaker={message.speaker} line={message.line} key={id} />);
-		}.bind(this));
-
+	render() {
+		let lines = this.props.messages.map((message, id)=> <Dialogue
+			speaker={message.speaker}
+			line={message.line}
+			key={id}
+			playername={this.props.playername}
+		/>);
 		return (
 			<Panel className="log-box" ref={(ref) => this.logpanel = ref} >
 				<Grid fluid>
@@ -39,8 +39,8 @@ var Log = React.createClass({
 	}
 });
 
-var mapStateToProps = function (state) {
-	return { name: state.player.name, messages: state.log.messages };
+let mapStateToProps = (state)=> {
+	return { playername: state.player.name, messages: state.log.messages };
 };
 
 module.exports = ReactRedux.connect(mapStateToProps)(Log);
