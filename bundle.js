@@ -27860,7 +27860,7 @@
 /* 277 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_RESULT__;/*!
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 	  Copyright (c) 2015 Jed Watson.
 	  Licensed under the MIT License (MIT), see
 	  http://jedwatson.github.io/classnames
@@ -27901,9 +27901,9 @@
 			module.exports = classNames;
 		} else if (true) {
 			// register as 'classnames', consistent with npm package name
-			!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
+			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
 				return classNames;
-			}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+			}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 		} else {
 			window.classNames = classNames;
 		}
@@ -34583,7 +34583,8 @@
 	  }
 
 	  component._values[propName] = value;
-	  component.forceUpdate();
+
+	  if (component.isMounted()) component.forceUpdate();
 	}
 
 	exports['default'] = _createUncontrollable2['default']([mixin], set);
@@ -43318,7 +43319,7 @@
 	var Log = React.createClass({
 		displayName: "Log",
 		propTypes: {
-			name: proptypes.string.isRequired,
+			playername: proptypes.string.isRequired,
 			messages: proptypes.array.isRequired
 		},
 		componentDidMount: function componentDidMount() {
@@ -43332,12 +43333,14 @@
 		render: function render() {
 			var _this = this;
 
-			var lines = [];
-
-			this.props.messages.forEach((function (message, id) {
-				lines.push(React.createElement(Dialogue, { speaker: message.speaker, line: message.line, key: id }));
-			}).bind(this));
-
+			var lines = this.props.messages.map(function (message, id) {
+				return React.createElement(Dialogue, {
+					speaker: message.speaker,
+					line: message.line,
+					key: id,
+					playername: _this.props.playername
+				});
+			});
 			return React.createElement(
 				Panel,
 				{ className: "log-box", ref: function ref(_ref) {
@@ -43353,7 +43356,7 @@
 	});
 
 	var mapStateToProps = function mapStateToProps(state) {
-		return { name: state.player.name, messages: state.log.messages };
+		return { playername: state.player.name, messages: state.log.messages };
 	};
 
 	module.exports = ReactRedux.connect(mapStateToProps)(Log);
@@ -43364,63 +43367,55 @@
 
 	"use strict";
 
+	// This component displays a single line in the game log window. Used in `log.js`.
+
 	var React = __webpack_require__(1),
-	    ReactRedux = __webpack_require__(209),
 	    proptypes = React.PropTypes,
 	    Row = __webpack_require__(241).Row,
 	    Col = __webpack_require__(241).Col;
 
-	var Dialogue = React.createClass({
-		displayName: "Dialogue",
-		propTypes: {
-			speaker: proptypes.string.isRequired,
-			line: proptypes.array.isRequired,
-			name: proptypes.string.isRequired
-		},
-		render: function render() {
-			var name = this.props.speaker + ":";
-			if (name === "Player:") {
-				name = this.props.name + ":";
-			} else if (name === "Narrator:") {
-				name = "";
-			}
+	var Dialogue = function Dialogue(props) {
 
-			var line = [];
+		// Figure out what name to display, if any
+		var displayname = props.speaker === "Player" ? props.playername + ": " : props.speaker === "Narrator" ? "" : props.speaker + ": ";
 
-			this.props.line.forEach((function (part, id) {
-				line.push(React.createElement(
-					"span",
-					{ key: id, className: part.className },
-					part.text
-				));
-			}).bind(this));
-
+		// Build the line out of the provided parts in order to allow for word-specific styling
+		var line = props.line.map(function (part, id) {
 			return React.createElement(
-				Row,
-				{ className: this.props.speaker },
-				React.createElement(
-					Col,
-					{ xs: 4, md: 1 },
-					name
-				),
-				React.createElement(
-					Col,
-					{ xs: 12, md: 11 },
-					React.createElement(
-						"p",
-						null,
-						line
-					)
-				)
+				"span",
+				{ key: id, className: part.className },
+				part.text
 			);
-		}
-	});
+		});
 
-	var mapStateToProps = function mapStateToProps(state) {
-		return { name: state.player.name };
+		// Return a row with displayname and the built line
+		return React.createElement(
+			Row,
+			{ className: props.speaker },
+			React.createElement(
+				Col,
+				{ xs: 4, md: 1 },
+				displayname
+			),
+			React.createElement(
+				Col,
+				{ xs: 12, md: 11 },
+				React.createElement(
+					"p",
+					null,
+					line
+				)
+			)
+		);
 	};
 
-	module.exports = ReactRedux.connect(mapStateToProps)(Dialogue);
+	Dialogue.propTypes = {
+		speaker: proptypes.string.isRequired,
+		line: proptypes.array.isRequired,
+		playername: proptypes.string.isRequired
+	};
+
+	module.exports = Dialogue;
 
 /***/ },
 /* 488 */
