@@ -25834,14 +25834,21 @@
 			case constants.EQUIP_ITEM:
 				switch (action.item.type) {
 					case constants.WEAPON:
-						newState.weapon = action.item;
+						if (newState.inventory.indexOf(action.item) > -1) {
+							newState.weapon = action.item;
+						} else {
+							throw new Error("No such weapon " + action.item.name + " in inventory!");
+						}
 						break;
 					case constants.ARMOUR:
-						newState.armour = action.item;
+						if (newState.inventory.indexOf(action.item) > -1) {
+							newState.armour = action.item;
+						} else {
+							throw new Error("No such armour " + action.item.name + " in inventory!");
+						}
 						break;
 					default:
-						console.log("Invalid item type passed to equipItem - " + action.item.name);
-						break;
+						throw new Error("Invalid item type passed to equipItem - " + action.item.name);
 				}
 				return newState;
 			case constants.PREP_INVENT:
