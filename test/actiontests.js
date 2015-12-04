@@ -1,8 +1,8 @@
-let expect = require("chai").expect,
-	actions = require("./../src/actions"),
-	constants = require("./../src/constants"),
-	Redux = require("redux"),
-	thunk = require("redux-thunk");
+import { expect } from "chai";
+import actions from "./../src/actions";
+import constants from "./../src/constants";
+import { applyMiddleware } from "redux";
+import thunk from "redux-thunk";
 
 function mockStore(getState, expectedActions, done) {
 	if (!Array.isArray(expectedActions)) {
@@ -33,7 +33,7 @@ function mockStore(getState, expectedActions, done) {
 		};
 	};
 
-	const mockStoreWithMiddleware = Redux.applyMiddleware(thunk)(mockStoreWithoutMiddleware);
+	const mockStoreWithMiddleware = applyMiddleware(thunk)(mockStoreWithoutMiddleware);
 
 	return mockStoreWithMiddleware();
 };

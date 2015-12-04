@@ -1,4 +1,4 @@
-let constants = require("./constants");
+import constants from "./constants";
 
 module.exports = {
 	showMessage(message, timeout) {

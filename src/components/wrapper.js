@@ -1,9 +1,6 @@
-let React = require("react"),
-	Navigation = require("./navigation"),
-	Panel = require("react-bootstrap").Panel,
-	Grid = require("react-bootstrap").Grid,
-    Row = require("react-bootstrap").Row,
-	Col = require("react-bootstrap").Col;
+import React from "react";
+import Navigation from "./navigation";
+import { Panel, Grid, Row, Col } from "react-bootstrap";
 
 let Wrapper = (props)=> {
     return (

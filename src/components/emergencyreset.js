@@ -1,10 +1,8 @@
-let React = require("react"),
-	ReactDOM = require("react-dom"),
-	ReactRedux = require("react-redux"),
-	actions = require("./../actions"),
-	Row = require("react-bootstrap").Row,
-	Col = require("react-bootstrap").Col,
-	Button = require("react-bootstrap").Button;
+import React from "react";
+import ReactDOM from "react-dom";
+import { connect } from "react-redux";
+import actions from "./../actions";
+import { Row, Col, Button } from "react-bootstrap";
 
 let EmergencyReset = React.createClass({
 	handleClick() {
@@ -31,4 +29,4 @@ let mapDispatchToProps = (dispatch)=> {
 	}
 };
 
-module.exports = ReactRedux.connect(null, mapDispatchToProps)(EmergencyReset);
+module.exports = connect(null, mapDispatchToProps)(EmergencyReset);

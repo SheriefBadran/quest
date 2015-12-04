@@ -1,5 +1,5 @@
-let _ = require("lodash"),
-	constants = require("./../constants");
+import _ from "lodash";
+import constants from "./../constants";
 
 let Weapons = {
 	starter: {

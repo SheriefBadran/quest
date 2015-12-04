@@ -1,11 +1,9 @@
-let React = require("react"),
-	ReactRedux = require("react-redux"),
-	proptypes = React.PropTypes,
-	constants = require("../constants"),
-	Panel = require("react-bootstrap").Panel,
-	Grid = require("react-bootstrap").Grid,
-	Row = require("react-bootstrap").Row,
-	Col = require("react-bootstrap").Col;
+import React from "react";
+import { connect } from "react-redux";
+import constants from "../constants";
+import { Panel, Grid, Row, Col } from "react-bootstrap";
+
+let proptypes = React.PropTypes;
 
 let WorldMap = React.createClass({
 	render() {
@@ -100,4 +98,4 @@ let mapStateToProps = (state)=> {
 	return { display: state.world.displayMap, map: state.world.map, player: state.world.playerPos };
 };
 
-module.exports = ReactRedux.connect(mapStateToProps)(WorldMap);
+module.exports = connect(mapStateToProps)(WorldMap);

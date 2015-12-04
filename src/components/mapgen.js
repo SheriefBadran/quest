@@ -1,4 +1,4 @@
-var NPCs = require("./../data/npc");
+import NPCs from "./../data/npc";
 
 module.exports = {
 	generateMap: function() {

@@ -1,9 +1,6 @@
-let React = require("react"),
-	LinkContainer = require("react-router-bootstrap").LinkContainer,
-	IndexLinkContainer = require("react-router-bootstrap").IndexLinkContainer,
-	NavItem = require("react-bootstrap").NavItem,
-	Nav = require("react-bootstrap").Nav,
-	ButtonGroup = require("react-bootstrap").ButtonGroup;
+import React from "react";
+import { LinkContainer, IndexLinkContainer } from "react-router-bootstrap";
+import { NavItem, Nav, ButtonGroup } from "react-bootstrap";
 
 let Navigation = (props)=> {
     return (

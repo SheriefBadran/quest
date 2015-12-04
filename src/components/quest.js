@@ -1,12 +1,10 @@
-let React = require("react"),
-	Log = require("./log"),
-	PlayerBar = require("./playerbar"),
-	Status = require("./status"),
-	Inventory = require("./inventory"),
-	WorldMap = require("./map"),
-	Grid = require ("react-bootstrap").Grid,
-	Row = require("react-bootstrap").Row,
-	Col = require("react-bootstrap").Col;
+import React from "react";
+import Log from "./log";
+import PlayerBar from "./playerbar";
+import Status from "./status";
+import Inventory from "./inventory";
+import WorldMap from "./map";
+import { Grid, Row, Col } from "react-bootstrap";
 
 let Quest = (props)=> {
 	return (

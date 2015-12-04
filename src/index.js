@@ -3,13 +3,12 @@ This is the entry point for the app! From here we merely import our routes defin
 then use React and React-DOM to render it.
 */
 
-let React = require("react"),
-    ReactRouter = require("react-router"),
-    Router = ReactRouter.Router,
-	ReactDOM = require("react-dom"),
-	Provider = require("react-redux").Provider,
-	store = require("./store"),
-	routes = require("./routes");
+import React from "react";
+import { Router } from "react-router";
+import ReactDOM from "react-dom";
+import { Provider } from "react-redux";
+import store from "./store";
+import routes from "./routes";
 
 ReactDOM.render(
 	<Provider store={store}>

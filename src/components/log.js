@@ -1,12 +1,10 @@
-let React = require("react"),
-	ReactDOM = require("react-dom"),
-	ReactRedux = require("react-redux"),
-	proptypes = React.PropTypes,
-	Panel = require("react-bootstrap").Panel,
-	Grid = require("react-bootstrap").Grid,
-	Row = require("react-bootstrap").Row,
-	Col = require("react-bootstrap").Col,
-	Dialogue = require("./dialogue");
+import React from "react";
+import ReactDOM from "react-dom";
+import { connect } from "react-redux";
+import { Panel, Grid, Row, Col } from "react-bootstrap";
+import Dialogue from "./dialogue";
+
+let proptypes = React.PropTypes;
 
 let Log = React.createClass({
 	displayName: "Log",
@@ -43,4 +41,4 @@ let mapStateToProps = (state)=> {
 	return { playername: state.player.name, messages: state.log.messages };
 };
 
-module.exports = ReactRedux.connect(mapStateToProps)(Log);
+module.exports = connect(mapStateToProps)(Log);

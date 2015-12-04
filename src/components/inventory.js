@@ -1,10 +1,8 @@
-let React = require("react"),
-	ReactRedux = require("react-redux"),
-	proptypes = React.PropTypes,
-	Panel = require("react-bootstrap").Panel,
-	Grid = require("react-bootstrap").Grid,
-	Row = require("react-bootstrap").Row,
-	Col = require("react-bootstrap").Col;
+import React from "react";
+import { connect } from "react-redux";
+import { Panel, Grid, Row, Col } from "react-bootstrap";
+
+let proptypes = React.PropTypes;
 
 let Inventory = React.createClass({
 	displayName: "Inventory",
@@ -73,4 +71,4 @@ let mapStateToProps = (state)=> {
 	return { display: state.player.displayInventory, inventory: state.player.inventory, weapon: state.player.weapon, armour: state.player.armour };
 };
 
-module.exports = ReactRedux.connect(mapStateToProps)(Inventory);
+module.exports = connect(mapStateToProps)(Inventory);

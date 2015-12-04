@@ -1,7 +1,7 @@
-let constants = require("./constants"),
-	React = require("react");
+import constants from "./constants";
+import React from "react";
 
-module.exports = function() { // Returns a function so it can't be modified accidentally
+module.exports = ()=> { // Returns a function so it can't be modified accidentally
 	return {
 		input: {
 			// Currently expected input

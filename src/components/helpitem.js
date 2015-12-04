@@ -1,9 +1,9 @@
 // Help item class used by "help.js"
 
-let React = require("react"),
-	proptypes = React.PropTypes,
-	Row = require("react-bootstrap").Row,
-	Col = require("react-bootstrap").Col;
+import React from "react";
+import { Row, Col } from "react-bootstrap";
+
+let proptypes = React.PropTypes;
 
 let HelpItem = (props)=> {
 	return (

@@ -1,7 +1,8 @@
-let expect = require("chai").expect,
-	initialState = require("./../src/initialstate"),
-	constants = require("./../src/constants"),
-	reducer;
+import { expect } from "chai";
+import initialState from "./../src/initialstate";
+import constants from "./../src/constants";
+
+let reducer;
 
 describe("input reducer", ()=> {
 	before(()=> {

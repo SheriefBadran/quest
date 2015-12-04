@@ -1,9 +1,8 @@
-let React = require("react"),
-	ReactRedux = require("react-redux"),
-	proptypes = React.PropTypes,
-	Panel = require("react-bootstrap").Panel,
-	Grid = require("react-bootstrap").Grid,
-	Col = require("react-bootstrap").Col;
+import React from "react";
+import { connect } from "react-redux";
+import { Panel, Grid, Col } from "react-bootstrap";
+
+let proptypes = React.PropTypes;
 
 let Status = React.createClass({
 	displayName: "Status",
@@ -84,4 +83,4 @@ let mapStateToProps = (state)=> {
 	return { name: state.player.name, display: state.player.displayStats, stats: state.player.stats, weapon: state.player.weapon, armour: state.player.armour };
 };
 
-module.exports = ReactRedux.connect(mapStateToProps)(Status);
+module.exports = connect(mapStateToProps)(Status);

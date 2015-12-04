@@ -1,16 +1,17 @@
-let React = require("react"),
-	ReactDOM = require("react-dom"),
-	ReactRedux = require("react-redux"),
-	actions = require("./../actions"),
-	constants = require("./../constants"),
-	messageGen = require("./messagegen"),
-	proptypes = React.PropTypes,
-	Input = require("react-bootstrap").Input,
-	Classes = require("./../data/class"),
-	Weapons = require("./../data/weapon"),
-	Items = require("./../data/item"),
-	MapGen = require("./mapgen"),
-	NPCs = require("./../data/npc");
+import React from "react";
+import ReactDOM from "react-dom";
+import { connect } from "react-redux";
+import actions from "./../actions";
+import constants from "./../constants";
+import messageGen from "./messagegen";
+import { Input } from "react-bootstrap";
+import Classes from "./../data/class";
+import Weapons from "./../data/weapon";
+import Items from "./../data/item";
+import MapGen from "./mapgen";
+import NPCs from "./../data/npc";
+
+let proptypes = React.PropTypes;
 
 let PlayerBar = React.createClass({
 	displayName: "PlayerBar",
@@ -462,4 +463,4 @@ let mapDispatchToProps = (dispatch)=> {
 	}
 };
 
-module.exports = ReactRedux.connect(mapStateToProps, mapDispatchToProps)(PlayerBar);
+module.exports = connect(mapStateToProps, mapDispatchToProps)(PlayerBar);

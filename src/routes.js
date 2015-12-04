@@ -1,10 +1,8 @@
-let React = require("react"),
-    ReactRouter = require("react-router"),
-    Route = ReactRouter.Route,
-    IndexRoute = ReactRouter.IndexRoute,
-    Wrap = require("./components/wrapper"),
-    quest = require("./components/quest"),
-    help = require("./components/help");
+import React from "react";
+import { Route, IndexRoute } from "react-router";
+import Wrap from "./components/wrapper";
+import quest from "./components/quest";
+import help from "./components/help";
 
 module.exports = (
     <Route component={Wrap} path="/">

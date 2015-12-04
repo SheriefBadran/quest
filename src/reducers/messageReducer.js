@@ -1,5 +1,5 @@
-let initialState = require("./../initialstate"),
-	constants = require("./../constants");
+import initialState from "./../initialstate";
+import constants from "./../constants";
 
 module.exports = (state, action)=> {
 	let newState = Object.assign({}, state); // Copy to a new state so we don't screw up the old one

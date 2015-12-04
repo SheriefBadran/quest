@@ -1,5 +1,4 @@
-let constants = require("./../constants"),
-	React = require("react");
+import constants from "./../constants";
 
 module.exports = {
 	getConfirmMessage(prevInput, name, option) {
@@ -41,9 +40,7 @@ module.exports = {
 			case constants.EXPECTING_RACE:
 			case constants.EXPECTING_WEAPON:
 				return { speaker: constants.WIZARD, line: [ { className: constants.WIZARD, text: "I'm sorry, I have no idea what you're trying to say... It's a " }, { className: "confirm", text: "yes" }, { className: constants.WIZARD, text: " or " }, { className: "deny", text: "no" }, { className: constants.WIZARD, text: " question!" } ] };
-			case constants.EXPECTING_RESET:
-				let yes = <font className="confirm">yes</font>;
-				let no = <font className="deny">no</font>		
+			case constants.EXPECTING_RESET:	
 				return { speaker: constants.FINAL_BOSS, line: [ { className: constants.FINAL_BOSS, text: "What on earth is that supposed to mean? All I need is a simple " }, { className: "confirm", text: "yes" }, { className: constants.FINAL_BOSS, text: " or " }, { className: "deny", text: "no" }, { className: constants.FINAL_BOSS, text: "!" } ] };
 			default:
 				console.log("Missing fail message for " + prevInput + " confirmation.");
