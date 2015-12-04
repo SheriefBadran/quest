@@ -1,19 +1,20 @@
 import { expect } from "chai";
 import initialState from "./../src/initialstate";
 import constants from "./../src/constants";
+import inputReducer from "./../src/reducers/inputReducer";
+import messageReducer from "./../src/reducers/messageReducer";
+import playerReducer from "./../src/reducers/playerReducer";
+import worldReducer from "./../src/reducers/worldReducer";
 
 let reducer;
 
 describe("input reducer", ()=> {
-	before(()=> {
-		reducer = require("./../src/reducers/inputReducer");
-	});
 	it("should return the initial state", ()=> {
-		expect(reducer(undefined, {})).to.deep.equal(initialState().input);
+		expect(inputReducer(undefined, {})).to.deep.equal(initialState().input);
 	});
 	it("should return initial state on reset", ()=> {
 		expect(
-			reducer(
+			inputReducer(
 				{
 					awaiting: constants.EXPECTING_CONF,
 					previous: constants.EXPECTING_NAME,
@@ -28,7 +29,7 @@ describe("input reducer", ()=> {
 	});
 	it("should update awaiting and previous on receiving a non-reset action", ()=> {
 		expect(
-			reducer(initialState().input, { type: constants.SET_INPUT, input: constants.EXPECTING_CONF })
+			inputReducer(initialState().input, { type: constants.SET_INPUT, input: constants.EXPECTING_CONF })
 		).to.deep.equal({
 			awaiting: constants.EXPECTING_CONF,
 			previous: constants.EXPECTING_NAME,
@@ -36,7 +37,7 @@ describe("input reducer", ()=> {
 			beforeResetIfConf: constants.EXPECTING_NAME
 		});
 		expect(
-			reducer(
+			inputReducer(
 				{
 					awaiting: constants.EXPECTING_CONF,
 					previous: constants.EXPECTING_NAME,
@@ -57,7 +58,7 @@ describe("input reducer", ()=> {
 	});
 	it("should set before reset parameter if going into reset mode", ()=> {
 		expect(
-			reducer(
+			inputReducer(
 				{
 					awaiting: constants.EXPECTING_WEAPON,
 					previous: constants.EXPECTING_CONF,
@@ -78,7 +79,7 @@ describe("input reducer", ()=> {
 	});
 	it("should set before reset parameter and before reset conf if going into reset mode during confirmation", ()=> {
 		expect(
-			reducer(
+			inputReducer(
 				{
 					awaiting: constants.EXPECTING_CONF,
 					previous: constants.EXPECTING_WEAPON,
@@ -99,7 +100,7 @@ describe("input reducer", ()=> {
 	});
 	it("should revert to before reset if receiving another reset command", ()=> {
 		expect(
-			reducer(
+			inputReducer(
 				{
 					awaiting: constants.EXPECTING_CONF,
 					previous: constants.EXPECTING_RESET,
@@ -118,7 +119,7 @@ describe("input reducer", ()=> {
 			beforeResetIfConf: constants.EXPECTING_WEAPON
 		});
 		expect(
-			reducer(
+			inputReducer(
 				{
 					awaiting: constants.EXPECTING_CONF,
 					previous: constants.EXPECTING_RESET,
@@ -140,15 +141,12 @@ describe("input reducer", ()=> {
 });
 
 describe("message reducer", ()=> {
-	before(()=> {
-		reducer = require("./../src/reducers/messageReducer");
-	});
 	it("should return the initial state", ()=> {
-		expect(reducer(undefined, {})).to.deep.equal(initialState().log);
+		expect(messageReducer(undefined, {})).to.deep.equal(initialState().log);
 	});
 	it("should return initial state on reset", ()=> {
 		expect(
-			reducer(
+			messageReducer(
 				{
 					queue: [],
 					messages: [
@@ -163,7 +161,7 @@ describe("message reducer", ()=> {
 	});
 	it("should add a message to the message queue", ()=> {
 		expect(
-			reducer(
+			messageReducer(
 				{
 					queue: [ { text: "Message 1" } ],
 					messages: []
@@ -180,7 +178,7 @@ describe("message reducer", ()=> {
 	});
 	it("should move message from queue to messages", ()=> {
 		expect(
-			reducer(
+			messageReducer(
 				{
 					queue: [ { text: "Message 2" } ],
 					messages: [ { text: "Message 1" } ]
@@ -197,15 +195,12 @@ describe("message reducer", ()=> {
 });
 
 describe("player reducer", ()=> {
-	before(()=> {
-		reducer = require("./../src/reducers/playerReducer");
-	});
 	it("should return the initial state", ()=> {
-		expect(reducer(undefined, {})).to.deep.equal(initialState().player);
+		expect(playerReducer(undefined, {})).to.deep.equal(initialState().player);
 	});
 	it("should return initial state on reset", ()=> {
 		expect(
-			reducer(
+			playerReducer(
 				{
 					name: "Hello",
 					displayStats: true,
@@ -225,7 +220,7 @@ describe("player reducer", ()=> {
 	});
 	it("should change the name when SET_NAME is provided", ()=> {
 		expect(
-			reducer(initialState().player, 
+			playerReducer(initialState().player, 
 				{ 
 					type: constants.SET_NAME, 
 					name: "Test" 
@@ -245,7 +240,7 @@ describe("player reducer", ()=> {
 	});
 	it("should update stats and add current hp and mp when SET_STATS is provided", ()=> {
 		expect(
-			reducer(initialState().player,
+			playerReducer(initialState().player,
 				{
 					type: constants.SET_STATS,
 					stats: {
@@ -282,7 +277,7 @@ describe("player reducer", ()=> {
 	});
 	it("should set prepStats when PREP_STATS is provided", ()=> {
 		expect(
-			reducer(initialState().player,
+			playerReducer(initialState().player,
 				{
 					type: constants.PREP_STATS,
 					display: true
@@ -303,7 +298,7 @@ describe("player reducer", ()=> {
 	});
 	it("should set displayStats and remove prepStats when DISPLAY_STATS is provided", ()=> {
 		expect(
-			reducer({
+			playerReducer({
 					name: "???",
 					prepStats: true,
 					displayStats: false,
@@ -335,7 +330,7 @@ describe("player reducer", ()=> {
 	it("should add item to empty item queue", ()=> {
 		let item = { name: "Test" };
 		expect(
-			reducer(
+			playerReducer(
 				initialState().player,
 				{
 					type: constants.QUEUE_ITEM,
@@ -358,7 +353,7 @@ describe("player reducer", ()=> {
 		let item = { name: "Test" },
 			item2 = { name: "Test2" };
 		expect(
-			reducer(
+			playerReducer(
 				{
 					name: "???",
 					displayStats: false,
@@ -391,7 +386,7 @@ describe("player reducer", ()=> {
 		let item = { name: "Test" },
 			item2 = { name: "Test2" };
 		expect(
-			reducer(
+			playerReducer(
 				{
 					name: "???",
 					displayStats: false,
@@ -424,7 +419,7 @@ describe("player reducer", ()=> {
 			item2 = { name: "Test2" },
 			item3 = { name: "Test3" };
 		expect(
-			reducer(
+			playerReducer(
 				{
 					name: "???",
 					displayStats: false,
@@ -456,7 +451,7 @@ describe("player reducer", ()=> {
 	it("should equip weapon if weapon supplied to EQUIP_ITEM", ()=> {
 		let weapon = { type: constants.WEAPON, name: "Sword" };
 		expect(
-			reducer(
+			playerReducer(
 				{
 					name: "???",
 					displayStats: false,
@@ -488,8 +483,8 @@ describe("player reducer", ()=> {
 	it("should throw exception if weapon supplied to EQUIP_ITEM is not in inventory", ()=> {
 		let weapon = { type: constants.WEAPON, name: "Sword" };
 		expect(
-			reducer.bind(
-				reducer,
+			playerReducer.bind(
+				playerReducer,
 				{
 					name: "???",
 					displayStats: false,
@@ -511,7 +506,7 @@ describe("player reducer", ()=> {
 	it("should equip armour if armour supplied to EQUIP_ITEM", ()=> {
 		let armour = { type: constants.ARMOUR, name: "Shield" };
 		expect(
-			reducer(
+			playerReducer(
 				{
 					name: "???",
 					displayStats: false,
@@ -543,8 +538,8 @@ describe("player reducer", ()=> {
 	it("should throw exception if armour supplied to EQUIP_ITEM is not in inventory", ()=> {
 		let armour = { type: constants.ARMOUR, name: "Shield" };
 		expect(
-			reducer.bind(
-				reducer,
+			playerReducer.bind(
+				playerReducer,
 				{
 					name: "???",
 					displayStats: false,
@@ -565,8 +560,8 @@ describe("player reducer", ()=> {
 	});
 	it("should throw error if invalid item type is supplied to EQUIP_ITEM", ()=> {
 		expect(
-			reducer.bind(
-				reducer,
+			playerReducer.bind(
+				playerReducer,
 				{
 					name: "???",
 					displayStats: false,
@@ -587,7 +582,7 @@ describe("player reducer", ()=> {
 	});
 	it("should set prepInvent when PREP_INVENT is supplied", ()=> {
 		expect(
-			reducer(
+			playerReducer(
 				initialState().player,
 				{
 					type: constants.PREP_INVENT,
@@ -609,7 +604,7 @@ describe("player reducer", ()=> {
 	});
 	it("should set displayInventory and remove prepInvent when DISPLAY_INVENTORY is supplied", ()=> {
 		expect(
-			reducer(
+			playerReducer(
 				{
 					name: "???",
 					displayStats: false,
@@ -643,9 +638,6 @@ describe("player reducer", ()=> {
 
 describe("world reducer", ()=> {
 	let map;
-	before(()=> {
-		reducer = require("./../src/reducers/worldReducer");
-	});
 	beforeEach(()=> {
 		map = [
 			[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
@@ -656,11 +648,11 @@ describe("world reducer", ()=> {
 		];
 	});
 	it("should return the initial state", ()=> {
-		expect(reducer(undefined, {})).to.deep.equal(initialState().world);
+		expect(worldReducer(undefined, {})).to.deep.equal(initialState().world);
 	});
 	it("should return initial state on reset", ()=> {
 		expect(
-			reducer(
+			worldReducer(
 				{
 					version: "0.1.2.34",
 					displayMap: false,
@@ -679,7 +671,7 @@ describe("world reducer", ()=> {
 	it("should set prepMap and mark tiles as seen when placed in centre with PREP_MAP", ()=> {
 		let pos = { x: 2, y: 2 };
 		expect(
-			reducer(
+			worldReducer(
 				initialState().world,
 				{
 					type: constants.PREP_MAP,
@@ -710,7 +702,7 @@ describe("world reducer", ()=> {
 	it("should set display map, update map and player pos, and remove prepMap with ADD_MAP", ()=> {
 		let pos = { x: 2, y: 2 };
 		expect(
-			reducer(
+			worldReducer(
 				{
 					version: "0.1.2.34",
 					displayMap: false,
@@ -753,7 +745,7 @@ describe("world reducer", ()=> {
 		let movement = { x: -1, y: 0 },
 			pos = { x: 2, y: 2 };
 		expect(
-			reducer(
+			worldReducer(
 				{
 					version: "0.1.2.34",
 					displayMap: true,
@@ -788,8 +780,8 @@ describe("world reducer", ()=> {
 		let movement = { x: 0, y: -1 },
 			pos = { x: 0, y: 1};
 		expect(
-			reducer.bind(
-				reducer,
+			worldReducer.bind(
+				worldReducer,
 				{
 					version: "0.1.2.34",
 					displayMap: true,
@@ -811,8 +803,8 @@ describe("world reducer", ()=> {
 		movement = { x: 1, y: 0};
 		pos = { x: 3, y: 4};
 		expect(
-			reducer.bind(
-				reducer,
+			worldReducer.bind(
+				worldReducer,
 				{
 					version: "0.1.2.34",
 					displayMap: true,
