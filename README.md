@@ -1,4 +1,4 @@
-# Quest [![Build Status](https://travis-ci.org/MoombaDS/quest.svg?branch=gh-pages)](https://travis-ci.org/MoombaDS/quest)
+# Quest [![Build Status](https://travis-ci.org/MoombaDS/quest.svg?branch=gh-pages)](https://travis-ci.org/MoombaDS/quest) [![Coverage Status](https://coveralls.io/repos/MoombaDS/quest/badge.svg?branch=gh-pages&service=github)](https://coveralls.io/github/MoombaDS/quest?branch=gh-pages)
 
 ### Try it out!
 

@@ -638,6 +638,197 @@ describe("player reducer", ()=> {
 			armour: null	
 		});
 	});
+});
 
-
+describe("world reducer", ()=> {
+	let map;
+	before(()=> {
+		reducer = require("./../src/reducers/worldReducer");
+	});
+	beforeEach(()=> {
+		map = [
+			[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
+			[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
+			[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
+			[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
+			[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}]
+		];
+	});
+	it("should return the initial state", ()=> {
+		expect(reducer(undefined, {})).to.deep.equal(initialState().world);
+	});
+	it("should return initial state on reset", ()=> {
+		expect(
+			reducer(
+				{
+					version: "0.1.2.34",
+					displayMap: false,
+					map: map,
+					playerPos: {
+						x: 3,
+						y: 2
+					}
+				}, 
+				{ 
+					type: constants.RESET 
+				}
+			)
+		).to.deep.equal(initialState().world);
+	});
+	it("should set prepMap and mark tiles as seen when placed in centre with PREP_MAP", ()=> {
+		let pos = { x: 2, y: 2 };
+		expect(
+			reducer(
+				initialState().world,
+				{
+					type: constants.PREP_MAP,
+					map: map,
+					position: pos
+				}
+			)
+		).to.deep.equal({
+			version: "0.1.2.34",
+			displayMap: false,
+			prepMap: {
+				map: [
+					[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
+					[{seen: false},{seen:false},{seen:true},{seen:false},{seen:false}], 
+					[{seen: false},{seen:true},{seen:false},{seen:true},{seen:false}], 
+					[{seen: false},{seen:false},{seen:true},{seen:false},{seen:false}], 
+					[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}]
+				],
+				position: pos
+			},
+			map: [[]],
+			playerPos: {
+				x: 0,
+				y: 0
+			}
+		});
+	});
+	it("should set display map, update map and player pos, and remove prepMap with ADD_MAP", ()=> {
+		let pos = { x: 2, y: 2 };
+		expect(
+			reducer(
+				{
+					version: "0.1.2.34",
+					displayMap: false,
+					prepMap: {
+						map: [
+							[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
+							[{seen: false},{seen:false},{seen:true},{seen:false},{seen:false}], 
+							[{seen: false},{seen:true},{seen:false},{seen:true},{seen:false}], 
+							[{seen: false},{seen:false},{seen:true},{seen:false},{seen:false}], 
+							[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}]
+						],
+						position: pos
+					},
+					map: [[]],
+					playerPos: {
+						x: 0,
+						y: 0
+					}
+				},
+				{
+					type: constants.ADD_MAP,
+					map: map,
+					position: pos
+				}
+			)
+		).to.deep.equal({
+			version: "0.1.2.34",
+			displayMap: true,
+			map: [
+				[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
+				[{seen: false},{seen:false},{seen:true},{seen:false},{seen:false}], 
+				[{seen: false},{seen:true},{seen:false},{seen:true},{seen:false}], 
+				[{seen: false},{seen:false},{seen:true},{seen:false},{seen:false}], 
+				[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}]
+			],
+			playerPos: pos
+		});
+	});
+	it("should move player and update map visibility with MOVE", ()=> {
+		let movement = { x: -1, y: 0 },
+			pos = { x: 2, y: 2 };
+		expect(
+			reducer(
+				{
+					version: "0.1.2.34",
+					displayMap: true,
+					map: [
+						[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
+						[{seen: false},{seen:false},{seen:true},{seen:false},{seen:false}], 
+						[{seen: false},{seen:true},{seen:false},{seen:true},{seen:false}], 
+						[{seen: false},{seen:false},{seen:true},{seen:false},{seen:false}], 
+						[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}]
+					],
+					playerPos: pos					
+				},
+				{
+					type: constants.MOVE,
+					movement: movement
+				}
+			)
+		).to.deep.equal({
+			version: "0.1.2.34",
+			displayMap: true,
+			map: [
+				[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
+				[{seen: false},{seen:true},{seen:true},{seen:false},{seen:false}], 
+				[{seen: true},{seen:true},{seen:true},{seen:true},{seen:false}], 
+				[{seen: false},{seen:true},{seen:true},{seen:false},{seen:false}], 
+				[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}]
+			],
+			playerPos: { x: pos.x + movement.x, y: pos.y + movement.y }
+		});
+	});
+	it("should not throw an exception when updating visibility at array boundaries", ()=> {
+		let movement = { x: 0, y: -1 },
+			pos = { x: 0, y: 1};
+		expect(
+			reducer.bind(
+				reducer,
+				{
+					version: "0.1.2.34",
+					displayMap: true,
+					map: [
+						[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
+						[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
+						[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
+						[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
+						[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}]
+					],
+					playerPos: pos	
+				},
+				{
+					type: constants.MOVE,
+					movement: movement
+				}
+			)
+		).to.not.throw(Error);
+		movement = { x: 1, y: 0};
+		pos = { x: 3, y: 4};
+		expect(
+			reducer.bind(
+				reducer,
+				{
+					version: "0.1.2.34",
+					displayMap: true,
+					map: [
+						[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
+						[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
+						[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
+						[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
+						[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}]
+					],
+					playerPos: pos	
+				},
+				{
+					type: constants.MOVE,
+					movement: movement
+				}
+			)
+		).to.not.throw(Error);
+	});
 });
