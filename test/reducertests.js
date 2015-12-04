@@ -12,7 +12,17 @@ describe("input reducer", ()=> {
 	});
 	it("should return initial state on reset", ()=> {
 		expect(
-			reducer(initialState().input, { type: constants.RESET })
+			reducer(
+				{
+					awaiting: constants.EXPECTING_CONF,
+					previous: constants.EXPECTING_NAME,
+					beforeReset: constants.EXPECTING_NAME,
+					beforeResetIfConf: constants.EXPECTING_NAME
+				}, 
+				{ 
+					type: constants.RESET 
+				}
+			)
 		).to.deep.equal(initialState().input);
 	});
 	it("should update awaiting and previous on receiving a non-reset action", ()=> {
@@ -86,7 +96,7 @@ describe("input reducer", ()=> {
 			beforeResetIfConf: constants.EXPECTING_WEAPON
 		});
 	});
-	it("should set revert to before reset if receiving another reset command", ()=> {
+	it("should revert to before reset if receiving another reset command", ()=> {
 		expect(
 			reducer(
 				{
@@ -124,6 +134,63 @@ describe("input reducer", ()=> {
 			previous: constants.EXPECTING_CONF,
 			beforeReset: constants.EXPECTING_NAME,
 			beforeResetIfConf: constants.EXPECTING_WEAPON
+		});
+	});
+});
+
+describe("message reducer", ()=> {
+	before(()=> {
+		reducer = require("./../src/reducers/messageReducer");
+	});
+	it("should return the initial state", ()=> {
+		expect(reducer(undefined, {})).to.deep.equal(initialState().log);
+	});
+	it("should return initial state on reset", ()=> {
+		expect(
+			reducer(
+				{
+					queue: [],
+					messages: [
+						{ speaker: "Test" }
+					]
+				}, 
+				{ 
+					type: constants.RESET 
+				}
+			)
+		).to.deep.equal(initialState().log);
+	});
+	it("should add a message to the message queue", ()=> {
+		expect(
+			reducer(
+				{
+					queue: [ { text: "Message 1" } ],
+					messages: []
+				},
+				{
+					type: constants.QUEUE_MESSAGE,
+					message: { text: "Message 2" }
+				}
+			)
+		).to.deep.equal({
+			queue: [ { text: "Message 1" }, { text: "Message 2" }],
+			messages: []
+		});
+	});
+	it("should move message from queue to messages", ()=> {
+		expect(
+			reducer(
+				{
+					queue: [ { text: "Message 2" } ],
+					messages: [ { text: "Message 1" } ]
+				},
+				{
+					type: constants.SHOW_MESSAGE
+				}
+			)
+		).to.deep.equal({
+			queue: [],
+			messages: [ { text: "Message 1" }, { text: "Message 2" } ]
 		});
 	});
 });
