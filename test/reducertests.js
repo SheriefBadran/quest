@@ -4,7 +4,7 @@ let expect = require("chai").expect,
 	reducer;
 
 describe("input reducer", ()=> {
-	before (()=> {
+	before(()=> {
 		reducer = require("./../src/reducers/inputReducer");
 	});
 	it("should return the initial state", ()=> {
@@ -42,6 +42,88 @@ describe("input reducer", ()=> {
 			previous: constants.EXPECTING_CONF,
 			beforeReset: constants.EXPECTING_NAME,
 			beforeResetIfConf: constants.EXPECTING_NAME
+		});
+	});
+	it("should set before reset parameter if going into reset mode", ()=> {
+		expect(
+			reducer(
+				{
+					awaiting: constants.EXPECTING_WEAPON,
+					previous: constants.EXPECTING_CONF,
+					beforeReset: constants.EXPECTING_RACE,
+					beforeResetIfConf: constants.EXPECTING_NAME
+				},
+				{ 
+					type: constants.SET_INPUT, 
+					input: constants.EXPECTING_RESET
+				}
+			)
+		).to.deep.equal({
+			awaiting: constants.EXPECTING_RESET,
+			previous: constants.EXPECTING_WEAPON,
+			beforeReset: constants.EXPECTING_WEAPON,
+			beforeResetIfConf: constants.EXPECTING_NAME
+		});
+	});
+	it("should set before reset parameter and before reset conf if going into reset mode during confirmation", ()=> {
+		expect(
+			reducer(
+				{
+					awaiting: constants.EXPECTING_CONF,
+					previous: constants.EXPECTING_WEAPON,
+					beforeReset: constants.EXPECTING_RACE,
+					beforeResetIfConf: constants.EXPECTING_NAME
+				},
+				{ 
+					type: constants.SET_INPUT, 
+					input: constants.EXPECTING_RESET
+				}
+			)
+		).to.deep.equal({
+			awaiting: constants.EXPECTING_RESET,
+			previous: constants.EXPECTING_CONF,
+			beforeReset: constants.EXPECTING_CONF,
+			beforeResetIfConf: constants.EXPECTING_WEAPON
+		});
+	});
+	it("should set revert to before reset if receiving another reset command", ()=> {
+		expect(
+			reducer(
+				{
+					awaiting: constants.EXPECTING_CONF,
+					previous: constants.EXPECTING_RESET,
+					beforeReset: constants.EXPECTING_CONF,
+					beforeResetIfConf: constants.EXPECTING_WEAPON
+				},
+				{ 
+					type: constants.SET_INPUT, 
+					input: constants.EXPECTING_RESET
+				}
+			)
+		).to.deep.equal({
+			awaiting: constants.EXPECTING_CONF,
+			previous: constants.EXPECTING_WEAPON,
+			beforeReset: constants.EXPECTING_CONF,
+			beforeResetIfConf: constants.EXPECTING_WEAPON
+		});
+		expect(
+			reducer(
+				{
+					awaiting: constants.EXPECTING_CONF,
+					previous: constants.EXPECTING_RESET,
+					beforeReset: constants.EXPECTING_NAME,
+					beforeResetIfConf: constants.EXPECTING_WEAPON
+				},
+				{ 
+					type: constants.SET_INPUT, 
+					input: constants.EXPECTING_RESET
+				}
+			)
+		).to.deep.equal({
+			awaiting: constants.EXPECTING_NAME,
+			previous: constants.EXPECTING_CONF,
+			beforeReset: constants.EXPECTING_NAME,
+			beforeResetIfConf: constants.EXPECTING_WEAPON
 		});
 	});
 });
