@@ -71,4 +71,4 @@ let mapStateToProps = (state)=> {
 	return { display: state.player.displayInventory, inventory: state.player.inventory, weapon: state.player.weapon, armour: state.player.armour };
 };
 
-module.exports = connect(mapStateToProps)(Inventory);
+export default connect(mapStateToProps)(Inventory);

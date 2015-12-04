@@ -1,6 +1,6 @@
 import NPCs from "./../data/npc";
 
-module.exports = {
+export default {
 	generateMap: function() {
 		var mapSize = 9; // TODO: change to be randomised
 

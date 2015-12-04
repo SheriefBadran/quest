@@ -29,4 +29,4 @@ let mapDispatchToProps = (dispatch)=> {
 	}
 };
 
-module.exports = connect(null, mapDispatchToProps)(EmergencyReset);
+export default connect(null, mapDispatchToProps)(EmergencyReset);

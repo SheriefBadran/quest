@@ -4,7 +4,7 @@ import Wrap from "./components/wrapper";
 import quest from "./components/quest";
 import help from "./components/help";
 
-module.exports = (
+export default (
     <Route component={Wrap} path="/">
         <IndexRoute component={quest} />
         <Route component={help} path="/help" />

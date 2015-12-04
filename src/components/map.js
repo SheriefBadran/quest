@@ -98,4 +98,4 @@ let mapStateToProps = (state)=> {
 	return { display: state.world.displayMap, map: state.world.map, player: state.world.playerPos };
 };
 
-module.exports = connect(mapStateToProps)(WorldMap);
+export default connect(mapStateToProps)(WorldMap);

@@ -27,4 +27,4 @@ let Wrapper = (props)=> {
     );
 };
 
-module.exports = Wrapper;
+export default Wrapper;

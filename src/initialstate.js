@@ -1,7 +1,7 @@
 import constants from "./constants";
 import React from "react";
 
-module.exports = ()=> { // Returns a function so it can't be modified accidentally
+export default ()=> { // Returns a function so it can't be modified accidentally
 	return {
 		input: {
 			// Currently expected input

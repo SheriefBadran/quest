@@ -2,4 +2,4 @@ let Items = {
 		map: require("./items/map.json")
 }
 
-module.exports = Items;
+export default Items;

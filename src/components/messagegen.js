@@ -1,6 +1,6 @@
 import constants from "./../constants";
 
-module.exports = {
+export default {
 	getConfirmMessage(prevInput, name, option) {
 		switch (prevInput) {
 			case constants.EXPECTING_NAME:

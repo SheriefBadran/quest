@@ -12,4 +12,4 @@ let HelpList = [
 	];
 
 
-module.exports = _.sortBy(HelpList, "name");
+export default _.sortBy(HelpList, "name");

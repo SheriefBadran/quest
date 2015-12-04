@@ -1,7 +1,7 @@
 import initialState from "./../initialstate";
 import constants from "./../constants";
 
-module.exports = (state, action)=> {
+export default (state, action)=> {
 	let newState = Object.assign({}, state); // Copy to a new state so we don't screw up the old one
 	switch (action.type) {
 		case constants.SET_NAME:

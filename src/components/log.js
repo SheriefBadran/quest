@@ -41,4 +41,4 @@ let mapStateToProps = (state)=> {
 	return { playername: state.player.name, messages: state.log.messages };
 };
 
-module.exports = connect(mapStateToProps)(Log);
+export default connect(mapStateToProps)(Log);

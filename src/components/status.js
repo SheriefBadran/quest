@@ -83,4 +83,4 @@ let mapStateToProps = (state)=> {
 	return { name: state.player.name, display: state.player.displayStats, stats: state.player.stats, weapon: state.player.weapon, armour: state.player.armour };
 };
 
-module.exports = connect(mapStateToProps)(Status);
+export default connect(mapStateToProps)(Status);

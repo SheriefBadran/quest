@@ -24,5 +24,5 @@ const saveLocal = store => next => action => {
   	return result;
 };
 
-module.exports = applyMiddleware(thunk, saveLocal)(createStore)(rootReducer, savedstate() || initialState());
+export default applyMiddleware(thunk, saveLocal)(createStore)(rootReducer, savedstate() || initialState());
 

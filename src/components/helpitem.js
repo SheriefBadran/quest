@@ -19,4 +19,4 @@ HelpItem.propTypes = {
 	description: proptypes.object.isRequired
 };
 
-module.exports = HelpItem;
+export default HelpItem;

@@ -1,6 +1,6 @@
 import initialState from "./initialstate";
 
-module.exports = (storage) => {
+export default (storage) => {
 	storage = storage || window.localStorage;
 	let state = JSON.parse(storage.getItem("Quest"));
 	// Before we return the state, we need to check if there's anything in the queues that should be moved to display.

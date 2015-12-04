@@ -33,4 +33,4 @@ Dialogue.propTypes = {
 	speaker: proptypes.string.isRequired
 };
 
-module.exports = Dialogue;
+export default Dialogue;

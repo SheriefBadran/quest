@@ -4,4 +4,4 @@ let Classes = {
 	Dwarf: require("./classes/dwarf")
 }
 
-module.exports = Classes;
+export default Classes;

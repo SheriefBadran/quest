@@ -25591,6 +25591,10 @@
 
 	"use strict";
 
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
 	var _redux = __webpack_require__(216);
 
 	var _initialstate = __webpack_require__(228);
@@ -25644,13 +25648,17 @@
 		};
 	};
 
-	module.exports = (0, _redux.applyMiddleware)(_reduxThunk2.default, saveLocal)(_redux.createStore)(rootReducer, (0, _savedstate2.default)() || (0, _initialstate2.default)());
+	exports.default = (0, _redux.applyMiddleware)(_reduxThunk2.default, saveLocal)(_redux.createStore)(rootReducer, (0, _savedstate2.default)() || (0, _initialstate2.default)());
 
 /***/ },
 /* 228 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
 
 	var _constants = __webpack_require__(229);
 
@@ -25662,7 +25670,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	module.exports = function () {
+	exports.default = function () {
 		// Returns a function so it can't be modified accidentally
 		return {
 			input: {
@@ -25707,7 +25715,10 @@
 
 	"use strict";
 
-	module.exports = {
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.default = {
 		MAX_NAME_LENGTH: 8,
 		MIN_NAME_LENGTH: 3,
 
@@ -25763,13 +25774,17 @@
 
 	"use strict";
 
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
 	var _initialstate = __webpack_require__(228);
 
 	var _initialstate2 = _interopRequireDefault(_initialstate);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	module.exports = function (storage) {
+	exports.default = function (storage) {
 		storage = storage || window.localStorage;
 		var state = JSON.parse(storage.getItem("Quest"));
 		// Before we return the state, we need to check if there's anything in the queues that should be moved to display.
@@ -25823,6 +25838,10 @@
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
 	var _initialstate = __webpack_require__(228);
 
 	var _initialstate2 = _interopRequireDefault(_initialstate);
@@ -25835,7 +25854,7 @@
 
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
-	module.exports = function (state, action) {
+	exports.default = function (state, action) {
 		var newState = _extends({}, state); // Copy to a new state so we don't screw up the old one
 		switch (action.type) {
 			case _constants2.default.QUEUE_MESSAGE:
@@ -25862,6 +25881,10 @@
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
 	var _initialstate = __webpack_require__(228);
 
 	var _initialstate2 = _interopRequireDefault(_initialstate);
@@ -25874,7 +25897,7 @@
 
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
-	module.exports = function (state, action) {
+	exports.default = function (state, action) {
 		var newState = _extends({}, state); // Copy to a new state so we don't screw up the old one
 		switch (action.type) {
 			case _constants2.default.SET_NAME:
@@ -25945,6 +25968,10 @@
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
 	var _initialstate = __webpack_require__(228);
 
 	var _initialstate2 = _interopRequireDefault(_initialstate);
@@ -25955,7 +25982,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	module.exports = function (state, action) {
+	exports.default = function (state, action) {
 		var newState = _extends({}, state); // Copy to a new state so we don't screw up the old one
 		switch (action.type) {
 			case _constants2.default.SET_INPUT:
@@ -25995,6 +26022,10 @@
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
 	var _initialstate = __webpack_require__(228);
 
 	var _initialstate2 = _interopRequireDefault(_initialstate);
@@ -26005,7 +26036,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	module.exports = function (state, action) {
+	exports.default = function (state, action) {
 		var updateMapVisibility = function updateMapVisibility(map, playerPos) {
 			if (playerPos.x > 0) {
 				map[playerPos.y][playerPos.x - 1].seen = true;
@@ -26079,6 +26110,10 @@
 
 	"use strict";
 
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
 	var _react = __webpack_require__(1);
 
 	var _react2 = _interopRequireDefault(_react);
@@ -26099,7 +26134,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	module.exports = _react2.default.createElement(
+	exports.default = _react2.default.createElement(
 	    _reactRouter.Route,
 	    { component: _wrapper2.default, path: "/" },
 	    _react2.default.createElement(_reactRouter.IndexRoute, { component: _quest2.default }),
@@ -26111,6 +26146,10 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
 
 	var _react = __webpack_require__(1);
 
@@ -26165,13 +26204,17 @@
 	    );
 	};
 
-	module.exports = Wrapper;
+	exports.default = Wrapper;
 
 /***/ },
 /* 238 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+			value: true
+	});
 
 	var _react = __webpack_require__(1);
 
@@ -26217,7 +26260,7 @@
 			);
 	};
 
-	module.exports = Navigation;
+	exports.default = Navigation;
 
 /***/ },
 /* 239 */
@@ -43349,6 +43392,10 @@
 
 	"use strict";
 
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
 	var _react = __webpack_require__(1);
 
 	var _react2 = _interopRequireDefault(_react);
@@ -43425,13 +43472,17 @@
 		);
 	};
 
-	module.exports = Quest;
+	exports.default = Quest;
 
 /***/ },
 /* 487 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
 
 	var _react = __webpack_require__(1);
 
@@ -43494,13 +43545,17 @@
 		return { playername: state.player.name, messages: state.log.messages };
 	};
 
-	module.exports = (0, _reactRedux.connect)(mapStateToProps)(Log);
+	exports.default = (0, _reactRedux.connect)(mapStateToProps)(Log);
 
 /***/ },
 /* 488 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
 
 	var _react = __webpack_require__(1);
 
@@ -43555,13 +43610,17 @@
 		speaker: proptypes.string.isRequired
 	};
 
-	module.exports = Dialogue;
+	exports.default = Dialogue;
 
 /***/ },
 /* 489 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
 
 	var _react = __webpack_require__(1);
 
@@ -44070,7 +44129,7 @@
 		};
 	};
 
-	module.exports = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(PlayerBar);
+	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(PlayerBar);
 
 /***/ },
 /* 490 */
@@ -44078,13 +44137,17 @@
 
 	"use strict";
 
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
 	var _constants = __webpack_require__(229);
 
 	var _constants2 = _interopRequireDefault(_constants);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	module.exports = {
+	exports.default = {
 		showMessage: function showMessage(message, timeout) {
 			return function (dispatch) {
 				dispatch({ type: _constants2.default.QUEUE_MESSAGE, message: message });
@@ -44158,13 +44221,17 @@
 
 	"use strict";
 
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
 	var _constants = __webpack_require__(229);
 
 	var _constants2 = _interopRequireDefault(_constants);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	module.exports = {
+	exports.default = {
 		getConfirmMessage: function getConfirmMessage(prevInput, name, option) {
 			switch (prevInput) {
 				case _constants2.default.EXPECTING_NAME:
@@ -44337,13 +44404,16 @@
 
 	"use strict";
 
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
 	var Classes = {
 		Elf: __webpack_require__(493),
 		Human: __webpack_require__(494),
 		Dwarf: __webpack_require__(495)
 	};
 
-	module.exports = Classes;
+	exports.default = Classes;
 
 /***/ },
 /* 493 */
@@ -44407,6 +44477,10 @@
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
 	var _lodash = __webpack_require__(497);
 
 	var _lodash2 = _interopRequireDefault(_lodash);
@@ -44435,7 +44509,7 @@
 		return ret;
 	}, Weapons.all);
 
-	module.exports = Weapons;
+	exports.default = Weapons;
 
 /***/ },
 /* 497 */
@@ -56868,11 +56942,14 @@
 
 	"use strict";
 
+	Object.defineProperty(exports, "__esModule", {
+			value: true
+	});
 	var Items = {
 			map: __webpack_require__(503)
 	};
 
-	module.exports = Items;
+	exports.default = Items;
 
 /***/ },
 /* 503 */
@@ -56891,13 +56968,17 @@
 
 	"use strict";
 
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
 	var _npc = __webpack_require__(505);
 
 	var _npc2 = _interopRequireDefault(_npc);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	module.exports = {
+	exports.default = {
 		generateMap: function generateMap() {
 			var mapSize = 9; // TODO: change to be randomised
 
@@ -56936,6 +57017,10 @@
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
 	var _lodash = __webpack_require__(497);
 
 	var _lodash2 = _interopRequireDefault(_lodash);
@@ -56957,7 +57042,7 @@
 		return ret;
 	}, NPCs.all);
 
-	module.exports = NPCs;
+	exports.default = NPCs;
 
 /***/ },
 /* 506 */
@@ -57021,6 +57106,10 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
 
 	var _react = __webpack_require__(1);
 
@@ -57145,13 +57234,17 @@
 		return { name: state.player.name, display: state.player.displayStats, stats: state.player.stats, weapon: state.player.weapon, armour: state.player.armour };
 	};
 
-	module.exports = (0, _reactRedux.connect)(mapStateToProps)(Status);
+	exports.default = (0, _reactRedux.connect)(mapStateToProps)(Status);
 
 /***/ },
 /* 508 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
 
 	var _react = __webpack_require__(1);
 
@@ -57284,13 +57377,17 @@
 		return { display: state.player.displayInventory, inventory: state.player.inventory, weapon: state.player.weapon, armour: state.player.armour };
 	};
 
-	module.exports = (0, _reactRedux.connect)(mapStateToProps)(Inventory);
+	exports.default = (0, _reactRedux.connect)(mapStateToProps)(Inventory);
 
 /***/ },
 /* 509 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
 
 	var _react = __webpack_require__(1);
 
@@ -57445,13 +57542,17 @@
 		return { display: state.world.displayMap, map: state.world.map, player: state.world.playerPos };
 	};
 
-	module.exports = (0, _reactRedux.connect)(mapStateToProps)(WorldMap);
+	exports.default = (0, _reactRedux.connect)(mapStateToProps)(WorldMap);
 
 /***/ },
 /* 510 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
 
 	var _react = __webpack_require__(1);
 
@@ -57533,13 +57634,17 @@
 		);
 	};
 
-	module.exports = Help;
+	exports.default = Help;
 
 /***/ },
 /* 511 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
 
 	var _lodash = __webpack_require__(497);
 
@@ -57549,7 +57654,7 @@
 
 	var HelpList = [__webpack_require__(512), __webpack_require__(513), __webpack_require__(514), __webpack_require__(515), __webpack_require__(516), __webpack_require__(517), __webpack_require__(518), __webpack_require__(519)];
 
-	module.exports = _lodash2.default.sortBy(HelpList, "name");
+	exports.default = _lodash2.default.sortBy(HelpList, "name");
 
 /***/ },
 /* 512 */
@@ -57637,6 +57742,10 @@
 
 	"use strict";
 
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
 	var _react = __webpack_require__(1);
 
 	var _react2 = _interopRequireDefault(_react);
@@ -57688,13 +57797,17 @@
 		};
 	};
 
-	module.exports = (0, _reactRedux.connect)(null, mapDispatchToProps)(EmergencyReset);
+	exports.default = (0, _reactRedux.connect)(null, mapDispatchToProps)(EmergencyReset);
 
 /***/ },
 /* 521 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
 
 	var _react = __webpack_require__(1);
 
@@ -57734,7 +57847,7 @@
 		description: proptypes.object.isRequired
 	};
 
-	module.exports = HelpItem;
+	exports.default = HelpItem;
 
 /***/ }
 /******/ ]);

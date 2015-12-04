@@ -15,4 +15,4 @@ let Navigation = (props)=> {
 	);
 };
 
-module.exports = Navigation;
+export default Navigation;

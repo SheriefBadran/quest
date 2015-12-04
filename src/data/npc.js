@@ -16,4 +16,4 @@ NPCs.all = _.reduce(NPCs.all, (ret, data, id)=> { // Add an id corresponding to 
 	return ret;
 }, NPCs.all);
 
-module.exports = NPCs;
+export default NPCs;

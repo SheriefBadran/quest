@@ -31,4 +31,4 @@ let Help = (props)=> {
 	);
 };
 
-module.exports = Help;
+export default Help;

@@ -463,4 +463,4 @@ let mapDispatchToProps = (dispatch)=> {
 	}
 };
 
-module.exports = connect(mapStateToProps, mapDispatchToProps)(PlayerBar);
+export default connect(mapStateToProps, mapDispatchToProps)(PlayerBar);

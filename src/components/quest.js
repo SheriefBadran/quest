@@ -36,4 +36,4 @@ let Quest = (props)=> {
 	);
 };
 
-module.exports = Quest;
+export default Quest;

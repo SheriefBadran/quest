@@ -1,7 +1,7 @@
 import initialState from "./../initialstate";
 import constants from "./../constants";
 
-module.exports = (state, action)=> {
+export default (state, action)=> {
 	let updateMapVisibility = (map, playerPos)=> {
 		if (playerPos.x > 0) {
 			map[playerPos.y][playerPos.x-1].seen = true;

@@ -20,4 +20,4 @@ Weapons.all = _.reduce(Weapons.all, (ret, data, id)=> { // Add the fact that the
 	return ret;
 }, Weapons.all);
 
-module.exports = Weapons;
+export default Weapons;

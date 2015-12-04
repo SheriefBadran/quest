@@ -1,6 +1,6 @@
 import constants from "./constants";
 
-module.exports = {
+export default {
 	showMessage(message, timeout) {
 		return (dispatch)=> {
 				dispatch({ type: constants.QUEUE_MESSAGE, message: message });
