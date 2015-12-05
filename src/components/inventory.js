@@ -12,23 +12,6 @@ let Inventory = React.createClass({
 	},
 	render() {
 		if (this.props.display) {
-			let col1 = [];
-			let col2 = [];
-			let col3 = [];
-			let col4 = [];
-
-			for (let i = 0; i < this.props.inventory.length; ++i) {
-				// TODO: improve the way this works a lot since it will be horrible for more than 20 items
-				if (i < 5) {
-					col1.push(<p key={i}>{this.props.inventory[i].name}</p>);
-				} else if (i < 10) {
-					col2.push(<p key={i}>{this.props.inventory[i].name}</p>);
-				} else if (i < 15) {
-					col3.push(<p key={i}>{this.props.inventory[i].name}</p>);
-				} else {
-					col4.push(<p key={i}>{this.props.inventory[i].name}</p>);
-				}
-			}
 
 			let weapon = "Nothing";
 			if (this.props.weapon) {
@@ -39,7 +22,31 @@ let Inventory = React.createClass({
 			if (this.props.armour) {
 				armour = this.props.armour.name;
 			}
+            
+            var currentNumberOfColumns = 1,
+                maximumNumberOfColumns = 4,
+                preferredNumberOfItemsInEachColumn = 5,
+                isLastColumn,
+                columns = [],
+                inventories = this.props.inventory.slice(0),
+                inventoriesInColumn,
+                wrapInventoryInPElement = function(inventory, index){
+                  return <p key={index}>{inventory.name}</p>;
+                };
 
+            while(currentNumberOfColumns <= maximumNumberOfColumns){
+                isLastColumn = currentNumberOfColumns === maximumNumberOfColumns;
+
+                if(isLastColumn){
+                    inventoriesInColumn = inventories.splice(0).map(wrapInventoryInPElement);
+                }else{
+                    inventoriesInColumn = inventories.splice(0, preferredNumberOfItemsInEachColumn).map(wrapInventoryInPElement);
+                }
+                
+                columns.push(<Col key={currentNumberOfColumns} md={3} xs={4.5}>{inventoriesInColumn}</Col>);
+                currentNumberOfColumns++;
+            }
+                        
 			return (
 				<Panel className="inventory-window">
 					<Grid fluid>
@@ -51,10 +58,7 @@ let Inventory = React.createClass({
 						<Col md={12} xs={18}>Inventory</Col>
 						</Row>
 						<Row>
-						<Col md={3} xs={4.5}>{col1}</Col>
-						<Col md={3} xs={4.5}>{col2}</Col>
-						<Col md={3} xs={4.5}>{col3}</Col>
-						<Col md={3} xs={4.5}>{col4}</Col>
+				            {columns}
 						</Row>
 					</Grid>
 				</Panel>
