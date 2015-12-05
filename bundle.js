@@ -25784,22 +25784,20 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+	
 	exports.default = function (storage) {
 		storage = storage || window.localStorage;
 		var state = JSON.parse(storage.getItem("Quest"));
 		// Before we return the state, we need to check if there's anything in the queues that should be moved to display.
 		if (state) {
 			if (state.log.queue && state.log.queue.length > 0) {
-				state.log.queue.forEach((function (item) {
-					state.log.messages.push(item);
-				}).bind(undefined));
+				state.log.messages = [].concat(_toConsumableArray(state.log.messages), _toConsumableArray(state.log.queue));
 				state.log.queue = [];
 			}
 	
 			if (state.player.itemQueue && state.player.itemQueue.length > 0) {
-				state.player.itemQueue.forEach((function (item) {
-					state.player.inventory.push(item);
-				}).bind(undefined));
+				state.player.inventory = [].concat(_toConsumableArray(state.player.inventory), _toConsumableArray(state.player.itemQueue));
 				state.player.itemQueue = [];
 			}
 	
@@ -26213,7 +26211,7 @@
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+			value: true
 	});
 	
 	var _react = __webpack_require__(1);
@@ -26227,37 +26225,37 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var Navigation = function Navigation(props) {
-		return _react2.default.createElement(
-			"div",
-			null,
-			_react2.default.createElement(
-				_reactBootstrap.Nav,
-				{ bsStyle: "pills" },
-				_react2.default.createElement(
-					_reactRouterBootstrap.IndexLinkContainer,
-					{ to: "/" },
+			return _react2.default.createElement(
+					"div",
+					null,
 					_react2.default.createElement(
-						_reactBootstrap.NavItem,
-						null,
-						"Home"
+							_reactBootstrap.Nav,
+							{ bsStyle: "pills" },
+							_react2.default.createElement(
+									_reactRouterBootstrap.IndexLinkContainer,
+									{ to: "/" },
+									_react2.default.createElement(
+											_reactBootstrap.NavItem,
+											null,
+											"Home"
+									)
+							),
+							_react2.default.createElement(
+									_reactRouterBootstrap.LinkContainer,
+									{ to: "/help" },
+									_react2.default.createElement(
+											_reactBootstrap.NavItem,
+											null,
+											"Help"
+									)
+							),
+							_react2.default.createElement(
+									_reactBootstrap.NavItem,
+									{ href: "https://github.com/MoombaDS/quest", target: "_blank" },
+									"Source Code"
+							)
 					)
-				),
-				_react2.default.createElement(
-					_reactRouterBootstrap.LinkContainer,
-					{ to: "/help" },
-					_react2.default.createElement(
-						_reactBootstrap.NavItem,
-						null,
-						"Help"
-					)
-				),
-				_react2.default.createElement(
-					_reactBootstrap.NavItem,
-					{ href: "https://github.com/MoombaDS/quest", target: "_blank" },
-					"Source Code"
-				)
-			)
-		);
+			);
 	};
 	
 	exports.default = Navigation;
@@ -28016,7 +28014,7 @@
 /* 278 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+	var __WEBPACK_AMD_DEFINE_RESULT__;/*!
 	  Copyright (c) 2015 Jed Watson.
 	  Licensed under the MIT License (MIT), see
 	  http://jedwatson.github.io/classnames
@@ -28057,9 +28055,9 @@
 			module.exports = classNames;
 		} else if (true) {
 			// register as 'classnames', consistent with npm package name
-			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
+			!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
 				return classNames;
-			}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+			}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 		} else {
 			window.classNames = classNames;
 		}
@@ -34739,8 +34737,7 @@
 	  }
 	
 	  component._values[propName] = value;
-	
-	  if (component.isMounted()) component.forceUpdate();
+	  component.forceUpdate();
 	}
 	
 	exports['default'] = _createUncontrollable2['default']([mixin], set);
@@ -43797,19 +43794,6 @@
 	
 			this.props.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: message }] }, 0);
 		},
-		checkAndSetName: function checkAndSetName(input) {
-			// Validate the length of the name
-			var message = undefined;
-			if (input.length > _constants2.default.MAX_NAME_LENGTH || input.length < _constants2.default.MIN_NAME_LENGTH) {
-				message = { speaker: _constants2.default.WIZARD, line: [{ text: "Hmmm... are you sure about that? Around here, names are usually between " + _constants2.default.MIN_NAME_LENGTH + " and " + _constants2.default.MAX_NAME_LENGTH + " characters in length! How about trying again?" }] };
-			} else {
-				message = { speaker: _constants2.default.WIZARD, line: [{ text: input + " you say? Weird name... are you sure about that?" }] };
-				this.props.setName(input);
-				this.props.setInputExpected(_constants2.default.EXPECTING_CONF);
-			}
-			this.props.showMessage({ speaker: _constants2.default.PLAYER, line: [{ text: "I'm " + input + "." }] }, 0);
-			this.props.showMessage(message, 1000); // Display the message
-		},
 		checkAndSelectRace: function checkAndSelectRace(input) {
 			var playerMessage = undefined;
 			var message = undefined;
@@ -44037,7 +44021,7 @@
 				case _constants2.default.DISABLED:
 					break; // Should not be doing anything
 				case _constants2.default.EXPECTING_NAME:
-					this.checkAndSetName(input);
+					this.props.checkAndSetName(input);
 					break;
 				case _constants2.default.EXPECTING_RACE:
 					this.checkAndSelectRace(input);
@@ -44068,7 +44052,7 @@
 					break;
 				default:
 					console.log("Missing input case for " + this.props.input);
-					break;;
+					break;
 			}
 		},
 		render: function render() {
@@ -44126,6 +44110,9 @@
 			},
 			resetGame: function resetGame(timeout) {
 				dispatch(_actions2.default.resetGame(timeout));
+			},
+			checkAndSetName: function checkAndSetName(input) {
+				dispatch(_actions2.default.checkAndSetName(input));
 			}
 		};
 	};
@@ -44147,6 +44134,8 @@
 	var _constants2 = _interopRequireDefault(_constants);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 	
 	exports.default = {
 		showMessage: function showMessage(message, timeout) {
@@ -44213,6 +44202,38 @@
 					dispatch({ type: _constants2.default.RESET });
 				}, timeout);
 			};
+		},
+		checkAndSetName: function checkAndSetName(input) {
+			var _this = this;
+	
+			// Validate the length of the name
+			if (input.length > _constants2.default.MAX_NAME_LENGTH || input.length < _constants2.default.MIN_NAME_LENGTH) {
+				var _ret = (function () {
+					var message = { speaker: _constants2.default.WIZARD, line: [{ text: "Hmmm... are you sure about that? Around here, names are usually between " + _constants2.default.MIN_NAME_LENGTH + " and " + _constants2.default.MAX_NAME_LENGTH + " characters in length! How about trying again?" }] };
+					return {
+						v: function v(dispatch) {
+							dispatch(_this.showMessage({ speaker: _constants2.default.PLAYER, line: [{ text: "I'm " + input + "." }] }, 0));
+							dispatch(_this.showMessage(message, 1000)); // Display the message
+						}
+					};
+				})();
+	
+				if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
+			} else {
+					var _ret2 = (function () {
+						var message = { speaker: _constants2.default.WIZARD, line: [{ text: input + " you say? Weird name... are you sure about that?" }] };
+						return {
+							v: function v(dispatch) {
+								dispatch(_this.setName(input));
+								dispatch(_this.setInputExpected(_constants2.default.EXPECTING_CONF));
+								dispatch(_this.showMessage({ speaker: _constants2.default.PLAYER, line: [{ text: "I'm " + input + "." }] }, 0));
+								dispatch(_this.showMessage(message, 1000)); // Display the message
+							}
+						};
+					})();
+	
+					if ((typeof _ret2 === "undefined" ? "undefined" : _typeof(_ret2)) === "object") return _ret2.v;
+				}
 		}
 	};
 

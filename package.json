@@ -35,6 +35,7 @@
     "redux": "^3.0.4",
     "redux-devtools": "^2.1.5",
     "redux-thunk": "^1.0.0",
+    "sinon": "^2.0.0-pre",
     "webpack": "^1.12.9"
   },
   "scripts": {

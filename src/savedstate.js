@@ -6,16 +6,12 @@ export default (storage) => {
 	// Before we return the state, we need to check if there's anything in the queues that should be moved to display.
 	if (state) {
 		if (state.log.queue && state.log.queue.length > 0) {
-			state.log.queue.forEach(function(item) {
-				state.log.messages.push(item);
-			}.bind(this));
+			state.log.messages = [...state.log.messages, ...state.log.queue];
 			state.log.queue = [];
 		}
 
 		if (state.player.itemQueue && state.player.itemQueue.length > 0) {
-			state.player.itemQueue.forEach(function(item) {
-				state.player.inventory.push(item);
-			}.bind(this));
+			state.player.inventory = [...state.player.inventory, ...state.player.itemQueue];
 			state.player.itemQueue = [];
 		}
 
