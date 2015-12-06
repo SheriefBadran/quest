@@ -25698,7 +25698,7 @@
 				armour: null
 			},
 			world: {
-				version: "0.1.2.34",
+				version: "0.1.2.51",
 				displayMap: false,
 				map: [[]],
 				playerPos: {
@@ -26126,7 +26126,7 @@
 	
 	var _quest2 = _interopRequireDefault(_quest);
 	
-	var _help = __webpack_require__(510);
+	var _help = __webpack_require__(511);
 	
 	var _help2 = _interopRequireDefault(_help);
 	
@@ -43406,15 +43406,15 @@
 	
 	var _playerbar2 = _interopRequireDefault(_playerbar);
 	
-	var _status = __webpack_require__(507);
+	var _status = __webpack_require__(508);
 	
 	var _status2 = _interopRequireDefault(_status);
 	
-	var _inventory = __webpack_require__(508);
+	var _inventory = __webpack_require__(509);
 	
 	var _inventory2 = _interopRequireDefault(_inventory);
 	
-	var _map = __webpack_require__(509);
+	var _map = __webpack_require__(510);
 	
 	var _map2 = _interopRequireDefault(_map);
 	
@@ -43630,39 +43630,15 @@
 	
 	var _reactRedux = __webpack_require__(209);
 	
-	var _actions = __webpack_require__(490);
-	
-	var _actions2 = _interopRequireDefault(_actions);
-	
 	var _constants = __webpack_require__(229);
 	
 	var _constants2 = _interopRequireDefault(_constants);
 	
-	var _messagegen = __webpack_require__(491);
-	
-	var _messagegen2 = _interopRequireDefault(_messagegen);
-	
 	var _reactBootstrap = __webpack_require__(242);
 	
-	var _class = __webpack_require__(492);
+	var _inputvalidation = __webpack_require__(490);
 	
-	var _class2 = _interopRequireDefault(_class);
-	
-	var _weapon = __webpack_require__(496);
-	
-	var _weapon2 = _interopRequireDefault(_weapon);
-	
-	var _item = __webpack_require__(502);
-	
-	var _item2 = _interopRequireDefault(_item);
-	
-	var _mapgen = __webpack_require__(504);
-	
-	var _mapgen2 = _interopRequireDefault(_mapgen);
-	
-	var _npc = __webpack_require__(505);
-	
-	var _npc2 = _interopRequireDefault(_npc);
+	var _inputvalidation2 = _interopRequireDefault(_inputvalidation);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -43671,21 +43647,10 @@
 	var PlayerBar = _react2.default.createClass({
 		displayName: "PlayerBar",
 		propTypes: {
-			addItem: proptypes.func.isRequired,
-			addMap: proptypes.func.isRequired,
-			equipItem: proptypes.func.isRequired,
 			input: proptypes.string.isRequired,
 			inventory: proptypes.array.isRequired,
 			name: proptypes.string.isRequired,
-			prevInput: proptypes.string.isRequired,
-			removeItem: proptypes.func.isRequired,
-			resetGame: proptypes.func.isRequired,
-			setDisplayInventory: proptypes.func.isRequired,
-			setDisplayStats: proptypes.func.isRequired,
-			setInputExpected: proptypes.func.isRequired,
-			setName: proptypes.func.isRequired,
-			setStats: proptypes.func.isRequired,
-			showMessage: proptypes.func.isRequired
+			prevInput: proptypes.string.isRequired
 		},
 		getInitialState: function getInitialState() {
 			return { text: "" };
@@ -43700,359 +43665,9 @@
 			if (event.keyCode == 13) {
 				// If it's enter key
 				if (this.state.text) {
-					this.validateAndSendInput(this.state.text);
+					this.props.validateInput(this.state.text, this.props.input, this.props.prevInput, this.props.name, this.props.playerPos, this.props.inventory, this.props.map);
 					this.setState({ text: "" });
 				}
-			}
-		},
-		getRequestedItem: function getRequestedItem(itemName) {
-			var requestedItem = null;
-			this.props.inventory.forEach((function (item) {
-				if (item.name.toUpperCase() === itemName.toUpperCase()) {
-					requestedItem = item;
-				}
-			}).bind(this));
-			return requestedItem;
-		},
-		attemptEquip: function attemptEquip(input) {
-			input = input.split(" ");
-	
-			if (input.length > 1) {
-	
-				var itemName = input[1];
-				for (var i = 2; i < input.length; ++i) {
-					itemName += " " + input[i];
-				}
-	
-				var requestedItem = this.getRequestedItem(itemName);
-	
-				if (requestedItem) {
-					if (requestedItem.equippable) {
-						this.props.equipItem(requestedItem);
-						this.props.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "You equip the " + requestedItem.prefix + " " }, { className: requestedItem.name, text: requestedItem.name }, { text: "." }] }, 0);
-					} else {
-						this.props.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ className: requestedItem.name, text: requestedItem.name }, { text: " cannot be equipped!" }] }, 0);
-					}
-				} else {
-					this.props.showMessage(_messagegen2.default.getNoSuchItemMessage(itemName), 0);
-				}
-			}
-		},
-		attemptLookAt: function attemptLookAt(input) {
-			input = input.split(" ");
-	
-			if (input.length > 2) {
-				var itemName = input[2];
-				for (var i = 3; i < input.length; ++i) {
-					itemName += " " + input[i];
-				}
-	
-				var requestedItem = this.getRequestedItem(itemName);
-	
-				if (requestedItem) {
-					var prefix = "AEIOU".indexOf(requestedItem.prefix.charAt(0).toUpperCase()) < 0 ? "A" : "An";
-					this.props.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: prefix + " " + requestedItem.prefix + " " }, { className: requestedItem.name, text: requestedItem.name }, { text: ". " + requestedItem.description }] }, 0);
-					if (requestedItem.type === _constants2.default.WEAPON || requestedItem.type === _constants2.default.ARMOUR) {
-						this.props.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "The stats are Strength: " + requestedItem.stats.str + ", Magic: " + requestedItem.stats.mag + ", Dexterity: " + requestedItem.stats.dex + ", and Defence: " + requestedItem.stats.def + "." }] }, 0);
-					}
-				} else {
-					this.props.showMessage(_messagegen2.default.getNoSuchItemMessage(itemName), 0);
-				}
-			}
-		},
-		lookAround: function lookAround() {
-			// TODO: make it look around the tile you're currently in too
-	
-			// We need to check what's in the four cardinal directions
-			var message = "";
-	
-			// Make sure it's both on the map
-			if (this.props.playerPos.y - 1 >= 0) {
-				message += "To the north you see ";
-				message += (this.props.map[this.props.playerPos.y - 1][this.props.playerPos.x].description || this.props.map[this.props.playerPos.y - 1][this.props.playerPos.x].type) + ". ";
-			}
-	
-			if (this.props.playerPos.x + 1 < this.props.map[0].length) {
-				message += "To the east you see ";
-				message += (this.props.map[this.props.playerPos.y][this.props.playerPos.x + 1].description || this.props.map[this.props.playerPos.y][this.props.playerPos.x + 1].type) + ". ";
-			}
-	
-			if (this.props.playerPos.y + 1 < this.props.map.length) {
-				message += "To the south you see ";
-				message += (this.props.map[this.props.playerPos.y + 1][this.props.playerPos.x].description || this.props.map[this.props.playerPos.y + 1][this.props.playerPos.x].type) + ". ";
-			}
-	
-			if (this.props.playerPos.x - 1 >= 0) {
-				message += "To the west you see ";
-				message += (this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].description || this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].type) + ". ";
-			}
-	
-			if (this.props.map[this.props.playerPos.y][this.props.playerPos.x].encounter) {
-				var encounter = _npc2.default.all[this.props.map[this.props.playerPos.y][this.props.playerPos.x].encounter];
-				this.props.showMessage({ speaker: _constants2.default.NARRATOR, line: encounter.description }, 0);
-			}
-	
-			this.props.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: message }] }, 0);
-		},
-		checkAndSelectRace: function checkAndSelectRace(input) {
-			var playerMessage = undefined;
-			var message = undefined;
-	
-			var raceOptions = [];
-	
-			for (var raceName in _class2.default) {
-				if (_class2.default.hasOwnProperty(raceName)) {
-					raceOptions.push(raceName);
-				}
-			}
-	
-			// Check if it's a valid race
-			var valid = false;
-			var chosenRace = undefined;
-			for (var i = 0; i < raceOptions.length; ++i) {
-				if (input.toUpperCase().indexOf(raceOptions[i].toUpperCase()) > -1) {
-					// Check if it's mentioned anywhere in the input
-					valid = true;
-					chosenRace = raceOptions[i];
-					break;
-				}
-			}
-	
-			if (valid) {
-				var prefix = "AEIOU".indexOf(input.charAt(0).toUpperCase()) < 0 ? "A" : "An";
-				playerMessage = { speaker: _constants2.default.PLAYER, line: [{ text: "I'm " + prefix.toLowerCase() + " " + chosenRace + "... I think?" }] };
-				message = { speaker: _constants2.default.WIZARD, line: [{ text: "Aha! " + prefix + " " }, { className: chosenRace, text: chosenRace }, { text: " eh? " + _class2.default[chosenRace].description + " Are you sure about this?" }] };
-				this.props.setStats(_class2.default[chosenRace].stats);
-				this.props.setInputExpected(_constants2.default.EXPECTING_CONF);
-			} else {
-				// If it's not a valid race then we do a fail again
-				playerMessage = _messagegen2.default.getPlayerFail();
-				message = _messagegen2.default.getMultiChoiceFailMessage(this.props.input, raceOptions, this.props.name);
-			}
-	
-			this.props.showMessage(playerMessage, 0);
-			this.props.showMessage(message, 1000); // Display the message
-		},
-		checkAndSelectStarterWeapon: function checkAndSelectStarterWeapon(input) {
-			var playerMessage = undefined;
-			var message = undefined;
-	
-			var weaponOptions = [];
-	
-			for (var weaponName in _weapon2.default.starter) {
-				if (_weapon2.default.starter.hasOwnProperty(weaponName)) {
-					weaponOptions.push(weaponName);
-				}
-			}
-	
-			// Check validity
-			var valid = false;
-			var chosenWeapon = undefined; // An object
-	
-			for (var i = 0; i < weaponOptions.length; ++i) {
-				if (input.toUpperCase().indexOf(weaponOptions[i].toUpperCase()) > -1) {
-					// Check if it's mentioned anywhere in the input
-					valid = true;
-					chosenWeapon = _weapon2.default.starter[weaponOptions[i]];
-					break;
-				}
-			}
-	
-			if (valid) {
-				playerMessage = { speaker: _constants2.default.PLAYER, line: [{ text: "I think I'll take the " + chosenWeapon.name + "." }] };
-				message = { speaker: _constants2.default.WIZARD, line: [{ text: "A fine choice! " + chosenWeapon.description + " Is this what you really want?" }] };
-				if (this.props.inventory.length > 0) {
-					// Remove the item if it was added in a previous cycle
-					this.props.removeItem(this.props.inventory[this.props.inventory.length - 1]);
-				}
-				this.props.addItem(chosenWeapon, 0);
-				this.props.setInputExpected(_constants2.default.EXPECTING_CONF);
-			} else {
-				playerMessage = _messagegen2.default.getPlayerFail();
-				message = _messagegen2.default.getMultiChoiceFailMessage(this.props.input, weaponOptions, this.props.name);
-			}
-	
-			this.props.showMessage(playerMessage, 0);
-			this.props.showMessage(message, 1000); // Display the message
-		},
-		checkAndValidateConfirmation: function checkAndValidateConfirmation(input) {
-			var playerMessage = undefined;
-			var message = undefined;
-			if (input.toUpperCase() === "YES" || input.toUpperCase() === "Y") {
-				playerMessage = _messagegen2.default.getPlayerYes();
-				message = _messagegen2.default.getConfirmMessage(this.props.prevInput, this.props.name);
-				this.props.showMessage(playerMessage, 0);
-				this.props.showMessage(message, 1000); // Display the message
-				switch (this.props.prevInput) {
-					case _constants2.default.EXPECTING_NAME:
-						this.props.showMessage(_messagegen2.default.getRaceMessage(this.props.name, _class2.default), 2000);
-						this.props.setInputExpected(_constants2.default.EXPECTING_RACE);
-						break;
-					case _constants2.default.EXPECTING_RACE:
-						this.props.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "Your status has been updated!" }] }, 2000);
-						this.props.setDisplayStats(true, 2000);
-						this.props.showMessage(_messagegen2.default.getWeaponMessage(this.props.name, _weapon2.default.starter), 3000);
-						this.props.setInputExpected(_constants2.default.EXPECTING_WEAPON);
-						break;
-					case _constants2.default.EXPECTING_WEAPON:
-						var latestItem = this.props.inventory[this.props.inventory.length - 1];
-						var prefix = "AEIOU".indexOf(latestItem.name.charAt(0).toUpperCase()) < 0 ? "A" : "An";
-						var has = latestItem.isPlural ? "have" : "has";
-						this.props.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: prefix + " " + latestItem.prefix + " " }, { className: latestItem.name, text: latestItem.name }, { text: " " + has + " been added to your inventory!" }] }, 2000);
-						this.props.setDisplayInventory(true, 2000);
-						this.props.showMessage({ speaker: _constants2.default.WIZARD, line: [{ text: "Don't forget to equip it before you head out into the world by using " }, { className: "confirm", text: "equip " + latestItem.name }, { text: "! Not my fault if you end up running around unarmed!" }] }, 3000);
-						this.props.showMessage({ speaker: _constants2.default.WIZARD, line: [{ text: "Ah, I can see from the look on your face that you have questions. Out with it then!" }] }, 4000);
-						this.props.setInputExpected(_constants2.default.EXPECTING_ANYTHING);
-						break;
-					case _constants2.default.EXPECTING_RESET:
-						this.props.resetGame(5000);
-						break;
-					default:
-						console.log("Missing case for confirmation.");
-						this.props.setInputExpected(_constants2.default.DISABLED);
-						break;
-				}
-			} else if (input.toUpperCase() === "NO" || input.toUpperCase() === "N") {
-				var options = [];
-	
-				if (this.props.prevInput === _constants2.default.EXPECTING_RACE) {
-					options = _class2.default;
-				} else if (this.props.prevInput === _constants2.default.EXPECTING_WEAPON) {
-					for (var weaponName in _weapon2.default.starter) {
-						if (_weapon2.default.starter.hasOwnProperty(weaponName)) {
-							options.push(weaponName);
-						}
-					}
-				}
-	
-				playerMessage = _messagegen2.default.getPlayerNo();
-				message = _messagegen2.default.getDenyMessage(this.props.prevInput, this.props.name, options);
-				this.props.setInputExpected(this.props.prevInput);
-				this.props.showMessage(playerMessage, 0);
-				this.props.showMessage(message, 1000); // Display the message
-			} else {
-					playerMessage = _messagegen2.default.getPlayerFail();
-					message = _messagegen2.default.getFailMessage(this.props.prevInput, this.props.name);
-					this.props.showMessage(playerMessage, 0);
-					this.props.showMessage(message, 1000); // Display the message
-				}
-		},
-		checkAndMovePlayer: function checkAndMovePlayer(input) {
-			//TODO: Possibly remove the text saying which direction you moved
-			var wrongWay = { speaker: _constants2.default.NARRATOR, line: [{ text: "You can't go that way!" }] };
-	
-			var movement = { x: 0, y: 0 };
-	
-			if (input.toUpperCase() === "N" || input.toUpperCase().indexOf("NORTH") > -1) {
-				// Make sure it's both on the map and that it's not an obstacle
-				if (this.props.playerPos.y - 1 < 0 || this.props.map[this.props.playerPos.y - 1][this.props.playerPos.x].obstacle) {
-					this.props.showMessage(wrongWay, 0);
-				} else {
-					movement = { x: 0, y: -1 };
-					this.props.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "You move north." }] }, 0);
-				}
-			} else if (input.toUpperCase() === "E" || input.toUpperCase().indexOf("EAST") > -1) {
-				if (this.props.playerPos.x + 1 > this.props.map[0].length - 1 || this.props.map[this.props.playerPos.y][this.props.playerPos.x + 1].obstacle) {
-					this.props.showMessage(wrongWay, 0);
-				} else {
-					movement = { x: 1, y: 0 };
-					this.props.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "You move east." }] }, 0);
-				}
-			} else if (input.toUpperCase() === "S" || input.toUpperCase().indexOf("SOUTH") > -1) {
-				if (this.props.playerPos.y + 1 > this.props.map.length - 1 || this.props.map[this.props.playerPos.y + 1][this.props.playerPos.x].obstacle) {
-					this.props.showMessage(wrongWay, 0);
-				} else {
-					movement = { x: 0, y: 1 };
-					this.props.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "You move south." }] }, 0);
-				}
-			} else if (input.toUpperCase() === "W" || input.toUpperCase().indexOf("WEST") > -1) {
-				if (this.props.playerPos.x - 1 < 0 || this.props.map[this.props.playerPos.y][this.props.playerPos.x - 1].obstacle) {
-					this.props.showMessage(wrongWay, 0);
-				} else {
-					movement = { x: -1, y: 0 };
-					this.props.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "You move west." }] }, 0);
-				}
-			}
-	
-			if (movement.x !== 0 || movement.y !== 0) {
-				this.props.movePlayer(movement);
-	
-				if (this.props.map[this.props.playerPos.y + movement.y][this.props.playerPos.x + movement.x].encounter) {
-					var encounter = _npc2.default.all[this.props.map[this.props.playerPos.y + movement.y][this.props.playerPos.x + movement.x].encounter];
-					this.props.showMessage({ speaker: _constants2.default.NARRATOR, line: encounter.description }, 0);
-					encounter.seen = true;
-				}
-			}
-	
-			// TODO: things like description when entering special new area
-		},
-		validateAndSendInput: function validateAndSendInput(input) {
-			// TODO: IMPORANT - MAKE THIS METHOD MUCH SMALLER
-			if (input.split(" ")[0].toUpperCase() === "RESET") {
-				// If they want to give up and reset the game
-				this.props.showMessage({ speaker: _constants2.default.PLAYER, line: [{ text: "I can't take this anymore..." }] }, 0);
-				this.props.showMessage(_messagegen2.default.getResetMessage(this.props.name), 1000);
-				this.props.setInputExpected(_constants2.default.EXPECTING_RESET);
-				this.props.setInputExpected(_constants2.default.EXPECTING_CONF);
-				return;
-			} else if (input.split(" ")[0].toUpperCase() === "EQUIP" && this.props.inventory.length > 0) {
-				// If they're looking to equip and have an inventory
-				this.attemptEquip(input);
-				return;
-			} else if (input.toUpperCase().indexOf("LOOK AT") > -1 && this.props.inventory.length > 0) {
-				// If they want to look at an item and have an inventory
-				this.attemptLookAt(input);
-				return;
-			} else if (input.toUpperCase().indexOf("LOOK AROUND") > -1 && this.props.input === _constants2.default.EXPECTING_MOVEMENT) {
-				// If they want to look around
-				this.lookAround();
-				return;
-			} else if (this.props.map[0].length > 0 && this.props.map[this.props.playerPos.y][this.props.playerPos.x].encounter) {
-				var encounter = _npc2.default.all[this.props.map[this.props.playerPos.y][this.props.playerPos.x].encounter];
-				if (input.toUpperCase().indexOf("TALK") > -1) {
-					this.props.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "You attempt to strike up a conversation with the " }, { className: encounter.name, text: encounter.name }, { text: "." }] }, 0);
-					var randomResponse = encounter.talk[Math.floor(Math.random() * encounter.talk.length)];
-					this.props.showMessage({ speaker: encounter.name, line: randomResponse }, 1000);
-				}
-	
-				//TODO: Encounter stuff!
-			}
-			switch (this.props.input) {
-				case _constants2.default.DISABLED:
-					break; // Should not be doing anything
-				case _constants2.default.EXPECTING_NAME:
-					this.props.checkAndSetName(input);
-					break;
-				case _constants2.default.EXPECTING_RACE:
-					this.checkAndSelectRace(input);
-					break;
-				case _constants2.default.EXPECTING_WEAPON:
-					this.checkAndSelectStarterWeapon(input);
-					break;
-				case _constants2.default.EXPECTING_ANYTHING:
-					// Making fun of the player at the end of the Wizard's intro
-					this.props.showMessage(_messagegen2.default.getPlayerFail(), 0);
-					this.props.showMessage({ speaker: _constants2.default.WIZARD, line: [{ text: "Oh, that's a pity... Well off with you then! Time to save the world or something!" }] }, 1000);
-					this.props.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "With a strength belying his frail physique, the " }, { className: _constants2.default.WIZARD, text: _constants2.default.WIZARD }, { text: " thrusts you from his crumbling tower and out into the unknown world..." }] }, 2000);
-					this.props.showMessage(_messagegen2.default.getAfterWizardMessage(), 4000);
-					this.props.showMessage(_messagegen2.default.getMapIntroMessage(), 6000);
-					this.props.showMessage(_messagegen2.default.getMapAddedMessage(), 8000);
-					this.props.addItem(_item2.default.map, 8000);
-					var map = _mapgen2.default.generateMap();
-					this.props.addMap(map.map, map.start, 8000);
-					this.props.showMessage(_messagegen2.default.getMapContMessage(), 9000);
-					this.props.showMessage(_messagegen2.default.getElfLeaveMessage(), 11000);
-					this.props.setInputExpected(_constants2.default.EXPECTING_MOVEMENT);
-					break;
-				case _constants2.default.EXPECTING_CONF:
-					this.checkAndValidateConfirmation(input);
-					break;
-				case _constants2.default.EXPECTING_MOVEMENT:
-					this.checkAndMovePlayer(input);
-					break;
-				default:
-					console.log("Missing input case for " + this.props.input);
-					break;
 			}
 		},
 		render: function render() {
@@ -44075,44 +43690,8 @@
 	
 	var mapDispatchToProps = function mapDispatchToProps(dispatch) {
 		return {
-			showMessage: function showMessage(message, timeout) {
-				dispatch(_actions2.default.showMessage(message, timeout));
-			},
-			setName: function setName(name) {
-				dispatch(_actions2.default.setName(name));
-			},
-			setStats: function setStats(stats) {
-				dispatch(_actions2.default.setStats(stats));
-			},
-			setInputExpected: function setInputExpected(inputType) {
-				dispatch(_actions2.default.setInputExpected(inputType));
-			},
-			setDisplayStats: function setDisplayStats(display, timeout) {
-				dispatch(_actions2.default.setDisplayStats(display, timeout));
-			},
-			addItem: function addItem(item, timeout) {
-				dispatch(_actions2.default.addItem(item, timeout));
-			},
-			removeItem: function removeItem(item) {
-				dispatch(_actions2.default.removeItem(item));
-			},
-			equipItem: function equipItem(item) {
-				dispatch(_actions2.default.equipItem(item));
-			},
-			setDisplayInventory: function setDisplayInventory(display, timeout) {
-				dispatch(_actions2.default.setDisplayInventory(display, timeout));
-			},
-			addMap: function addMap(map, position, timeout) {
-				dispatch(_actions2.default.addMap(map, position, timeout));
-			},
-			movePlayer: function movePlayer(movement) {
-				dispatch(_actions2.default.movePlayer(movement));
-			},
-			resetGame: function resetGame(timeout) {
-				dispatch(_actions2.default.resetGame(timeout));
-			},
-			checkAndSetName: function checkAndSetName(input) {
-				dispatch(_actions2.default.checkAndSetName(input));
+			validateInput: function validateInput(input, expectedInput, prevInput, name, playerPos, inventory, map) {
+				dispatch((0, _inputvalidation2.default)(input, expectedInput, prevInput, name, playerPos, inventory, map));
 			}
 		};
 	};
@@ -44133,9 +43712,536 @@
 	
 	var _constants2 = _interopRequireDefault(_constants);
 	
+	var _actions = __webpack_require__(491);
+	
+	var _actions2 = _interopRequireDefault(_actions);
+	
+	var _messagegen = __webpack_require__(492);
+	
+	var _messagegen2 = _interopRequireDefault(_messagegen);
+	
+	var _class = __webpack_require__(493);
+	
+	var _class2 = _interopRequireDefault(_class);
+	
+	var _weapon = __webpack_require__(497);
+	
+	var _weapon2 = _interopRequireDefault(_weapon);
+	
+	var _item = __webpack_require__(503);
+	
+	var _item2 = _interopRequireDefault(_item);
+	
+	var _mapgen = __webpack_require__(505);
+	
+	var _mapgen2 = _interopRequireDefault(_mapgen);
+	
+	var _npc = __webpack_require__(506);
+	
+	var _npc2 = _interopRequireDefault(_npc);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
+	
+	function checkAndSetName(input) {
+		// Validate the length of the name
+		if (input.length > _constants2.default.MAX_NAME_LENGTH || input.length < _constants2.default.MIN_NAME_LENGTH) {
+			var _ret = (function () {
+				var message = { speaker: _constants2.default.WIZARD, line: [{ text: "Hmmm... are you sure about that? Around here, names are usually between " + _constants2.default.MIN_NAME_LENGTH + " and " + _constants2.default.MAX_NAME_LENGTH + " characters in length! How about trying again?" }] };
+				return {
+					v: function v(dispatch) {
+						dispatch(_actions2.default.showMessage({ speaker: _constants2.default.PLAYER, line: [{ text: "I'm " + input + "." }] }, 0));
+						dispatch(_actions2.default.showMessage(message, 1000)); // Display the message
+					}
+				};
+			})();
+	
+			if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
+		} else {
+				var _ret2 = (function () {
+					var message = { speaker: _constants2.default.WIZARD, line: [{ text: input + " you say? Weird name... are you sure about that?" }] };
+					return {
+						v: function v(dispatch) {
+							dispatch(_actions2.default.setName(input));
+							dispatch(_actions2.default.setInputExpected(_constants2.default.EXPECTING_CONF));
+							dispatch(_actions2.default.showMessage({ speaker: _constants2.default.PLAYER, line: [{ text: "I'm " + input + "." }] }, 0));
+							dispatch(_actions2.default.showMessage(message, 1000)); // Display the message
+						}
+					};
+				})();
+	
+				if ((typeof _ret2 === "undefined" ? "undefined" : _typeof(_ret2)) === "object") return _ret2.v;
+			}
+	};
+	
+	function getRequestedItem(itemName, inventory) {
+		var requestedItem = null;
+		inventory.forEach((function (item) {
+			if (item.name.toUpperCase() === itemName.toUpperCase()) {
+				requestedItem = item;
+			}
+		}).bind(this));
+		return requestedItem;
+	};
+	
+	function attemptEquip(input, inventory) {
+		input = input.split(" ");
+	
+		if (input.length > 1) {
+			var _ret3 = (function () {
+	
+				var itemName = input[1];
+				for (var i = 2; i < input.length; ++i) {
+					itemName += " " + input[i];
+				}
+	
+				var requestedItem = getRequestedItem(itemName, inventory);
+	
+				if (requestedItem) {
+					if (requestedItem.equippable) {
+						return {
+							v: function v(dispatch) {
+								dispatch(_actions2.default.equipItem(requestedItem));
+								dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "You equip the " + requestedItem.prefix + " " }, { className: requestedItem.name, text: requestedItem.name }, { text: "." }] }, 0));
+							}
+						};
+					} else {
+						return {
+							v: function v(dispatch) {
+								dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ className: requestedItem.name, text: requestedItem.name }, { text: " cannot be equipped!" }] }, 0));
+							}
+						};
+					}
+				} else {
+					return {
+						v: function v(dispatch) {
+							dispatch(_actions2.default.showMessage(_messagegen2.default.getNoSuchItemMessage(itemName), 0));
+						}
+					};
+				}
+			})();
+	
+			if ((typeof _ret3 === "undefined" ? "undefined" : _typeof(_ret3)) === "object") return _ret3.v;
+		}
+	};
+	
+	function attemptLookAt(input, inventory) {
+		input = input.split(" ");
+	
+		if (input.length > 2) {
+			var _ret4 = (function () {
+				var itemName = input[2];
+				for (var i = 3; i < input.length; ++i) {
+					itemName += " " + input[i];
+				}
+	
+				var requestedItem = getRequestedItem(itemName, inventory);
+	
+				if (requestedItem) {
+					var _ret5 = (function () {
+						var prefix = "AEIOU".indexOf(requestedItem.prefix.charAt(0).toUpperCase()) < 0 ? "A" : "An";
+						return {
+							v: {
+								v: function v(dispatch) {
+									dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: prefix + " " + requestedItem.prefix + " " }, { className: requestedItem.name, text: requestedItem.name }, { text: ". " + requestedItem.description }] }, 0));
+									if (requestedItem.type === _constants2.default.WEAPON || requestedItem.type === _constants2.default.ARMOUR) {
+										dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "The stats are Strength: " + requestedItem.stats.str + ", Magic: " + requestedItem.stats.mag + ", Dexterity: " + requestedItem.stats.dex + ", and Defence: " + requestedItem.stats.def + "." }] }, 0));
+									}
+								}
+							}
+						};
+					})();
+	
+					if ((typeof _ret5 === "undefined" ? "undefined" : _typeof(_ret5)) === "object") return _ret5.v;
+				} else {
+					return {
+						v: function v(dispatch) {
+							dispatch(_actions2.default.showMessage(_messagegen2.default.getNoSuchItemMessage(itemName), 0));
+						}
+					};
+				}
+			})();
+	
+			if ((typeof _ret4 === "undefined" ? "undefined" : _typeof(_ret4)) === "object") return _ret4.v;
+		}
+	};
+	
+	function lookAround(playerPos, map) {
+		// TODO: make it look around the tile you're currently in too
+	
+		// We need to check what's in the four cardinal directions
+		var message = "";
+	
+		// Make sure it's both on the map
+		if (playerPos.y - 1 >= 0) {
+			message += "To the north you see ";
+			message += (map[playerPos.y - 1][playerPos.x].description || map[playerPos.y - 1][playerPos.x].type) + ". ";
+		}
+	
+		if (playerPos.x + 1 < map[0].length) {
+			message += "To the east you see ";
+			message += (map[playerPos.y][playerPos.x + 1].description || map[playerPos.y][playerPos.x + 1].type) + ". ";
+		}
+	
+		if (playerPos.y + 1 < map.length) {
+			message += "To the south you see ";
+			message += (map[playerPos.y + 1][playerPos.x].description || map[playerPos.y + 1][playerPos.x].type) + ". ";
+		}
+	
+		if (playerPos.x - 1 >= 0) {
+			message += "To the west you see ";
+			message += (map[playerPos.y][playerPos.x - 1].description || map[playerPos.y][playerPos.x - 1].type) + ". ";
+		}
+	
+		return function (dispatch) {
+			if (map[playerPos.y][playerPos.x].encounter) {
+				var encounter = _npc2.default.all[map[playerPos.y][playerPos.x].encounter];
+				dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: encounter.description }, 0));
+			}
+	
+			dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: message }] }, 0));
+		};
+	};
+	
+	function checkAndSelectRace(input, expectedInput, name) {
+		var raceOptions = [];
+	
+		for (var raceName in _class2.default) {
+			if (_class2.default.hasOwnProperty(raceName)) {
+				raceOptions.push(raceName);
+			}
+		}
+	
+		// Check if it's a valid race
+		var valid = false;
+		var chosenRace = undefined;
+		for (var i = 0; i < raceOptions.length; ++i) {
+			if (input.toUpperCase().indexOf(raceOptions[i].toUpperCase()) > -1) {
+				// Check if it's mentioned anywhere in the input
+				valid = true;
+				chosenRace = raceOptions[i];
+				break;
+			}
+		}
+	
+		if (valid) {
+			var _ret6 = (function () {
+				var prefix = "AEIOU".indexOf(input.charAt(0).toUpperCase()) < 0 ? "A" : "An";
+				var playerMessage = { speaker: _constants2.default.PLAYER, line: [{ text: "I'm " + prefix.toLowerCase() + " " + chosenRace + "... I think?" }] };
+				var message = { speaker: _constants2.default.WIZARD, line: [{ text: "Aha! " + prefix + " " }, { className: chosenRace, text: chosenRace }, { text: " eh? " + _class2.default[chosenRace].description + " Are you sure about this?" }] };
+				return {
+					v: function v(dispatch) {
+						dispatch(_actions2.default.setStats(_class2.default[chosenRace].stats));
+						dispatch(_actions2.default.setInputExpected(_constants2.default.EXPECTING_CONF));
+						dispatch(_actions2.default.showMessage(playerMessage, 0));
+						dispatch(_actions2.default.showMessage(message, 1000)); // Display the message
+					}
+				};
+			})();
+	
+			if ((typeof _ret6 === "undefined" ? "undefined" : _typeof(_ret6)) === "object") return _ret6.v;
+		} else {
+				var _ret7 = (function () {
+					// If it's not a valid race then we do a fail again
+					var playerMessage = _messagegen2.default.getPlayerFail();
+					var message = _messagegen2.default.getMultiChoiceFailMessage(expectedInput, raceOptions, name);
+					return {
+						v: function v(dispatch) {
+							dispatch(_actions2.default.showMessage(playerMessage, 0));
+							dispatch(_actions2.default.showMessage(message, 1000)); // Display the message
+						}
+					};
+				})();
+	
+				if ((typeof _ret7 === "undefined" ? "undefined" : _typeof(_ret7)) === "object") return _ret7.v;
+			}
+	};
+	
+	function checkAndSelectStarterWeapon(input, expectedInput, name, inventory) {
+		var weaponOptions = [];
+	
+		for (var weaponName in _weapon2.default.starter) {
+			if (_weapon2.default.starter.hasOwnProperty(weaponName)) {
+				weaponOptions.push(weaponName);
+			}
+		}
+	
+		// Check validity
+		var valid = false;
+		var chosenWeapon = undefined; // An object
+	
+		for (var i = 0; i < weaponOptions.length; ++i) {
+			if (input.toUpperCase().indexOf(weaponOptions[i].toUpperCase()) > -1) {
+				// Check if it's mentioned anywhere in the input
+				valid = true;
+				chosenWeapon = _weapon2.default.starter[weaponOptions[i]];
+				break;
+			}
+		}
+	
+		if (valid) {
+			var _ret8 = (function () {
+				var playerMessage = { speaker: _constants2.default.PLAYER, line: [{ text: "I think I'll take the " + chosenWeapon.name + "." }] };
+				var message = { speaker: _constants2.default.WIZARD, line: [{ text: "A fine choice! " + chosenWeapon.description + " Is this what you really want?" }] };
+				return {
+					v: function v(dispatch) {
+						if (inventory.length > 0) {
+							// Remove the item if it was added in a previous cycle
+							dispatch(_actions2.default.removeItem(inventory[inventory.length - 1]));
+						}
+						dispatch(_actions2.default.addItem(chosenWeapon, 0));
+						dispatch(_actions2.default.setInputExpected(_constants2.default.EXPECTING_CONF));
+						dispatch(_actions2.default.showMessage(playerMessage, 0));
+						dispatch(_actions2.default.showMessage(message, 1000)); // Display the message
+					}
+				};
+			})();
+	
+			if ((typeof _ret8 === "undefined" ? "undefined" : _typeof(_ret8)) === "object") return _ret8.v;
+		} else {
+				var _ret9 = (function () {
+					var playerMessage = _messagegen2.default.getPlayerFail();
+					var message = _messagegen2.default.getMultiChoiceFailMessage(expectedInput, weaponOptions, name);
+					return {
+						v: function v(dispatch) {
+							dispatch(_actions2.default.showMessage(playerMessage, 0));
+							dispatch(_actions2.default.showMessage(message, 1000)); // Display the message
+						}
+					};
+				})();
+	
+				if ((typeof _ret9 === "undefined" ? "undefined" : _typeof(_ret9)) === "object") return _ret9.v;
+			}
+	};
+	
+	function checkAndValidateConfirmation(input, prevInput, name, inventory) {
+		var playerMessage = undefined;
+		var message = undefined;
+		if (input.toUpperCase() === "YES" || input.toUpperCase() === "Y") {
+			playerMessage = _messagegen2.default.getPlayerYes();
+			message = _messagegen2.default.getConfirmMessage(prevInput, name);
+			return function (dispatch) {
+				dispatch(_actions2.default.showMessage(playerMessage, 0));
+				dispatch(_actions2.default.showMessage(message, 1000)); // Display the message
+				switch (prevInput) {
+					case _constants2.default.EXPECTING_NAME:
+						dispatch(_actions2.default.showMessage(_messagegen2.default.getRaceMessage(name, _class2.default), 2000));
+						dispatch(_actions2.default.setInputExpected(_constants2.default.EXPECTING_RACE));
+						break;
+					case _constants2.default.EXPECTING_RACE:
+						dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "Your status has been updated!" }] }, 2000));
+						dispatch(_actions2.default.setDisplayStats(true, 2000));
+						dispatch(_actions2.default.showMessage(_messagegen2.default.getWeaponMessage(name, _weapon2.default.starter), 3000));
+						dispatch(_actions2.default.setInputExpected(_constants2.default.EXPECTING_WEAPON));
+						break;
+					case _constants2.default.EXPECTING_WEAPON:
+						var latestItem = inventory[inventory.length - 1];
+						var prefix = "AEIOU".indexOf(latestItem.name.charAt(0).toUpperCase()) < 0 ? "A" : "An";
+						var has = latestItem.isPlural ? "have" : "has";
+						dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: prefix + " " + latestItem.prefix + " " }, { className: latestItem.name, text: latestItem.name }, { text: " " + has + " been added to your inventory!" }] }, 2000));
+						dispatch(_actions2.default.setDisplayInventory(true, 2000));
+						dispatch(_actions2.default.showMessage({ speaker: _constants2.default.WIZARD, line: [{ text: "Don't forget to equip it before you head out into the world by using " }, { className: "confirm", text: "equip " + latestItem.name }, { text: "! Not my fault if you end up running around unarmed!" }] }, 3000));
+						dispatch(_actions2.default.showMessage({ speaker: _constants2.default.WIZARD, line: [{ text: "Ah, I can see from the look on your face that you have questions. Out with it then!" }] }, 4000));
+						dispatch(_actions2.default.setInputExpected(_constants2.default.EXPECTING_ANYTHING));
+						break;
+					case _constants2.default.EXPECTING_RESET:
+						dispatch(_actions2.default.resetGame(5000));
+						break;
+					default:
+						dispatch(_actions2.default.setInputExpected(_constants2.default.DISABLED));
+						throw new Error("Missing case for confirmation.");
+				}
+			};
+		} else if (input.toUpperCase() === "NO" || input.toUpperCase() === "N") {
+			var options = [];
+	
+			if (prevInput === _constants2.default.EXPECTING_RACE) {
+				options = _class2.default;
+			} else if (prevInput === _constants2.default.EXPECTING_WEAPON) {
+				for (var weaponName in _weapon2.default.starter) {
+					if (_weapon2.default.starter.hasOwnProperty(weaponName)) {
+						options.push(weaponName);
+					}
+				}
+			}
+	
+			playerMessage = _messagegen2.default.getPlayerNo();
+			message = _messagegen2.default.getDenyMessage(prevInput, name, options);
+			return function (dispatch) {
+				dispatch(_actions2.default.setInputExpected(prevInput));
+				dispatch(_actions2.default.showMessage(playerMessage, 0));
+				dispatch(_actions2.default.showMessage(message, 1000)); // Display the message
+			};
+		} else {
+				playerMessage = _messagegen2.default.getPlayerFail();
+				message = _messagegen2.default.getFailMessage(prevInput, name);
+				return function (dispatch) {
+					dispatch(_actions2.default.showMessage(playerMessage, 0));
+					dispatch(_actions2.default.showMessage(message, 1000)); // Display the message
+				};
+			}
+	};
+	
+	function checkAndMovePlayer(input, playerPos, map) {
+		//TODO: Possibly remove the text saying which direction you moved
+		var wrongWay = { speaker: _constants2.default.NARRATOR, line: [{ text: "You can't go that way!" }] };
+	
+		var movement = { x: 0, y: 0 };
+	
+		return function (dispatch) {
+			if (input.toUpperCase() === "N" || input.toUpperCase().indexOf("NORTH") > -1) {
+				// Make sure it's both on the map and that it's not an obstacle
+				if (playerPos.y - 1 < 0 || map[playerPos.y - 1][playerPos.x].obstacle) {
+					dispatch(_actions2.default.showMessage(wrongWay, 0));
+				} else {
+					movement = { x: 0, y: -1 };
+					dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "You move north." }] }, 0));
+				}
+			} else if (input.toUpperCase() === "E" || input.toUpperCase().indexOf("EAST") > -1) {
+				if (playerPos.x + 1 > map[0].length - 1 || map[playerPos.y][playerPos.x + 1].obstacle) {
+					dispatch(_actions2.default.showMessage(wrongWay, 0));
+				} else {
+					movement = { x: 1, y: 0 };
+					dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "You move east." }] }, 0));
+				}
+			} else if (input.toUpperCase() === "S" || input.toUpperCase().indexOf("SOUTH") > -1) {
+				if (playerPos.y + 1 > map.length - 1 || map[playerPos.y + 1][playerPos.x].obstacle) {
+					dispatch(_actions2.default.showMessage(wrongWay, 0));
+				} else {
+					movement = { x: 0, y: 1 };
+					dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "You move south." }] }, 0));
+				}
+			} else if (input.toUpperCase() === "W" || input.toUpperCase().indexOf("WEST") > -1) {
+				if (playerPos.x - 1 < 0 || map[playerPos.y][playerPos.x - 1].obstacle) {
+					dispatch(_actions2.default.showMessage(wrongWay, 0));
+				} else {
+					movement = { x: -1, y: 0 };
+					dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "You move west." }] }, 0));
+				}
+			}
+	
+			if (movement.x !== 0 || movement.y !== 0) {
+				dispatch(_actions2.default.movePlayer(movement));
+	
+				if (map[playerPos.y + movement.y][playerPos.x + movement.x].encounter) {
+					var encounter = _npc2.default.all[map[playerPos.y + movement.y][playerPos.x + movement.x].encounter];
+					dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: encounter.description }, 0));
+					encounter.seen = true;
+				}
+			}
+		};
+	
+		// TODO: things like description when entering special new area
+	};
+	
+	exports.default = function (input, expectedInput, prevInput, name, playerPos, inventory, map) {
+		if (input.split(" ")[0].toUpperCase() === "RESET") {
+			// If they want to give up and reset the game
+			return function (dispatch) {
+				dispatch(_actions2.default.showMessage({ speaker: _constants2.default.PLAYER, line: [{ text: "I can't take this anymore..." }] }, 0));
+				dispatch(_actions2.default.showMessage(_messagegen2.default.getResetMessage(name), 1000));
+				dispatch(_actions2.default.setInputExpected(_constants2.default.EXPECTING_RESET));
+				dispatch(_actions2.default.setInputExpected(_constants2.default.EXPECTING_CONF));
+			};
+		} else if (input.split(" ")[0].toUpperCase() === "EQUIP" && inventory.length > 0) {
+			// If they're looking to equip and have an inventory
+			return function (dispatch) {
+				dispatch(attemptEquip(input, inventory));
+			};
+		} else if (input.toUpperCase().indexOf("LOOK AT") > -1 && inventory.length > 0) {
+			// If they want to look at an item and have an inventory
+			return function (dispatch) {
+				dispatch(attemptLookAt(input, inventory));
+			};
+		} else if (input.toUpperCase().indexOf("LOOK AROUND") > -1 && expectedInput === _constants2.default.EXPECTING_MOVEMENT) {
+			// If they want to look around
+			return function (dispatch) {
+				dispatch(lookAround(playerPos, map));
+			};
+		} else if (map[0].length > 0 && map[playerPos.y][playerPos.x].encounter) {
+			var _ret10 = (function () {
+				var encounter = _npc2.default.all[map[playerPos.y][playerPos.x].encounter];
+				if (input.toUpperCase().indexOf("TALK") > -1) {
+					var _ret11 = (function () {
+						var randomResponse = encounter.talk[Math.floor(Math.random() * encounter.talk.length)];
+						return {
+							v: {
+								v: function v(dispatch) {
+									dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "You attempt to strike up a conversation with the " }, { className: encounter.name, text: encounter.name }, { text: "." }] }, 0));
+									dispatch(_actions2.default.showMessage({ speaker: encounter.name, line: randomResponse }, 1000));
+								}
+							}
+						};
+					})();
+	
+					if ((typeof _ret11 === "undefined" ? "undefined" : _typeof(_ret11)) === "object") return _ret11.v;
+				}
+	
+				//TODO: Encounter stuff!
+			})();
+	
+			if ((typeof _ret10 === "undefined" ? "undefined" : _typeof(_ret10)) === "object") return _ret10.v;
+		}
+		switch (expectedInput) {
+			case _constants2.default.DISABLED:
+				throw new Error("Attempted to send input when input was disabled.");
+			case _constants2.default.EXPECTING_NAME:
+				return function (dispatch) {
+					dispatch(checkAndSetName(input));
+				};
+			case _constants2.default.EXPECTING_RACE:
+				return function (dispatch) {
+					dispatch(checkAndSelectRace(input, expectedInput, name));
+				};
+			case _constants2.default.EXPECTING_WEAPON:
+				return function (dispatch) {
+					dispatch(checkAndSelectStarterWeapon(input, expectedInput, name, inventory));
+				};
+			case _constants2.default.EXPECTING_ANYTHING:
+				// Making fun of the player at the end of the Wizard's intro
+				var map = _mapgen2.default.generateMap();
+				return function (dispatch) {
+					dispatch(_actions2.default.showMessage(_messagegen2.default.getPlayerFail(), 0));
+					dispatch(_actions2.default.showMessage({ speaker: _constants2.default.WIZARD, line: [{ text: "Oh, that's a pity... Well off with you then! Time to save the world or something!" }] }, 1000));
+					dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "With a strength belying his frail physique, the " }, { className: _constants2.default.WIZARD, text: _constants2.default.WIZARD }, { text: " thrusts you from his crumbling tower and out into the unknown world..." }] }, 2000));
+					dispatch(_actions2.default.showMessage(_messagegen2.default.getAfterWizardMessage(), 4000));
+					dispatch(_actions2.default.showMessage(_messagegen2.default.getMapIntroMessage(), 6000));
+					dispatch(_actions2.default.showMessage(_messagegen2.default.getMapAddedMessage(), 8000));
+					dispatch(_actions2.default.addItem(_item2.default.map, 8000));
+					dispatch(_actions2.default.addMap(map.map, map.start, 8000));
+					dispatch(_actions2.default.showMessage(_messagegen2.default.getMapContMessage(), 9000));
+					dispatch(_actions2.default.showMessage(_messagegen2.default.getElfLeaveMessage(), 11000));
+					dispatch(_actions2.default.setInputExpected(_constants2.default.EXPECTING_MOVEMENT));
+				};
+			case _constants2.default.EXPECTING_CONF:
+				return function (dispatch) {
+					dispatch(checkAndValidateConfirmation(input, prevInput, name, inventory));
+				};
+			case _constants2.default.EXPECTING_MOVEMENT:
+				return function (dispatch) {
+					dispatch(checkAndMovePlayer(input, playerPos, map));
+				};
+			default:
+				throw new Error("Missing input case for " + input);
+		}
+	};
+
+/***/ },
+/* 491 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _constants = __webpack_require__(229);
+	
+	var _constants2 = _interopRequireDefault(_constants);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	exports.default = {
 		showMessage: function showMessage(message, timeout) {
@@ -44202,43 +44308,11 @@
 					dispatch({ type: _constants2.default.RESET });
 				}, timeout);
 			};
-		},
-		checkAndSetName: function checkAndSetName(input) {
-			var _this = this;
-	
-			// Validate the length of the name
-			if (input.length > _constants2.default.MAX_NAME_LENGTH || input.length < _constants2.default.MIN_NAME_LENGTH) {
-				var _ret = (function () {
-					var message = { speaker: _constants2.default.WIZARD, line: [{ text: "Hmmm... are you sure about that? Around here, names are usually between " + _constants2.default.MIN_NAME_LENGTH + " and " + _constants2.default.MAX_NAME_LENGTH + " characters in length! How about trying again?" }] };
-					return {
-						v: function v(dispatch) {
-							dispatch(_this.showMessage({ speaker: _constants2.default.PLAYER, line: [{ text: "I'm " + input + "." }] }, 0));
-							dispatch(_this.showMessage(message, 1000)); // Display the message
-						}
-					};
-				})();
-	
-				if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
-			} else {
-					var _ret2 = (function () {
-						var message = { speaker: _constants2.default.WIZARD, line: [{ text: input + " you say? Weird name... are you sure about that?" }] };
-						return {
-							v: function v(dispatch) {
-								dispatch(_this.setName(input));
-								dispatch(_this.setInputExpected(_constants2.default.EXPECTING_CONF));
-								dispatch(_this.showMessage({ speaker: _constants2.default.PLAYER, line: [{ text: "I'm " + input + "." }] }, 0));
-								dispatch(_this.showMessage(message, 1000)); // Display the message
-							}
-						};
-					})();
-	
-					if ((typeof _ret2 === "undefined" ? "undefined" : _typeof(_ret2)) === "object") return _ret2.v;
-				}
 		}
-	};
+	}; // Used by inputvalidation.js to generate generic actions for dispatch
 
 /***/ },
-/* 491 */
+/* 492 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -44421,7 +44495,7 @@
 	};
 
 /***/ },
-/* 492 */
+/* 493 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -44430,15 +44504,15 @@
 		value: true
 	});
 	var Classes = {
-		Elf: __webpack_require__(493),
-		Human: __webpack_require__(494),
-		Dwarf: __webpack_require__(495)
+		Elf: __webpack_require__(494),
+		Human: __webpack_require__(495),
+		Dwarf: __webpack_require__(496)
 	};
 	
 	exports.default = Classes;
 
 /***/ },
-/* 493 */
+/* 494 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -44456,7 +44530,7 @@
 	};
 
 /***/ },
-/* 494 */
+/* 495 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -44474,7 +44548,7 @@
 	};
 
 /***/ },
-/* 495 */
+/* 496 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -44492,7 +44566,7 @@
 	};
 
 /***/ },
-/* 496 */
+/* 497 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -44503,7 +44577,7 @@
 		value: true
 	});
 	
-	var _lodash = __webpack_require__(497);
+	var _lodash = __webpack_require__(498);
 	
 	var _lodash2 = _interopRequireDefault(_lodash);
 	
@@ -44515,9 +44589,9 @@
 	
 	var Weapons = {
 		starter: {
-			Sword: __webpack_require__(499),
-			Bow: __webpack_require__(500),
-			Staff: __webpack_require__(501)
+			Sword: __webpack_require__(500),
+			Bow: __webpack_require__(501),
+			Staff: __webpack_require__(502)
 		},
 		all: {}
 	};
@@ -44534,7 +44608,7 @@
 	exports.default = Weapons;
 
 /***/ },
-/* 497 */
+/* 498 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/**
@@ -56889,10 +56963,10 @@
 	  }
 	}.call(this));
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(498)(module), (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(499)(module), (function() { return this; }())))
 
 /***/ },
-/* 498 */
+/* 499 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -56908,7 +56982,7 @@
 
 
 /***/ },
-/* 499 */
+/* 500 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -56925,7 +56999,7 @@
 	};
 
 /***/ },
-/* 500 */
+/* 501 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -56942,7 +57016,7 @@
 	};
 
 /***/ },
-/* 501 */
+/* 502 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -56959,7 +57033,7 @@
 	};
 
 /***/ },
-/* 502 */
+/* 503 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -56968,13 +57042,13 @@
 			value: true
 	});
 	var Items = {
-			map: __webpack_require__(503)
+			map: __webpack_require__(504)
 	};
 	
 	exports.default = Items;
 
 /***/ },
-/* 503 */
+/* 504 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -56985,7 +57059,7 @@
 	};
 
 /***/ },
-/* 504 */
+/* 505 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -56994,7 +57068,7 @@
 		value: true
 	});
 	
-	var _npc = __webpack_require__(505);
+	var _npc = __webpack_require__(506);
 	
 	var _npc2 = _interopRequireDefault(_npc);
 	
@@ -57032,7 +57106,7 @@
 	};
 
 /***/ },
-/* 505 */
+/* 506 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -57043,7 +57117,7 @@
 		value: true
 	});
 	
-	var _lodash = __webpack_require__(497);
+	var _lodash = __webpack_require__(498);
 	
 	var _lodash2 = _interopRequireDefault(_lodash);
 	
@@ -57051,7 +57125,7 @@
 	
 	var NPCs = {
 		random: {
-			elf: __webpack_require__(506)
+			elf: __webpack_require__(507)
 		},
 		all: {}
 	};
@@ -57067,7 +57141,7 @@
 	exports.default = NPCs;
 
 /***/ },
-/* 506 */
+/* 507 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -57124,7 +57198,7 @@
 	};
 
 /***/ },
-/* 507 */
+/* 508 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -57259,7 +57333,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps)(Status);
 
 /***/ },
-/* 508 */
+/* 509 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -57382,7 +57456,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps)(Inventory);
 
 /***/ },
-/* 509 */
+/* 510 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -57547,7 +57621,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps)(WorldMap);
 
 /***/ },
-/* 510 */
+/* 511 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -57562,15 +57636,15 @@
 	
 	var _reactBootstrap = __webpack_require__(242);
 	
-	var _helplist = __webpack_require__(511);
+	var _helplist = __webpack_require__(512);
 	
 	var _helplist2 = _interopRequireDefault(_helplist);
 	
-	var _emergencyreset = __webpack_require__(520);
+	var _emergencyreset = __webpack_require__(521);
 	
 	var _emergencyreset2 = _interopRequireDefault(_emergencyreset);
 	
-	var _helpitem = __webpack_require__(521);
+	var _helpitem = __webpack_require__(522);
 	
 	var _helpitem2 = _interopRequireDefault(_helpitem);
 	
@@ -57639,7 +57713,7 @@
 	exports.default = Help;
 
 /***/ },
-/* 511 */
+/* 512 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -57648,18 +57722,18 @@
 		value: true
 	});
 	
-	var _lodash = __webpack_require__(497);
+	var _lodash = __webpack_require__(498);
 	
 	var _lodash2 = _interopRequireDefault(_lodash);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var HelpList = [__webpack_require__(512), __webpack_require__(513), __webpack_require__(514), __webpack_require__(515), __webpack_require__(516), __webpack_require__(517), __webpack_require__(518), __webpack_require__(519)];
+	var HelpList = [__webpack_require__(513), __webpack_require__(514), __webpack_require__(515), __webpack_require__(516), __webpack_require__(517), __webpack_require__(518), __webpack_require__(519), __webpack_require__(520)];
 	
 	exports.default = _lodash2.default.sortBy(HelpList, "name");
 
 /***/ },
-/* 512 */
+/* 513 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -57669,7 +57743,7 @@
 	};
 
 /***/ },
-/* 513 */
+/* 514 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -57679,7 +57753,7 @@
 	};
 
 /***/ },
-/* 514 */
+/* 515 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -57689,7 +57763,7 @@
 	};
 
 /***/ },
-/* 515 */
+/* 516 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -57699,7 +57773,7 @@
 	};
 
 /***/ },
-/* 516 */
+/* 517 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -57709,7 +57783,7 @@
 	};
 
 /***/ },
-/* 517 */
+/* 518 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -57719,7 +57793,7 @@
 	};
 
 /***/ },
-/* 518 */
+/* 519 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -57729,7 +57803,7 @@
 	};
 
 /***/ },
-/* 519 */
+/* 520 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -57739,7 +57813,7 @@
 	};
 
 /***/ },
-/* 520 */
+/* 521 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -57758,7 +57832,7 @@
 	
 	var _reactRedux = __webpack_require__(209);
 	
-	var _actions = __webpack_require__(490);
+	var _actions = __webpack_require__(491);
 	
 	var _actions2 = _interopRequireDefault(_actions);
 	
@@ -57802,7 +57876,7 @@
 	exports.default = (0, _reactRedux.connect)(null, mapDispatchToProps)(EmergencyReset);
 
 /***/ },
-/* 521 */
+/* 522 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";

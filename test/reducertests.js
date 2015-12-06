@@ -654,7 +654,7 @@ describe("world reducer", ()=> {
 		expect(
 			worldReducer(
 				{
-					version: "0.1.2.34",
+					version: initialState().world.version,
 					displayMap: false,
 					map: map,
 					playerPos: {
@@ -680,7 +680,7 @@ describe("world reducer", ()=> {
 				}
 			)
 		).to.deep.equal({
-			version: "0.1.2.34",
+			version: initialState().world.version,
 			displayMap: false,
 			prepMap: {
 				map: [
@@ -704,7 +704,7 @@ describe("world reducer", ()=> {
 		expect(
 			worldReducer(
 				{
-					version: "0.1.2.34",
+					version: initialState().world.version,
 					displayMap: false,
 					prepMap: {
 						map: [
@@ -729,7 +729,7 @@ describe("world reducer", ()=> {
 				}
 			)
 		).to.deep.equal({
-			version: "0.1.2.34",
+			version: initialState().world.version,
 			displayMap: true,
 			map: [
 				[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
@@ -747,7 +747,7 @@ describe("world reducer", ()=> {
 		expect(
 			worldReducer(
 				{
-					version: "0.1.2.34",
+					version: initialState().world.version,
 					displayMap: true,
 					map: [
 						[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
@@ -764,7 +764,7 @@ describe("world reducer", ()=> {
 				}
 			)
 		).to.deep.equal({
-			version: "0.1.2.34",
+			version: initialState().world.version,
 			displayMap: true,
 			map: [
 				[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
@@ -783,7 +783,7 @@ describe("world reducer", ()=> {
 			worldReducer.bind(
 				worldReducer,
 				{
-					version: "0.1.2.34",
+					version: initialState().world.version,
 					displayMap: true,
 					map: [
 						[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
@@ -806,7 +806,7 @@ describe("world reducer", ()=> {
 			worldReducer.bind(
 				worldReducer,
 				{
-					version: "0.1.2.34",
+					version: initialState().world.version,
 					displayMap: true,
 					map: [
 						[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 

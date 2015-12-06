@@ -1,3 +1,5 @@
+// Used by inputvalidation.js to generate generic actions for dispatch
+
 import constants from "./constants";
 
 export default {
