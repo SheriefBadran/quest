@@ -63,6 +63,7 @@ export default {
 	},
 	resetGame(timeout) {
 		return (dispatch)=> {
+				dispatch({ type: constants.DUMMY_RESET }); // dispatched for testing purposes - has no actual effect
 			setTimeout(()=> {
 				dispatch({ type: constants.RESET });
 			}, timeout);

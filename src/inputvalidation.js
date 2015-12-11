@@ -67,6 +67,7 @@ function attemptEquip(input, inventory) {
 			};
 		}
 	}
+	return (dispatch)=> {};
 };
 
 function attemptLookAt(input, inventory) {
@@ -84,7 +85,7 @@ function attemptLookAt(input, inventory) {
 			let prefix = ("AEIOU".indexOf(requestedItem.prefix.charAt(0).toUpperCase()) < 0) ? "A" : "An";
 			return (dispatch)=> {
 				dispatch(actions.showMessage({ speaker: constants.NARRATOR, line: [ { text: prefix + " " + requestedItem.prefix + " " }, { className: requestedItem.name, text: requestedItem.name }, { text: ". " + requestedItem.description } ] }, 0));
-				if (requestedItem.type === constants.WEAPON || requestedItem.type === constants.ARMOUR) {
+				if (requestedItem.equippable) {
 					dispatch(actions.showMessage({ speaker: constants.NARRATOR, line: [ { text: "The stats are Strength: " + requestedItem.stats.str + ", Magic: " + requestedItem.stats.mag + ", Dexterity: " + requestedItem.stats.dex + ", and Defence: " + requestedItem.stats.def + "." } ] }, 0));
 				}
 			};
@@ -94,6 +95,7 @@ function attemptLookAt(input, inventory) {
 			}
 		}
 	}
+	return (dispatch)=> {};
 };
 
 function lookAround(playerPos, map) {
@@ -251,7 +253,7 @@ function checkAndValidateConfirmation(input, prevInput, name, inventory) {
 					break;
 				default:
 					dispatch(actions.setInputExpected(constants.DISABLED));
-					throw new Error("Missing case for confirmation.");
+					console.log("Missing case for confirmation.");
 			}
 		};
 	} else if (input.toUpperCase() === "NO" || input.toUpperCase() === "N") {
@@ -407,6 +409,6 @@ export default (input, expectedInput, prevInput, name, playerPos, inventory, map
 				dispatch(checkAndMovePlayer(input, playerPos, map));
 			};
 		default:
-			throw new Error("Missing input case for " + input);
+			throw new Error("Missing input case for " + expectedInput);
 	}
 };

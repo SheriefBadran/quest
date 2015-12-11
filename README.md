@@ -17,6 +17,7 @@ You can find the live version at: http://moombads.github.io/quest/
 If you're looking to help or maybe just plain bored, here's a (relatively) up to date list of minor things that need to be done:
 * Fix layout to be less tempremental with smaller resolutions
 * Find and replace any "magic strings" with constants from `constants.js` (this may mean adding new constants)
+* Move all messages from any files out to messagegen.js
 * Write procedural generation methods for fun! Rivers, roads, anything really! These go in the `mapgen.js` file for the most part
 * Weep over the frequently poorly structured code and possibly attempt to fix it
 * Try to come up with a name that's original and not already taken

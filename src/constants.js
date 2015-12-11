@@ -45,5 +45,6 @@ export default {
 	PREP_MAP: "PREP_MAP",
 	ADD_MAP: "ADD_MAP",
 	MOVE: "MOVE",
+	DUMMY_RESET: "DUMMY_RESET",
 	RESET: "RESET"
 };

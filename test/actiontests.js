@@ -137,7 +137,10 @@ describe("async actions", ()=> {
 		store.dispatch(actions.addMap(map, pos, 0));
 	});
 	it("should dispatch a RESET action", (done)=> {
-		const expectedActions = [{ type: constants.RESET }];
+		const expectedActions = [
+			{ type: constants.DUMMY_RESET },
+			{ type: constants.RESET }
+		];
 		const store = mockStore({}, expectedActions, done);
 		store.dispatch(actions.resetGame(0));
 	});

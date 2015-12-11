@@ -25765,6 +25765,7 @@
 		PREP_MAP: "PREP_MAP",
 		ADD_MAP: "ADD_MAP",
 		MOVE: "MOVE",
+		DUMMY_RESET: "DUMMY_RESET",
 		RESET: "RESET"
 	};
 
@@ -43742,7 +43743,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
+	function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; } // Used by playerbar.js for input validation and mapping to action dispatch
 	
 	function checkAndSetName(input) {
 		// Validate the length of the name
@@ -43824,6 +43825,7 @@
 	
 			if ((typeof _ret3 === "undefined" ? "undefined" : _typeof(_ret3)) === "object") return _ret3.v;
 		}
+		return function (dispatch) {};
 	};
 	
 	function attemptLookAt(input, inventory) {
@@ -43865,6 +43867,7 @@
 	
 			if ((typeof _ret4 === "undefined" ? "undefined" : _typeof(_ret4)) === "object") return _ret4.v;
 		}
+		return function (dispatch) {};
 	};
 	
 	function lookAround(playerPos, map) {
@@ -44136,6 +44139,7 @@
 	};
 	
 	exports.default = function (input, expectedInput, prevInput, name, playerPos, inventory, map) {
+		//TODO: Break stuff up!
 		if (input.split(" ")[0].toUpperCase() === "RESET") {
 			// If they want to give up and reset the game
 			return function (dispatch) {
@@ -44304,6 +44308,7 @@
 		},
 		resetGame: function resetGame(timeout) {
 			return function (dispatch) {
+				dispatch({ type: _constants2.default.DUMMY_RESET }); // dispatched for testing purposes - has no actual effect
 				setTimeout(function () {
 					dispatch({ type: _constants2.default.RESET });
 				}, timeout);
