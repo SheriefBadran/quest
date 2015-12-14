@@ -894,6 +894,7 @@ describe("input validation: misc", ()=> {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
 		expect(console.log.calledWith("Missing case for confirmation.")).to.be.true;
+		console.log.restore();
 		done();
 	});
 });

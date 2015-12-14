@@ -12,17 +12,17 @@ import NPCs from "./data/npc";
 function checkAndSetName(input) {
 	// Validate the length of the name
 	if (input.length > constants.MAX_NAME_LENGTH || input.length < constants.MIN_NAME_LENGTH) {
-		let message = { speaker: constants.WIZARD, line: [ { text: "Hmmm... are you sure about that? Around here, names are usually between " + constants.MIN_NAME_LENGTH + " and " + constants.MAX_NAME_LENGTH + " characters in length! How about trying again?" } ] };
+		let message = messageGen.getNameLengthMessage();
 		return (dispatch)=> {
-			dispatch(actions.showMessage({ speaker: constants.PLAYER, line: [ { text: "I'm " + input + "." } ] }, 0));
+			dispatch(actions.showMessage(messageGen.getStateNameMessage(input), 0));
 			dispatch(actions.showMessage(message, 1000)); // Display the message
 		};
 	} else {
-		let message = { speaker: constants.WIZARD, line: [ { text: input + " you say? Weird name... are you sure about that?" } ] };
+		let message = messageGen.getNameAreYouSureMessage(input);
 		return (dispatch)=> {
 			dispatch(actions.setName(input));
 			dispatch(actions.setInputExpected(constants.EXPECTING_CONF));
-			dispatch(actions.showMessage({ speaker: constants.PLAYER, line: [ { text: "I'm " + input + "." } ] }, 0));
+			dispatch(actions.showMessage(messageGen.getStateNameMessage(input), 0));
 			dispatch(actions.showMessage(message, 1000)); // Display the message
 		};
 	}
@@ -54,11 +54,11 @@ function attemptEquip(input, inventory) {
 			if (requestedItem.equippable) {
 				return (dispatch)=> {
 					dispatch(actions.equipItem(requestedItem));
-					dispatch(actions.showMessage({ speaker: constants.NARRATOR, line: [ { text: "You equip the " + requestedItem.prefix + " " }, { className: requestedItem.name, text: requestedItem.name }, { text: "." } ] }, 0));
+					dispatch(actions.showMessage(messageGen.getEquipMessage(requestedItem), 0));
 				};
 			} else {
 				return (dispatch)=> {
-					dispatch(actions.showMessage({ speaker: constants.NARRATOR, line: [ { className: requestedItem.name, text: requestedItem.name }, { text: " cannot be equipped!" } ] }, 0));
+					dispatch(actions.showMessage(messageGen.getCannotBeEquippedMessage(requestedItem), 0));
 				};
 			}
 		} else {
@@ -82,11 +82,10 @@ function attemptLookAt(input, inventory) {
 		let requestedItem = getRequestedItem(itemName, inventory);
 
 		if (requestedItem) {
-			let prefix = ("AEIOU".indexOf(requestedItem.prefix.charAt(0).toUpperCase()) < 0) ? "A" : "An";
 			return (dispatch)=> {
-				dispatch(actions.showMessage({ speaker: constants.NARRATOR, line: [ { text: prefix + " " + requestedItem.prefix + " " }, { className: requestedItem.name, text: requestedItem.name }, { text: ". " + requestedItem.description } ] }, 0));
+				dispatch(actions.showMessage(messageGen.getLookAtItemMessage(requestedItem), 0));
 				if (requestedItem.equippable) {
-					dispatch(actions.showMessage({ speaker: constants.NARRATOR, line: [ { text: "The stats are Strength: " + requestedItem.stats.str + ", Magic: " + requestedItem.stats.mag + ", Dexterity: " + requestedItem.stats.dex + ", and Defence: " + requestedItem.stats.def + "." } ] }, 0));
+					dispatch(actions.showMessage(messageGen.getItemStatsMessage(requestedItem), 0));
 				}
 			};
 		} else {
@@ -99,39 +98,13 @@ function attemptLookAt(input, inventory) {
 };
 
 function lookAround(playerPos, map) {
-	// TODO: make it look around the tile you're currently in too
-
-	// We need to check what's in the four cardinal directions
-	let message = "";
-
-	// Make sure it's both on the map 
-	if (playerPos.y -1 >= 0 ) {
-		message += "To the north you see ";
-		message += (map[playerPos.y - 1][playerPos.x].description || map[playerPos.y - 1][playerPos.x].type) + ". ";
-	}
-	
-	if (playerPos.x + 1 < map[0].length) {
-		message += "To the east you see ";
-		message += (map[playerPos.y][playerPos.x + 1].description || map[playerPos.y][playerPos.x + 1].type) + ". ";
-	}
-	
-	if (playerPos.y + 1 < map.length) {
-		message += "To the south you see ";
-		message += (map[playerPos.y + 1][playerPos.x].description || map[playerPos.y + 1][playerPos.x].type) + ". ";
-	}
-
-	if (playerPos.x -1 >= 0 ) {
-		message += "To the west you see ";
-		message += (map[playerPos.y][playerPos.x - 1].description || map[playerPos.y][playerPos.x - 1].type) + ". ";
-	}
-
 	return (dispatch)=> {
 		if (map[playerPos.y][playerPos.x].encounter) {
 			let encounter = NPCs.all[map[playerPos.y][playerPos.x].encounter];
-			dispatch(actions.showMessage({ speaker: constants.NARRATOR, line: encounter.description }, 0));
+			dispatch(actions.showMessage(messageGen.getEncounterMessage(encounter), 0));
 		}
 
-		dispatch(actions.showMessage({ speaker: constants.NARRATOR, line: [ { text: message } ] }, 0));
+		dispatch(actions.showMessage(messageGen.getLookAroundMessage(playerPos, map), 0));
 	};
 };
 
@@ -146,21 +119,20 @@ function checkAndSelectRace(input, expectedInput, name) {
 
 	// Check if it's a valid race
 	let valid = false;
-	let chosenRace;
+	let requestedRace;
 	for (let i = 0; i < raceOptions.length; ++i) {
 		if (input.toUpperCase().indexOf(raceOptions[i].toUpperCase()) > -1) { // Check if it's mentioned anywhere in the input
 			valid = true;
-			chosenRace = raceOptions[i];
+			requestedRace = Classes[raceOptions[i]];
 			break;
 		}
 	}
 
 	if (valid) {
-		let prefix = ("AEIOU".indexOf(input.charAt(0).toUpperCase()) < 0) ? "A" : "An";
-		let playerMessage = { speaker: constants.PLAYER, line: [ { text: "I'm " + prefix.toLowerCase() + " " + chosenRace + "... I think?" } ] };
-		let message = { speaker: constants.WIZARD, line: [ { text: "Aha! " + prefix + " " }, { className: chosenRace, text: chosenRace }, { text: " eh? " + Classes[chosenRace].description + " Are you sure about this?" } ] };
+		let playerMessage = messageGen.getPlayerRaceChoiceMessage(requestedRace);
+		let message = messageGen.getRaceAreYouSureMessage(requestedRace);
 		return (dispatch)=> {
-			dispatch(actions.setStats(Classes[chosenRace].stats));
+			dispatch(actions.setStats(requestedRace.stats));
 			dispatch(actions.setInputExpected(constants.EXPECTING_CONF));
 			dispatch(actions.showMessage(playerMessage, 0));
 			dispatch(actions.showMessage(message, 1000)); // Display the message
@@ -197,8 +169,8 @@ function checkAndSelectStarterWeapon(input, expectedInput, name, inventory) {
 	}
 
 	if (valid) {
-		let playerMessage = { speaker: constants.PLAYER, line: [ { text: "I think I'll take the " + chosenWeapon.name + "." } ] };
-		let message = { speaker: constants.WIZARD, line: [ { text: "A fine choice! " + chosenWeapon.description + " Is this what you really want?" } ] };
+		let playerMessage = messageGen.getPlayerWeaponSelectMessage(chosenWeapon);
+		let message = messageGen.getConfirmWeaponMessage(chosenWeapon);
 		return (dispatch)=> {
 			if (inventory.length > 0) { // Remove the item if it was added in a previous cycle
 				dispatch(actions.removeItem(inventory[inventory.length-1]));
@@ -233,19 +205,17 @@ function checkAndValidateConfirmation(input, prevInput, name, inventory) {
 					dispatch(actions.setInputExpected(constants.EXPECTING_RACE));
 					break;
 				case constants.EXPECTING_RACE:
-					dispatch(actions.showMessage({ speaker: constants.NARRATOR, line: [ { text: "Your status has been updated!" } ] }, 2000));
+					dispatch(actions.showMessage(messageGen.getStatusUpdatedMessage(), 2000));
 					dispatch(actions.setDisplayStats(true, 2000));
 					dispatch(actions.showMessage(messageGen.getWeaponMessage(name, Weapons.starter), 3000));
 					dispatch(actions.setInputExpected(constants.EXPECTING_WEAPON));
 					break;
 				case constants.EXPECTING_WEAPON:
 					let latestItem = inventory[inventory.length-1];
-					let prefix = ("AEIOU".indexOf(latestItem.name.charAt(0).toUpperCase()) < 0) ? "A" : "An";
-					let has = (latestItem.isPlural) ? "have" : "has";
-					dispatch(actions.showMessage({ speaker: constants.NARRATOR, line: [ { text: prefix + " " + latestItem.prefix + " " }, { className: latestItem.name, text: latestItem.name }, { text: " " + has + " been added to your inventory!" } ] }, 2000));
+					dispatch(actions.showMessage(messageGen.getItemAddedMessage(latestItem), 2000));
 					dispatch(actions.setDisplayInventory(true, 2000));
-					dispatch(actions.showMessage({ speaker: constants.WIZARD, line: [ { text: "Don't forget to equip it before you head out into the world by using " }, { className: "confirm", text: "equip " + latestItem.name }, { text: "! Not my fault if you end up running around unarmed!" } ] }, 3000));
-					dispatch(actions.showMessage({ speaker: constants.WIZARD, line: [ { text: "Ah, I can see from the look on your face that you have questions. Out with it then!" } ] }, 4000));
+					dispatch(actions.showMessage(messageGen.getDontForgetToEquipMessage(latestItem), 3000));
+					dispatch(actions.showMessage(messageGen.getISeeYouHaveQuestionsMessage(), 4000));
 					dispatch(actions.setInputExpected(constants.EXPECTING_ANYTHING));
 					break;
 				case constants.EXPECTING_RESET:
@@ -287,7 +257,7 @@ function checkAndValidateConfirmation(input, prevInput, name, inventory) {
 };
 
 function checkAndMovePlayer(input, playerPos, map) { //TODO: Possibly remove the text saying which direction you moved
-	let wrongWay = { speaker: constants.NARRATOR, line: [ { text: "You can't go that way!" } ] };
+	let wrongWay = messageGen.getWrongWayMessage();
 
 	let movement = { x: 0, y: 0 };
 
@@ -298,28 +268,28 @@ function checkAndMovePlayer(input, playerPos, map) { //TODO: Possibly remove the
 				dispatch(actions.showMessage(wrongWay, 0));
 			} else {
 				movement = { x: 0, y: -1 };
-				dispatch(actions.showMessage({ speaker: constants.NARRATOR, line: [ { text: "You move north." } ] }, 0));
+				dispatch(actions.showMessage(messageGen.getMoveNorthMessage(), 0));
 			}
 		} else if (input.toUpperCase() === "E" || input.toUpperCase().indexOf("EAST") > -1) {
 			if (playerPos.x + 1 > map[0].length - 1 || map[playerPos.y][playerPos.x + 1].obstacle) {
 				dispatch(actions.showMessage(wrongWay, 0));
 			} else {
 				movement = { x: 1, y: 0 };
-				dispatch(actions.showMessage({ speaker: constants.NARRATOR, line: [ { text: "You move east." } ] }, 0));
+				dispatch(actions.showMessage(messageGen.getMoveEastMessage(), 0));
 			}
 		} else if (input.toUpperCase() === "S" || input.toUpperCase().indexOf("SOUTH") > -1) {
 			if (playerPos.y + 1 > map.length - 1 || map[playerPos.y + 1][playerPos.x].obstacle) {
 				dispatch(actions.showMessage(wrongWay, 0));
 			} else {
 				movement = { x: 0, y: 1 };
-				dispatch(actions.showMessage({ speaker: constants.NARRATOR, line: [ { text: "You move south." } ] }, 0));
+				dispatch(actions.showMessage(messageGen.getMoveSouthMessage(), 0));
 			}
 		} else if (input.toUpperCase() === "W" || input.toUpperCase().indexOf("WEST") > -1) {
 			if (playerPos.x -1 < 0 || map[playerPos.y][playerPos.x - 1].obstacle) {
 				dispatch(actions.showMessage(wrongWay, 0));
 			} else {
 				movement = { x: -1, y: 0 };
-				dispatch(actions.showMessage({ speaker: constants.NARRATOR, line: [ { text: "You move west." } ] }, 0));
+				dispatch(actions.showMessage(messageGen.getMoveWestMessage(), 0));
 			}
 		}
 
@@ -328,7 +298,7 @@ function checkAndMovePlayer(input, playerPos, map) { //TODO: Possibly remove the
 
 			if (map[playerPos.y + movement.y][playerPos.x + movement.x].encounter) {
 				let encounter = NPCs.all[map[playerPos.y + movement.y][playerPos.x + movement.x].encounter];
-				dispatch(actions.showMessage({ speaker: constants.NARRATOR, line: encounter.description }, 0));
+				dispatch(actions.showMessage(messageGen.getEncounterMessage(encounter), 0));
 				encounter.seen = true;
 			}
 		}
@@ -340,7 +310,7 @@ function checkAndMovePlayer(input, playerPos, map) { //TODO: Possibly remove the
 export default (input, expectedInput, prevInput, name, playerPos, inventory, map)=> { //TODO: Break stuff up!
 	if (input.split(" ")[0].toUpperCase() === "RESET") { // If they want to give up and reset the game
 		return (dispatch)=> {
-			dispatch(actions.showMessage({ speaker: constants.PLAYER, line: [ { text: "I can't take this anymore..." } ] }, 0));
+			dispatch(actions.showMessage(messageGen.getPlayerWantResetMessage(), 0));
 			dispatch(actions.showMessage(messageGen.getResetMessage(name), 1000));
 			dispatch(actions.setInputExpected(constants.EXPECTING_RESET));
 			dispatch(actions.setInputExpected(constants.EXPECTING_CONF));
@@ -360,10 +330,9 @@ export default (input, expectedInput, prevInput, name, playerPos, inventory, map
 	} else if (map[0].length > 0 && map[playerPos.y][playerPos.x].encounter) {
 		let encounter = NPCs.all[map[playerPos.y][playerPos.x].encounter];
 		if (input.toUpperCase().indexOf("TALK") > -1) {
-			let randomResponse = encounter.talk[Math.floor(Math.random() * encounter.talk.length)];
 			return (dispatch)=> {
-				dispatch(actions.showMessage({ speaker: constants.NARRATOR, line: [ { text: "You attempt to strike up a conversation with the " }, { className: encounter.name, text: encounter.name }, { text: "." } ] }, 0));
-				dispatch(actions.showMessage({ speaker: encounter.name, line: randomResponse }, 1000));
+				dispatch(actions.showMessage(messageGen.getEncounterTalkMessage(encounter), 0));
+				dispatch(actions.showMessage(messageGen.getEncounterRandomTalkMessage(encounter), 1000));
 			};
 		}
 
@@ -389,8 +358,8 @@ export default (input, expectedInput, prevInput, name, playerPos, inventory, map
 			let map = MapGen.generateMap();
 			return (dispatch)=> {
 				dispatch(actions.showMessage(messageGen.getPlayerFail(), 0));
-				dispatch(actions.showMessage({ speaker: constants.WIZARD, line: [ { text: "Oh, that's a pity... Well off with you then! Time to save the world or something!" } ] }, 1000));
-				dispatch(actions.showMessage({ speaker: constants.NARRATOR, line: [ { text: "With a strength belying his frail physique, the " }, { className: constants.WIZARD, text: constants.WIZARD }, { text: " thrusts you from his crumbling tower and out into the unknown world..." } ] }, 2000));
+				dispatch(actions.showMessage(messageGen.getOffWithYouMessage(), 1000));
+				dispatch(actions.showMessage(messageGen.getLeaveTowerMessage(), 2000));
 				dispatch(actions.showMessage(messageGen.getAfterWizardMessage(), 4000));
 				dispatch(actions.showMessage(messageGen.getMapIntroMessage(), 6000));
 				dispatch(actions.showMessage(messageGen.getMapAddedMessage(), 8000));

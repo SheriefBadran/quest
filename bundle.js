@@ -43749,10 +43749,10 @@
 		// Validate the length of the name
 		if (input.length > _constants2.default.MAX_NAME_LENGTH || input.length < _constants2.default.MIN_NAME_LENGTH) {
 			var _ret = (function () {
-				var message = { speaker: _constants2.default.WIZARD, line: [{ text: "Hmmm... are you sure about that? Around here, names are usually between " + _constants2.default.MIN_NAME_LENGTH + " and " + _constants2.default.MAX_NAME_LENGTH + " characters in length! How about trying again?" }] };
+				var message = _messagegen2.default.getNameLengthMessage();
 				return {
 					v: function v(dispatch) {
-						dispatch(_actions2.default.showMessage({ speaker: _constants2.default.PLAYER, line: [{ text: "I'm " + input + "." }] }, 0));
+						dispatch(_actions2.default.showMessage(_messagegen2.default.getStateNameMessage(input), 0));
 						dispatch(_actions2.default.showMessage(message, 1000)); // Display the message
 					}
 				};
@@ -43761,12 +43761,12 @@
 			if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
 		} else {
 				var _ret2 = (function () {
-					var message = { speaker: _constants2.default.WIZARD, line: [{ text: input + " you say? Weird name... are you sure about that?" }] };
+					var message = _messagegen2.default.getNameAreYouSureMessage(input);
 					return {
 						v: function v(dispatch) {
 							dispatch(_actions2.default.setName(input));
 							dispatch(_actions2.default.setInputExpected(_constants2.default.EXPECTING_CONF));
-							dispatch(_actions2.default.showMessage({ speaker: _constants2.default.PLAYER, line: [{ text: "I'm " + input + "." }] }, 0));
+							dispatch(_actions2.default.showMessage(_messagegen2.default.getStateNameMessage(input), 0));
 							dispatch(_actions2.default.showMessage(message, 1000)); // Display the message
 						}
 					};
@@ -43804,13 +43804,13 @@
 						return {
 							v: function v(dispatch) {
 								dispatch(_actions2.default.equipItem(requestedItem));
-								dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "You equip the " + requestedItem.prefix + " " }, { className: requestedItem.name, text: requestedItem.name }, { text: "." }] }, 0));
+								dispatch(_actions2.default.showMessage(_messagegen2.default.getEquipMessage(requestedItem), 0));
 							}
 						};
 					} else {
 						return {
 							v: function v(dispatch) {
-								dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ className: requestedItem.name, text: requestedItem.name }, { text: " cannot be equipped!" }] }, 0));
+								dispatch(_actions2.default.showMessage(_messagegen2.default.getCannotBeEquippedMessage(requestedItem), 0));
 							}
 						};
 					}
@@ -43841,21 +43841,14 @@
 				var requestedItem = getRequestedItem(itemName, inventory);
 	
 				if (requestedItem) {
-					var _ret5 = (function () {
-						var prefix = "AEIOU".indexOf(requestedItem.prefix.charAt(0).toUpperCase()) < 0 ? "A" : "An";
-						return {
-							v: {
-								v: function v(dispatch) {
-									dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: prefix + " " + requestedItem.prefix + " " }, { className: requestedItem.name, text: requestedItem.name }, { text: ". " + requestedItem.description }] }, 0));
-									if (requestedItem.type === _constants2.default.WEAPON || requestedItem.type === _constants2.default.ARMOUR) {
-										dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "The stats are Strength: " + requestedItem.stats.str + ", Magic: " + requestedItem.stats.mag + ", Dexterity: " + requestedItem.stats.dex + ", and Defence: " + requestedItem.stats.def + "." }] }, 0));
-									}
-								}
+					return {
+						v: function v(dispatch) {
+							dispatch(_actions2.default.showMessage(_messagegen2.default.getLookAtItemMessage(requestedItem), 0));
+							if (requestedItem.equippable) {
+								dispatch(_actions2.default.showMessage(_messagegen2.default.getItemStatsMessage(requestedItem), 0));
 							}
-						};
-					})();
-	
-					if ((typeof _ret5 === "undefined" ? "undefined" : _typeof(_ret5)) === "object") return _ret5.v;
+						}
+					};
 				} else {
 					return {
 						v: function v(dispatch) {
@@ -43871,39 +43864,13 @@
 	};
 	
 	function lookAround(playerPos, map) {
-		// TODO: make it look around the tile you're currently in too
-	
-		// We need to check what's in the four cardinal directions
-		var message = "";
-	
-		// Make sure it's both on the map
-		if (playerPos.y - 1 >= 0) {
-			message += "To the north you see ";
-			message += (map[playerPos.y - 1][playerPos.x].description || map[playerPos.y - 1][playerPos.x].type) + ". ";
-		}
-	
-		if (playerPos.x + 1 < map[0].length) {
-			message += "To the east you see ";
-			message += (map[playerPos.y][playerPos.x + 1].description || map[playerPos.y][playerPos.x + 1].type) + ". ";
-		}
-	
-		if (playerPos.y + 1 < map.length) {
-			message += "To the south you see ";
-			message += (map[playerPos.y + 1][playerPos.x].description || map[playerPos.y + 1][playerPos.x].type) + ". ";
-		}
-	
-		if (playerPos.x - 1 >= 0) {
-			message += "To the west you see ";
-			message += (map[playerPos.y][playerPos.x - 1].description || map[playerPos.y][playerPos.x - 1].type) + ". ";
-		}
-	
 		return function (dispatch) {
 			if (map[playerPos.y][playerPos.x].encounter) {
 				var encounter = _npc2.default.all[map[playerPos.y][playerPos.x].encounter];
-				dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: encounter.description }, 0));
+				dispatch(_actions2.default.showMessage(_messagegen2.default.getEncounterMessage(encounter), 0));
 			}
 	
-			dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: message }] }, 0));
+			dispatch(_actions2.default.showMessage(_messagegen2.default.getLookAroundMessage(playerPos, map), 0));
 		};
 	};
 	
@@ -43918,24 +43885,23 @@
 	
 		// Check if it's a valid race
 		var valid = false;
-		var chosenRace = undefined;
+		var requestedRace = undefined;
 		for (var i = 0; i < raceOptions.length; ++i) {
 			if (input.toUpperCase().indexOf(raceOptions[i].toUpperCase()) > -1) {
 				// Check if it's mentioned anywhere in the input
 				valid = true;
-				chosenRace = raceOptions[i];
+				requestedRace = _class2.default[raceOptions[i]];
 				break;
 			}
 		}
 	
 		if (valid) {
-			var _ret6 = (function () {
-				var prefix = "AEIOU".indexOf(input.charAt(0).toUpperCase()) < 0 ? "A" : "An";
-				var playerMessage = { speaker: _constants2.default.PLAYER, line: [{ text: "I'm " + prefix.toLowerCase() + " " + chosenRace + "... I think?" }] };
-				var message = { speaker: _constants2.default.WIZARD, line: [{ text: "Aha! " + prefix + " " }, { className: chosenRace, text: chosenRace }, { text: " eh? " + _class2.default[chosenRace].description + " Are you sure about this?" }] };
+			var _ret5 = (function () {
+				var playerMessage = _messagegen2.default.getPlayerRaceChoiceMessage(requestedRace);
+				var message = _messagegen2.default.getRaceAreYouSureMessage(requestedRace);
 				return {
 					v: function v(dispatch) {
-						dispatch(_actions2.default.setStats(_class2.default[chosenRace].stats));
+						dispatch(_actions2.default.setStats(requestedRace.stats));
 						dispatch(_actions2.default.setInputExpected(_constants2.default.EXPECTING_CONF));
 						dispatch(_actions2.default.showMessage(playerMessage, 0));
 						dispatch(_actions2.default.showMessage(message, 1000)); // Display the message
@@ -43943,9 +43909,9 @@
 				};
 			})();
 	
-			if ((typeof _ret6 === "undefined" ? "undefined" : _typeof(_ret6)) === "object") return _ret6.v;
+			if ((typeof _ret5 === "undefined" ? "undefined" : _typeof(_ret5)) === "object") return _ret5.v;
 		} else {
-				var _ret7 = (function () {
+				var _ret6 = (function () {
 					// If it's not a valid race then we do a fail again
 					var playerMessage = _messagegen2.default.getPlayerFail();
 					var message = _messagegen2.default.getMultiChoiceFailMessage(expectedInput, raceOptions, name);
@@ -43957,7 +43923,7 @@
 					};
 				})();
 	
-				if ((typeof _ret7 === "undefined" ? "undefined" : _typeof(_ret7)) === "object") return _ret7.v;
+				if ((typeof _ret6 === "undefined" ? "undefined" : _typeof(_ret6)) === "object") return _ret6.v;
 			}
 	};
 	
@@ -43984,9 +43950,9 @@
 		}
 	
 		if (valid) {
-			var _ret8 = (function () {
-				var playerMessage = { speaker: _constants2.default.PLAYER, line: [{ text: "I think I'll take the " + chosenWeapon.name + "." }] };
-				var message = { speaker: _constants2.default.WIZARD, line: [{ text: "A fine choice! " + chosenWeapon.description + " Is this what you really want?" }] };
+			var _ret7 = (function () {
+				var playerMessage = _messagegen2.default.getPlayerWeaponSelectMessage(chosenWeapon);
+				var message = _messagegen2.default.getConfirmWeaponMessage(chosenWeapon);
 				return {
 					v: function v(dispatch) {
 						if (inventory.length > 0) {
@@ -44001,9 +43967,9 @@
 				};
 			})();
 	
-			if ((typeof _ret8 === "undefined" ? "undefined" : _typeof(_ret8)) === "object") return _ret8.v;
+			if ((typeof _ret7 === "undefined" ? "undefined" : _typeof(_ret7)) === "object") return _ret7.v;
 		} else {
-				var _ret9 = (function () {
+				var _ret8 = (function () {
 					var playerMessage = _messagegen2.default.getPlayerFail();
 					var message = _messagegen2.default.getMultiChoiceFailMessage(expectedInput, weaponOptions, name);
 					return {
@@ -44014,7 +43980,7 @@
 					};
 				})();
 	
-				if ((typeof _ret9 === "undefined" ? "undefined" : _typeof(_ret9)) === "object") return _ret9.v;
+				if ((typeof _ret8 === "undefined" ? "undefined" : _typeof(_ret8)) === "object") return _ret8.v;
 			}
 	};
 	
@@ -44033,19 +43999,17 @@
 						dispatch(_actions2.default.setInputExpected(_constants2.default.EXPECTING_RACE));
 						break;
 					case _constants2.default.EXPECTING_RACE:
-						dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "Your status has been updated!" }] }, 2000));
+						dispatch(_actions2.default.showMessage(_messagegen2.default.getStatusUpdatedMessage(), 2000));
 						dispatch(_actions2.default.setDisplayStats(true, 2000));
 						dispatch(_actions2.default.showMessage(_messagegen2.default.getWeaponMessage(name, _weapon2.default.starter), 3000));
 						dispatch(_actions2.default.setInputExpected(_constants2.default.EXPECTING_WEAPON));
 						break;
 					case _constants2.default.EXPECTING_WEAPON:
 						var latestItem = inventory[inventory.length - 1];
-						var prefix = "AEIOU".indexOf(latestItem.name.charAt(0).toUpperCase()) < 0 ? "A" : "An";
-						var has = latestItem.isPlural ? "have" : "has";
-						dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: prefix + " " + latestItem.prefix + " " }, { className: latestItem.name, text: latestItem.name }, { text: " " + has + " been added to your inventory!" }] }, 2000));
+						dispatch(_actions2.default.showMessage(_messagegen2.default.getItemAddedMessage(latestItem), 2000));
 						dispatch(_actions2.default.setDisplayInventory(true, 2000));
-						dispatch(_actions2.default.showMessage({ speaker: _constants2.default.WIZARD, line: [{ text: "Don't forget to equip it before you head out into the world by using " }, { className: "confirm", text: "equip " + latestItem.name }, { text: "! Not my fault if you end up running around unarmed!" }] }, 3000));
-						dispatch(_actions2.default.showMessage({ speaker: _constants2.default.WIZARD, line: [{ text: "Ah, I can see from the look on your face that you have questions. Out with it then!" }] }, 4000));
+						dispatch(_actions2.default.showMessage(_messagegen2.default.getDontForgetToEquipMessage(latestItem), 3000));
+						dispatch(_actions2.default.showMessage(_messagegen2.default.getISeeYouHaveQuestionsMessage(), 4000));
 						dispatch(_actions2.default.setInputExpected(_constants2.default.EXPECTING_ANYTHING));
 						break;
 					case _constants2.default.EXPECTING_RESET:
@@ -44053,7 +44017,7 @@
 						break;
 					default:
 						dispatch(_actions2.default.setInputExpected(_constants2.default.DISABLED));
-						throw new Error("Missing case for confirmation.");
+						console.log("Missing case for confirmation.");
 				}
 			};
 		} else if (input.toUpperCase() === "NO" || input.toUpperCase() === "N") {
@@ -44088,7 +44052,7 @@
 	
 	function checkAndMovePlayer(input, playerPos, map) {
 		//TODO: Possibly remove the text saying which direction you moved
-		var wrongWay = { speaker: _constants2.default.NARRATOR, line: [{ text: "You can't go that way!" }] };
+		var wrongWay = _messagegen2.default.getWrongWayMessage();
 	
 		var movement = { x: 0, y: 0 };
 	
@@ -44099,28 +44063,28 @@
 					dispatch(_actions2.default.showMessage(wrongWay, 0));
 				} else {
 					movement = { x: 0, y: -1 };
-					dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "You move north." }] }, 0));
+					dispatch(_actions2.default.showMessage(_messagegen2.default.getMoveNorthMessage(), 0));
 				}
 			} else if (input.toUpperCase() === "E" || input.toUpperCase().indexOf("EAST") > -1) {
 				if (playerPos.x + 1 > map[0].length - 1 || map[playerPos.y][playerPos.x + 1].obstacle) {
 					dispatch(_actions2.default.showMessage(wrongWay, 0));
 				} else {
 					movement = { x: 1, y: 0 };
-					dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "You move east." }] }, 0));
+					dispatch(_actions2.default.showMessage(_messagegen2.default.getMoveEastMessage(), 0));
 				}
 			} else if (input.toUpperCase() === "S" || input.toUpperCase().indexOf("SOUTH") > -1) {
 				if (playerPos.y + 1 > map.length - 1 || map[playerPos.y + 1][playerPos.x].obstacle) {
 					dispatch(_actions2.default.showMessage(wrongWay, 0));
 				} else {
 					movement = { x: 0, y: 1 };
-					dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "You move south." }] }, 0));
+					dispatch(_actions2.default.showMessage(_messagegen2.default.getMoveSouthMessage(), 0));
 				}
 			} else if (input.toUpperCase() === "W" || input.toUpperCase().indexOf("WEST") > -1) {
 				if (playerPos.x - 1 < 0 || map[playerPos.y][playerPos.x - 1].obstacle) {
 					dispatch(_actions2.default.showMessage(wrongWay, 0));
 				} else {
 					movement = { x: -1, y: 0 };
-					dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "You move west." }] }, 0));
+					dispatch(_actions2.default.showMessage(_messagegen2.default.getMoveWestMessage(), 0));
 				}
 			}
 	
@@ -44129,7 +44093,7 @@
 	
 				if (map[playerPos.y + movement.y][playerPos.x + movement.x].encounter) {
 					var encounter = _npc2.default.all[map[playerPos.y + movement.y][playerPos.x + movement.x].encounter];
-					dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: encounter.description }, 0));
+					dispatch(_actions2.default.showMessage(_messagegen2.default.getEncounterMessage(encounter), 0));
 					encounter.seen = true;
 				}
 			}
@@ -44143,7 +44107,7 @@
 		if (input.split(" ")[0].toUpperCase() === "RESET") {
 			// If they want to give up and reset the game
 			return function (dispatch) {
-				dispatch(_actions2.default.showMessage({ speaker: _constants2.default.PLAYER, line: [{ text: "I can't take this anymore..." }] }, 0));
+				dispatch(_actions2.default.showMessage(_messagegen2.default.getPlayerWantResetMessage(), 0));
 				dispatch(_actions2.default.showMessage(_messagegen2.default.getResetMessage(name), 1000));
 				dispatch(_actions2.default.setInputExpected(_constants2.default.EXPECTING_RESET));
 				dispatch(_actions2.default.setInputExpected(_constants2.default.EXPECTING_CONF));
@@ -44164,28 +44128,21 @@
 				dispatch(lookAround(playerPos, map));
 			};
 		} else if (map[0].length > 0 && map[playerPos.y][playerPos.x].encounter) {
-			var _ret10 = (function () {
+			var _ret9 = (function () {
 				var encounter = _npc2.default.all[map[playerPos.y][playerPos.x].encounter];
 				if (input.toUpperCase().indexOf("TALK") > -1) {
-					var _ret11 = (function () {
-						var randomResponse = encounter.talk[Math.floor(Math.random() * encounter.talk.length)];
-						return {
-							v: {
-								v: function v(dispatch) {
-									dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "You attempt to strike up a conversation with the " }, { className: encounter.name, text: encounter.name }, { text: "." }] }, 0));
-									dispatch(_actions2.default.showMessage({ speaker: encounter.name, line: randomResponse }, 1000));
-								}
-							}
-						};
-					})();
-	
-					if ((typeof _ret11 === "undefined" ? "undefined" : _typeof(_ret11)) === "object") return _ret11.v;
+					return {
+						v: function v(dispatch) {
+							dispatch(_actions2.default.showMessage(_messagegen2.default.getEncounterTalkMessage(encounter), 0));
+							dispatch(_actions2.default.showMessage(_messagegen2.default.getEncounterRandomTalkMessage(encounter), 1000));
+						}
+					};
 				}
 	
 				//TODO: Encounter stuff!
 			})();
 	
-			if ((typeof _ret10 === "undefined" ? "undefined" : _typeof(_ret10)) === "object") return _ret10.v;
+			if ((typeof _ret9 === "undefined" ? "undefined" : _typeof(_ret9)) === "object") return _ret9.v;
 		}
 		switch (expectedInput) {
 			case _constants2.default.DISABLED:
@@ -44207,8 +44164,8 @@
 				var map = _mapgen2.default.generateMap();
 				return function (dispatch) {
 					dispatch(_actions2.default.showMessage(_messagegen2.default.getPlayerFail(), 0));
-					dispatch(_actions2.default.showMessage({ speaker: _constants2.default.WIZARD, line: [{ text: "Oh, that's a pity... Well off with you then! Time to save the world or something!" }] }, 1000));
-					dispatch(_actions2.default.showMessage({ speaker: _constants2.default.NARRATOR, line: [{ text: "With a strength belying his frail physique, the " }, { className: _constants2.default.WIZARD, text: _constants2.default.WIZARD }, { text: " thrusts you from his crumbling tower and out into the unknown world..." }] }, 2000));
+					dispatch(_actions2.default.showMessage(_messagegen2.default.getOffWithYouMessage(), 1000));
+					dispatch(_actions2.default.showMessage(_messagegen2.default.getLeaveTowerMessage(), 2000));
 					dispatch(_actions2.default.showMessage(_messagegen2.default.getAfterWizardMessage(), 4000));
 					dispatch(_actions2.default.showMessage(_messagegen2.default.getMapIntroMessage(), 6000));
 					dispatch(_actions2.default.showMessage(_messagegen2.default.getMapAddedMessage(), 8000));
@@ -44227,7 +44184,7 @@
 					dispatch(checkAndMovePlayer(input, playerPos, map));
 				};
 			default:
-				throw new Error("Missing input case for " + input);
+				throw new Error("Missing input case for " + expectedInput);
 		}
 	};
 
@@ -44333,6 +44290,15 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	exports.default = {
+		getNameLengthMessage: function getNameLengthMessage() {
+			return { speaker: _constants2.default.WIZARD, line: [{ text: "Hmmm... are you sure about that? Around here, names are usually between " + _constants2.default.MIN_NAME_LENGTH + " and " + _constants2.default.MAX_NAME_LENGTH + " characters in length! How about trying again?" }] };
+		},
+		getStateNameMessage: function getStateNameMessage(input) {
+			return { speaker: _constants2.default.PLAYER, line: [{ text: "I'm " + input + "." }] };
+		},
+		getNameAreYouSureMessage: function getNameAreYouSureMessage(input) {
+			return { speaker: _constants2.default.WIZARD, line: [{ text: input + " you say? Weird name... are you sure about that?" }] };
+		},
 		getConfirmMessage: function getConfirmMessage(prevInput, name, option) {
 			switch (prevInput) {
 				case _constants2.default.EXPECTING_NAME:
@@ -44496,6 +44462,110 @@
 		},
 		getElfLeaveMessage: function getElfLeaveMessage() {
 			return { speaker: _constants2.default.NARRATOR, line: [{ text: "The " }, { className: _constants2.default.ELF, text: _constants2.default.ELF }, { text: " gives you one last glance before pulling herself up into the tree and vanishing from sight, leaving you to wonder why she had ever appeared in the first place. You are now free to roam. Perhaps you should start by looking around?" }] };
+		},
+		getEquipMessage: function getEquipMessage(requestedItem) {
+			return { speaker: _constants2.default.NARRATOR, line: [{ text: "You equip the " + requestedItem.prefix + " " }, { className: requestedItem.name, text: requestedItem.name }, { text: "." }] };
+		},
+		getCannotBeEquippedMessage: function getCannotBeEquippedMessage(requestedItem) {
+			return { speaker: _constants2.default.NARRATOR, line: [{ className: requestedItem.name, text: requestedItem.name }, { text: " cannot be equipped!" }] };
+		},
+		getLookAtItemMessage: function getLookAtItemMessage(requestedItem) {
+			var prefix = "AEIOU".indexOf(requestedItem.prefix.charAt(0).toUpperCase()) < 0 ? "A" : "An";
+			return { speaker: _constants2.default.NARRATOR, line: [{ text: prefix + " " + requestedItem.prefix + " " }, { className: requestedItem.name, text: requestedItem.name }, { text: ". " + requestedItem.description }] };
+		},
+		getItemStatsMessage: function getItemStatsMessage(requestedItem) {
+			return { speaker: _constants2.default.NARRATOR, line: [{ text: "The stats are Strength: " + requestedItem.stats.str + ", Magic: " + requestedItem.stats.mag + ", Dexterity: " + requestedItem.stats.dex + ", and Defence: " + requestedItem.stats.def + "." }] };
+		},
+		getLookAroundMessage: function getLookAroundMessage(playerPos, map) {
+			// TODO: make it look around the tile you're currently in too
+	
+			// We need to check what's in the four cardinal directions
+			var message = "";
+	
+			// Make sure it's both on the map
+			if (playerPos.y - 1 >= 0) {
+				message += "To the north you see ";
+				message += (map[playerPos.y - 1][playerPos.x].description || map[playerPos.y - 1][playerPos.x].type) + ". ";
+			}
+	
+			if (playerPos.x + 1 < map[0].length) {
+				message += "To the east you see ";
+				message += (map[playerPos.y][playerPos.x + 1].description || map[playerPos.y][playerPos.x + 1].type) + ". ";
+			}
+	
+			if (playerPos.y + 1 < map.length) {
+				message += "To the south you see ";
+				message += (map[playerPos.y + 1][playerPos.x].description || map[playerPos.y + 1][playerPos.x].type) + ". ";
+			}
+	
+			if (playerPos.x - 1 >= 0) {
+				message += "To the west you see ";
+				message += (map[playerPos.y][playerPos.x - 1].description || map[playerPos.y][playerPos.x - 1].type) + ". ";
+			}
+	
+			return { speaker: _constants2.default.NARRATOR, line: [{ text: message }] };
+		},
+		getEncounterMessage: function getEncounterMessage(encounter) {
+			return { speaker: _constants2.default.NARRATOR, line: encounter.description };
+		},
+		getPlayerRaceChoiceMessage: function getPlayerRaceChoiceMessage(requestedRace) {
+			var prefix = "AEIOU".indexOf(requestedRace.name.charAt(0).toUpperCase()) < 0 ? "A" : "An";
+			return { speaker: _constants2.default.PLAYER, line: [{ text: "I'm " + prefix.toLowerCase() + " " + requestedRace.name + "... I think?" }] };
+		},
+		getRaceAreYouSureMessage: function getRaceAreYouSureMessage(requestedRace) {
+			var prefix = "AEIOU".indexOf(requestedRace.name.charAt(0).toUpperCase()) < 0 ? "A" : "An";
+			return { speaker: _constants2.default.WIZARD, line: [{ text: "Aha! " + prefix + " " }, { className: requestedRace.name, text: requestedRace.name }, { text: " eh? " + requestedRace.description + " Are you sure about this?" }] };
+		},
+		getPlayerWeaponSelectMessage: function getPlayerWeaponSelectMessage(chosenWeapon) {
+			return { speaker: _constants2.default.PLAYER, line: [{ text: "I think I'll take the " + chosenWeapon.name + "." }] };
+		},
+		getConfirmWeaponMessage: function getConfirmWeaponMessage(chosenWeapon) {
+			return { speaker: _constants2.default.WIZARD, line: [{ text: "A fine choice! " + chosenWeapon.description + " Is this what you really want?" }] };
+		},
+		getStatusUpdatedMessage: function getStatusUpdatedMessage() {
+			return { speaker: _constants2.default.NARRATOR, line: [{ text: "Your status has been updated!" }] };
+		},
+		getItemAddedMessage: function getItemAddedMessage(item) {
+			var prefix = "AEIOU".indexOf(item.name.charAt(0).toUpperCase()) < 0 ? "A" : "An";
+			var has = item.isPlural ? "have" : "has";
+			return { speaker: _constants2.default.NARRATOR, line: [{ text: prefix + " " + item.prefix + " " }, { className: item.name, text: item.name }, { text: " " + has + " been added to your inventory!" }] };
+		},
+		getDontForgetToEquipMessage: function getDontForgetToEquipMessage(item) {
+			return { speaker: _constants2.default.WIZARD, line: [{ text: "Don't forget to equip it before you head out into the world by using " }, { className: "confirm", text: "equip " + item.name }, { text: "! Not my fault if you end up running around unarmed!" }] };
+		},
+		getISeeYouHaveQuestionsMessage: function getISeeYouHaveQuestionsMessage() {
+			return { speaker: _constants2.default.WIZARD, line: [{ text: "Ah, I can see from the look on your face that you have questions. Out with it then!" }] };
+		},
+		getWrongWayMessage: function getWrongWayMessage() {
+			return { speaker: _constants2.default.NARRATOR, line: [{ text: "You can't go that way!" }] };
+		},
+		getMoveNorthMessage: function getMoveNorthMessage() {
+			return { speaker: _constants2.default.NARRATOR, line: [{ text: "You move north." }] };
+		},
+		getMoveEastMessage: function getMoveEastMessage() {
+			return { speaker: _constants2.default.NARRATOR, line: [{ text: "You move east." }] };
+		},
+		getMoveSouthMessage: function getMoveSouthMessage() {
+			return { speaker: _constants2.default.NARRATOR, line: [{ text: "You move south." }] };
+		},
+		getMoveWestMessage: function getMoveWestMessage() {
+			return { speaker: _constants2.default.NARRATOR, line: [{ text: "You move west." }] };
+		},
+		getPlayerWantResetMessage: function getPlayerWantResetMessage() {
+			return { speaker: _constants2.default.PLAYER, line: [{ text: "I can't take this anymore..." }] };
+		},
+		getEncounterTalkMessage: function getEncounterTalkMessage(encounter) {
+			return { speaker: _constants2.default.NARRATOR, line: [{ text: "You attempt to strike up a conversation with the " }, { className: encounter.name, text: encounter.name }, { text: "." }] };
+		},
+		getEncounterRandomTalkMessage: function getEncounterRandomTalkMessage(encounter) {
+			var randomResponse = encounter.talk[Math.floor(Math.random() * encounter.talk.length)];
+			return { speaker: encounter.name, line: randomResponse };
+		},
+		getOffWithYouMessage: function getOffWithYouMessage() {
+			return { speaker: _constants2.default.WIZARD, line: [{ text: "Oh, that's a pity... Well off with you then! Time to save the world or something!" }] };
+		},
+		getLeaveTowerMessage: function getLeaveTowerMessage() {
+			return { speaker: _constants2.default.NARRATOR, line: [{ text: "With a strength belying his frail physique, the " }, { className: _constants2.default.WIZARD, text: _constants2.default.WIZARD }, { text: " thrusts you from his crumbling tower and out into the unknown world..." }] };
 		}
 	};
 

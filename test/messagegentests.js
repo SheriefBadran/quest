@@ -24,4 +24,28 @@ describe("messageGen", ()=> {
 
 		expect(stub.callCount).to.equal(3);
 	});
+	it("should log to console and return a message when a confirm message case is missing", ()=> {
+		sinon.spy(console, "log");
+		expect(messageGen.getConfirmMessage("FakeCase", "Test")).to.deep.equal(messageGen.getErrorOccurredMessage());
+		expect(console.log.calledOnce).to.be.true;
+		console.log.restore();
+	});
+	it("should log to console and return a message when a deny message case is missing", ()=> {
+		sinon.spy(console, "log");
+		expect(messageGen.getDenyMessage("FakeCase", "Test")).to.deep.equal(messageGen.getErrorOccurredMessage());
+		expect(console.log.calledOnce).to.be.true;
+		console.log.restore();
+	});
+	it("should log to console and return a message when a fail message case is missing", ()=> {
+		sinon.spy(console, "log");
+		expect(messageGen.getFailMessage("FakeCase", "Test")).to.deep.equal(messageGen.getErrorOccurredMessage());
+		expect(console.log.calledOnce).to.be.true;
+		console.log.restore();
+	});
+	it("should log to console and return a message when a multi-choice fail message case is missing", ()=> {
+		sinon.spy(console, "log");
+		expect(messageGen.getMultiChoiceFailMessage("FakeCase", null, "Test")).to.deep.equal(messageGen.getErrorOccurredMessage());
+		expect(console.log.calledOnce).to.be.true;
+		console.log.restore();
+	});
 });

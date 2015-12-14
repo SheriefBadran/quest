@@ -1,6 +1,18 @@
 import constants from "./../constants";
 
 export default {
+	getErrorOccurredMessage() {
+		return { speaker: constants.NARRATOR, line: [ { className: constants.NARRATOR, text: "Whoops! Looks like some sort of error occurred... silly me!" } ] };
+	},
+	getNameLengthMessage() {
+		return { speaker: constants.WIZARD, line: [ { text: "Hmmm... are you sure about that? Around here, names are usually between " + constants.MIN_NAME_LENGTH + " and " + constants.MAX_NAME_LENGTH + " characters in length! How about trying again?" } ] };
+	},
+	getStateNameMessage(input) {
+		return { speaker: constants.PLAYER, line: [ { text: "I'm " + input + "." } ] };
+	},
+	getNameAreYouSureMessage(input) {
+		return { speaker: constants.WIZARD, line: [ { text: input + " you say? Weird name... are you sure about that?" } ] };
+	},
 	getConfirmMessage(prevInput, name, option) {
 		switch (prevInput) {
 			case constants.EXPECTING_NAME:
@@ -13,7 +25,7 @@ export default {
 				return { speaker: constants.FINAL_BOSS, line: [ { className: constants.FINAL_BOSS, text: "Ah well. Guess I win then?" } ] };
 			default:
 				console.log("Missing confirm message for " + prevInput);
-				return { speaker: constants.NARRATOR, line: [ { className: constants.NARRATOR, text: "Whoops! Looks like some sort of error occurred... silly me!" } ] };
+				return this.getErrorOccurredMessage();
 		}
 	},
 	getDenyMessage(prevInput, name, options) {
@@ -31,7 +43,7 @@ export default {
 				return { speaker: constants.FINAL_BOSS, line: [ { className: constants.FINAL_BOSS, text: "Well that's a relief! Better get back to what you were doing... I'll just be over here creating an oppressive reign of terror or whatever it is that I do..." } ] };
 			default:
 				console.log("Missing deny message for " + prevInput);
-				return { speaker: constants.NARRATOR, line: [ { className: constants.NARRATOR, text: "Whoops! Looks like some sort of error occurred... silly me!" } ] };
+				return this.getErrorOccurredMessage();
 		}
 	},
 	getFailMessage(prevInput, name) {
@@ -44,7 +56,7 @@ export default {
 				return { speaker: constants.FINAL_BOSS, line: [ { className: constants.FINAL_BOSS, text: "What on earth is that supposed to mean? All I need is a simple " }, { className: "confirm", text: "yes" }, { className: constants.FINAL_BOSS, text: " or " }, { className: "deny", text: "no" }, { className: constants.FINAL_BOSS, text: "!" } ] };
 			default:
 				console.log("Missing fail message for " + prevInput + " confirmation.");
-				return { speaker: constants.NARRATOR, line: [ { className: constants.NARRATOR, text: "Whoops! Looks like some sort of error occurred... silly me!" } ] };
+				return this.getErrorOccurredMessage();
 		}
 	},
 	getMultiChoiceFailMessage(input, options, name) {
@@ -57,7 +69,7 @@ export default {
 				return {speaker: constants.WIZARD, line: line };
 			default:
 				console.log("Missing npc fail message for: " + input);
-				return { speaker: constants.NARRATOR, line: [ { className: constants.NARRATOR, text: "Whoops! Looks like some sort of error occurred... silly me!" } ] };
+				return this.getErrorOccurredMessage();
 		}
 	},
 	getMultiOptionLines(options) {
@@ -167,5 +179,109 @@ export default {
 	},
 	getElfLeaveMessage() {
 		return { speaker: constants.NARRATOR, line: [ { text: "The " }, { className: constants.ELF, text: constants.ELF }, { text: " gives you one last glance before pulling herself up into the tree and vanishing from sight, leaving you to wonder why she had ever appeared in the first place. You are now free to roam. Perhaps you should start by looking around?" } ] };
+	},
+	getEquipMessage(requestedItem) {
+		return { speaker: constants.NARRATOR, line: [ { text: "You equip the " + requestedItem.prefix + " " }, { className: requestedItem.name, text: requestedItem.name }, { text: "." } ] };
+	},
+	getCannotBeEquippedMessage(requestedItem) {
+		return { speaker: constants.NARRATOR, line: [ { className: requestedItem.name, text: requestedItem.name }, { text: " cannot be equipped!" } ] };
+	},
+	getLookAtItemMessage(requestedItem) {
+		let prefix = ("AEIOU".indexOf(requestedItem.prefix.charAt(0).toUpperCase()) < 0) ? "A" : "An";
+		return { speaker: constants.NARRATOR, line: [ { text: prefix + " " + requestedItem.prefix + " " }, { className: requestedItem.name, text: requestedItem.name }, { text: ". " + requestedItem.description } ] };
+	},
+	getItemStatsMessage(requestedItem) {
+		return { speaker: constants.NARRATOR, line: [ { text: "The stats are Strength: " + requestedItem.stats.str + ", Magic: " + requestedItem.stats.mag + ", Dexterity: " + requestedItem.stats.dex + ", and Defence: " + requestedItem.stats.def + "." } ] };
+	},
+	getLookAroundMessage(playerPos, map) {
+		// TODO: make it look around the tile you're currently in too
+
+		// We need to check what's in the four cardinal directions
+		let message = "";
+
+		// Make sure it's both on the map 
+		if (playerPos.y -1 >= 0 ) {
+			message += "To the north you see ";
+			message += (map[playerPos.y - 1][playerPos.x].description || map[playerPos.y - 1][playerPos.x].type) + ". ";
+		}
+		
+		if (playerPos.x + 1 < map[0].length) {
+			message += "To the east you see ";
+			message += (map[playerPos.y][playerPos.x + 1].description || map[playerPos.y][playerPos.x + 1].type) + ". ";
+		}
+		
+		if (playerPos.y + 1 < map.length) {
+			message += "To the south you see ";
+			message += (map[playerPos.y + 1][playerPos.x].description || map[playerPos.y + 1][playerPos.x].type) + ". ";
+		}
+
+		if (playerPos.x -1 >= 0 ) {
+			message += "To the west you see ";
+			message += (map[playerPos.y][playerPos.x - 1].description || map[playerPos.y][playerPos.x - 1].type) + ". ";
+		}
+
+		return { speaker: constants.NARRATOR, line: [ { text: message } ] };
+	},
+	getEncounterMessage(encounter) {
+		return { speaker: constants.NARRATOR, line: encounter.description };
+	},
+	getPlayerRaceChoiceMessage(requestedRace) {
+		let prefix = ("AEIOU".indexOf(requestedRace.name.charAt(0).toUpperCase()) < 0) ? "A" : "An";
+		return { speaker: constants.PLAYER, line: [ { text: "I'm " + prefix.toLowerCase() + " " + requestedRace.name + "... I think?" } ] };
+	},
+	getRaceAreYouSureMessage(requestedRace) {
+		let prefix = ("AEIOU".indexOf(requestedRace.name.charAt(0).toUpperCase()) < 0) ? "A" : "An";
+		return { speaker: constants.WIZARD, line: [ { text: "Aha! " + prefix + " " }, { className: requestedRace.name, text: requestedRace.name }, { text: " eh? " + requestedRace.description + " Are you sure about this?" } ] }
+	},
+	getPlayerWeaponSelectMessage(chosenWeapon) {
+		return { speaker: constants.PLAYER, line: [ { text: "I think I'll take the " + chosenWeapon.name + "." } ] };
+	},
+	getConfirmWeaponMessage(chosenWeapon) {
+		return { speaker: constants.WIZARD, line: [ { text: "A fine choice! " + chosenWeapon.description + " Is this what you really want?" } ] };
+	},
+	getStatusUpdatedMessage() {
+		return { speaker: constants.NARRATOR, line: [ { text: "Your status has been updated!" } ] };
+	},
+	getItemAddedMessage(item) {
+		let prefix = ("AEIOU".indexOf(item.name.charAt(0).toUpperCase()) < 0) ? "A" : "An";
+		let has = (item.isPlural) ? "have" : "has";
+		return { speaker: constants.NARRATOR, line: [ { text: prefix + " " + item.prefix + " " }, { className: item.name, text: item.name }, { text: " " + has + " been added to your inventory!" } ] };
+	},
+	getDontForgetToEquipMessage(item) {
+		return { speaker: constants.WIZARD, line: [ { text: "Don't forget to equip it before you head out into the world by using " }, { className: "confirm", text: "equip " + item.name }, { text: "! Not my fault if you end up running around unarmed!" } ] };
+	},
+	getISeeYouHaveQuestionsMessage() {
+		return { speaker: constants.WIZARD, line: [ { text: "Ah, I can see from the look on your face that you have questions. Out with it then!" } ] };
+	},
+	getWrongWayMessage() {
+		return { speaker: constants.NARRATOR, line: [ { text: "You can't go that way!" } ] };
+	},
+	getMoveNorthMessage() {
+		return { speaker: constants.NARRATOR, line: [ { text: "You move north." } ] };
+	},
+	getMoveEastMessage() {
+		return { speaker: constants.NARRATOR, line: [ { text: "You move east." } ] };
+	},
+	getMoveSouthMessage() {
+		return { speaker: constants.NARRATOR, line: [ { text: "You move south." } ] };
+	},
+	getMoveWestMessage() {
+		return { speaker: constants.NARRATOR, line: [ { text: "You move west." } ] };
+	},
+	getPlayerWantResetMessage() {
+		return { speaker: constants.PLAYER, line: [ { text: "I can't take this anymore..." } ] };
+	},
+	getEncounterTalkMessage(encounter) {
+		return { speaker: constants.NARRATOR, line: [ { text: "You attempt to strike up a conversation with the " }, { className: encounter.name, text: encounter.name }, { text: "." } ] };
+	},
+	getEncounterRandomTalkMessage(encounter) {
+		let randomResponse = encounter.talk[Math.floor(Math.random() * encounter.talk.length)];
+		return { speaker: encounter.name, line: randomResponse };
+	},
+	getOffWithYouMessage() {
+		return { speaker: constants.WIZARD, line: [ { text: "Oh, that's a pity... Well off with you then! Time to save the world or something!" } ] };
+	},
+	getLeaveTowerMessage() {
+		return { speaker: constants.NARRATOR, line: [ { text: "With a strength belying his frail physique, the " }, { className: constants.WIZARD, text: constants.WIZARD }, { text: " thrusts you from his crumbling tower and out into the unknown world..." } ] };
 	}
 };
