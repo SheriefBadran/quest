@@ -306,7 +306,8 @@ export default {
 		return { speaker: constants.NARRATOR, line: [ { text: "HP: " + encounter.hp } ] }; //TODO: Include other stats
 	},
 	getEncounterWinMessage(NPC) {
-		return { speaker: constants.NARRATOR, line: [ { text: "You defeat the " }, { className: NPC.name, text: NPC.name }, { text: "!" } ] };
+		let randomResponse = NPC.defeated[Math.floor(Math.random() * NPC.defeated.length)];
+		return { speaker: constants.NARRATOR, line: randomResponse };
 	},
 	getPlayerDieMessage() {
 		let dieLines = [
