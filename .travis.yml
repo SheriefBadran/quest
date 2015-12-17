@@ -13,6 +13,7 @@ script:
 
 after_success:
  - cat coverage/*/lcov.info | ./node_modules/coveralls/bin/coveralls.js
+ - chmod a+x ./tools/deploy.sh
  - ./tools/deploy.sh
 
 branches:
