@@ -18,6 +18,9 @@
 	"attacked": [ 
 		[ { "text": "..." } ]
 	],
+	"miss": [
+		[ { "text": "The " }, { "className": "Goblin", "text": "Goblin" }, { "text": " trips and misses."} ]
+	],
 	"flee": [ 
 		[ { "text": "Rargh" } ]
 	],

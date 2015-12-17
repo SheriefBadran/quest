@@ -295,6 +295,16 @@ export default {
 		let randomResponse = NPC.attackAction[Math.floor(Math.random() * NPC.attackAction.length)];
 		return { speaker: constants.NARRATOR, line: randomResponse };
 	},
+	getPlayerMissMessage() {
+		let attackLines = [ //TODO: Vary these by player level to give illusion of improvement
+			"You stumble over your own feet and fail to hit your target."
+		];
+		return { speaker: constants.NARRATOR, line: [ { text: attackLines[Math.floor(Math.random() * attackLines.length)] } ] };
+	},
+	getEncounterMissMessage(NPC) {
+		let randomResponse = NPC.miss[Math.floor(Math.random() * NPC.miss.length)];
+		return { speaker: constants.NARRATOR, line: randomResponse };
+	},
 	getPlayerDamageTakenMessage(damage) {
 		return { speaker: constants.NARRATOR, line: [ { text: "You take " }, { className: "deny", text: damage + " damage" }, { text: "." } ] };
 	},

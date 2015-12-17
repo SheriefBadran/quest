@@ -8,6 +8,7 @@ let Classes = {
 
 Classes = _.reduce(Classes, (ret, data, id)=> {
 	ret[id].stats.level = 1; // Add the level to each class
+	ret[id].stats.currentexp = 0;
 	return ret;
 }, Classes);
 
