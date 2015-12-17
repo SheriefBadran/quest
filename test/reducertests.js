@@ -634,6 +634,71 @@ describe("player reducer", ()=> {
 			armour: null	
 		});
 	});
+	it("should set takendamage when PREP_DAMAGE is supplied", ()=> {
+		expect(
+			playerReducer(
+				{
+					name: "???",
+					displayStats: false,
+					stats: {
+					},
+					itemQueue: [],
+					inventory: [],
+					displayInventory: false,
+					weapon: null,
+					armour: null	
+				},
+				{
+					type: constants.PREP_DAMAGE,
+					damage: 10
+				}
+			)
+		).to.deep.equal({
+			name: "???",
+			displayStats: false,
+			stats: {
+				takendamage: 10
+			},
+			itemQueue: [],
+			inventory: [],
+			displayInventory: false,
+			weapon: null,
+			armour: null	
+		});
+	});
+	it("should update currenthp and remove takendamage when DAMAGE_PLAYER is supplied", ()=> {
+		expect(
+			playerReducer(
+				{
+					name: "???",
+					displayStats: false,
+					stats: {
+						takendamage: 10,
+						currenthp: 20
+					},
+					itemQueue: [],
+					inventory: [],
+					displayInventory: false,
+					weapon: null,
+					armour: null	
+				},
+				{
+					type: constants.DAMAGE_PLAYER
+				}
+			)
+		).to.deep.equal({
+			name: "???",
+			displayStats: false,
+			stats: {
+				currenthp: 10
+			},
+			itemQueue: [],
+			inventory: [],
+			displayInventory: false,
+			weapon: null,
+			armour: null	
+		});
+	})
 });
 
 describe("world reducer", ()=> {
@@ -776,6 +841,41 @@ describe("world reducer", ()=> {
 			playerPos: { x: pos.x + movement.x, y: pos.y + movement.y }
 		});
 	});
+	it("shoukd move player and update encounter visibility with MOVE", ()=> {
+		let movement = { x: -1, y: 0 },
+			pos = { x: 2, y: 2 };
+		expect(
+			worldReducer(
+				{
+					version: initialState().world.version,
+					displayMap: true,
+					map: [
+						[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
+						[{seen: false},{seen:false},{seen:true},{seen:false},{seen:false}], 
+						[{seen: false},{seen:true, encounter: {}},{seen:false},{seen:true},{seen:false}], 
+						[{seen: false},{seen:false},{seen:true},{seen:false},{seen:false}], 
+						[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}]
+					],
+					playerPos: pos					
+				},
+				{
+					type: constants.MOVE,
+					movement: movement
+				}
+			)
+		).to.deep.equal({
+			version: initialState().world.version,
+			displayMap: true,
+			map: [
+				[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
+				[{seen: false},{seen:true},{seen:true},{seen:false},{seen:false}], 
+				[{seen: true},{seen:true, encounter: {seen:true}},{seen:true},{seen:true},{seen:false}], 
+				[{seen: false},{seen:true},{seen:true},{seen:false},{seen:false}], 
+				[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}]
+			],
+			playerPos: { x: pos.x + movement.x, y: pos.y + movement.y }
+		});
+	});
 	it("should not throw an exception when updating visibility at array boundaries", ()=> {
 		let movement = { x: 0, y: -1 },
 			pos = { x: 0, y: 1};
@@ -823,5 +923,72 @@ describe("world reducer", ()=> {
 				}
 			)
 		).to.not.throw(Error);
+	});
+	it("should update encounter hp with DAMAGE_NPC", ()=> {
+		let pos = { x: 2, y: 2 };
+		expect(
+			worldReducer(
+				{
+					version: initialState().world.version,
+					displayMap: true,
+					map: [
+						[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
+						[{seen: false},{seen:false},{seen:true},{seen:false},{seen:false}], 
+						[{seen: false},{seen:true},{seen:false, encounter: {seen:true,hp:200}},{seen:true},{seen:false}], 
+						[{seen: false},{seen:false},{seen:true},{seen:false},{seen:false}], 
+						[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}]
+					],
+					playerPos: pos					
+				},
+				{
+					type: constants.DAMAGE_NPC,
+					damage: 10
+				}
+			)
+		).to.deep.equal({
+			version: initialState().world.version,
+			displayMap: true,
+			map: [
+				[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
+				[{seen: false},{seen:false},{seen:true},{seen:false},{seen:false}], 
+				[{seen: false},{seen:true},{seen:false, encounter: {seen:true,hp:190}},{seen:true},{seen:false}], 
+				[{seen: false},{seen:false},{seen:true},{seen:false},{seen:false}], 
+				[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}]
+			],
+			playerPos: pos
+		});
+	});
+	it("should remove encounter on DEFEAT_ENEMY", ()=> {
+		let pos = { x: 2, y: 2 };
+		expect(
+			worldReducer(
+				{
+					version: initialState().world.version,
+					displayMap: true,
+					map: [
+						[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
+						[{seen: false},{seen:false},{seen:true},{seen:false},{seen:false}], 
+						[{seen: false},{seen:true},{seen:false, encounter: {seen:true}},{seen:true},{seen:false}], 
+						[{seen: false},{seen:false},{seen:true},{seen:false},{seen:false}], 
+						[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}]
+					],
+					playerPos: pos					
+				},
+				{
+					type: constants.DEFEAT_ENEMY
+				}
+			)
+		).to.deep.equal({
+			version: initialState().world.version,
+			displayMap: true,
+			map: [
+				[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}], 
+				[{seen: false},{seen:false},{seen:true},{seen:false},{seen:false}], 
+				[{seen: false},{seen:true},{seen:false},{seen:true},{seen:false}], 
+				[{seen: false},{seen:false},{seen:true},{seen:false},{seen:false}], 
+				[{seen: false},{seen:false},{seen:false},{seen:false},{seen:false}]
+			],
+			playerPos: pos
+		});
 	});
 });

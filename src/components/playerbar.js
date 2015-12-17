@@ -11,8 +11,7 @@ let PlayerBar = React.createClass({
 	displayName: "PlayerBar",
 	propTypes: {
 		input: proptypes.string.isRequired,
-		inventory: proptypes.array.isRequired,
-		name: proptypes.string.isRequired,
+		player: proptypes.object.isRequired,
 		prevInput: proptypes.string.isRequired
 	},
 	getInitialState() {
@@ -27,7 +26,7 @@ let PlayerBar = React.createClass({
 	handleSubmit(event) {
 		if (event.keyCode == 13) { // If it's enter key
 			if (this.state.text) {
-				this.props.validateInput(this.state.text, this.props.input, this.props.prevInput, this.props.name, this.props.playerPos, this.props.inventory, this.props.map);
+				this.props.validateInput(this.state.text, this.props.input, this.props.prevInput, this.props.playerPos, this.props.player, this.props.map);
 				this.setState({ text: "" });
 			}
 		}
@@ -48,14 +47,14 @@ let PlayerBar = React.createClass({
 });
 
 let mapStateToProps = (state)=> {
-	return { input: state.input.awaiting, prevInput: state.input.previous, name: state.player.name, inventory: state.player.inventory, map: state.world.map,
+	return { input: state.input.awaiting, prevInput: state.input.previous, player: state.player, map: state.world.map,
 				playerPos: state.world.playerPos };
 };
 
 let mapDispatchToProps = (dispatch)=> {
 	return {
-		validateInput(input, expectedInput, prevInput, name, playerPos, inventory, map) {
-			dispatch(inputvalidation(input, expectedInput, prevInput, name, playerPos, inventory, map));
+		validateInput(input, expectedInput, prevInput, playerPos, player, map) {
+			dispatch(inputvalidation(input, expectedInput, prevInput, playerPos, player, map));
 		}
 	};
 };

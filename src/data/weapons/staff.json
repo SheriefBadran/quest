@@ -1,6 +1,6 @@
 {
 	"name": "Staff",
-	"description": "STAFF DESC",
+	"description": [ { "text": "Though this battered oak " }, { "className": "Staff", "text": "staff" }, { "text": " looks the worse for wear, it still provides a tint boost in magic. Hopefully. If you believe in that stuff anyway." } ],
 	"isPlural": false,
 	"prefix": "battered oak",
 	"stats": {

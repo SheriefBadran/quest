@@ -159,6 +159,12 @@ export default {
 		];
 		return { speaker: constants.PLAYER, line: [ { className: constants.PLAYER, text: failLines[Math.floor(Math.random() * failLines.length)] } ] };
 	},
+	getPlayerBattleFailMessage() {
+		let failLines = [
+			"You fall flat on your face."
+		];
+		return { speaker: constants.NARRATOR, line: [ { text: failLines[Math.floor(Math.random() * failLines.length)] } ] };
+	},
 	getNoSuchItemMessage(itemName) {
 		return { speaker: constants.NARRATOR, line: [ { text: "You don't currently possess an item of name " }, { className: "deny", text: itemName }, { text: "!" } ] };
 	},
@@ -188,7 +194,7 @@ export default {
 	},
 	getLookAtItemMessage(requestedItem) {
 		let prefix = ("AEIOU".indexOf(requestedItem.prefix.charAt(0).toUpperCase()) < 0) ? "A" : "An";
-		return { speaker: constants.NARRATOR, line: [ { text: prefix + " " + requestedItem.prefix + " " }, { className: requestedItem.name, text: requestedItem.name }, { text: ". " + requestedItem.description } ] };
+		return { speaker: constants.NARRATOR, line: [ { text: prefix + " " + requestedItem.prefix + " " }, { className: requestedItem.name, text: requestedItem.name }, { text: ". " }, ...requestedItem.description ] };
 	},
 	getItemStatsMessage(requestedItem) {
 		return { speaker: constants.NARRATOR, line: [ { text: "The stats are Strength: " + requestedItem.stats.str + ", Magic: " + requestedItem.stats.mag + ", Dexterity: " + requestedItem.stats.dex + ", and Defence: " + requestedItem.stats.def + "." } ] };
@@ -222,8 +228,8 @@ export default {
 
 		return { speaker: constants.NARRATOR, line: [ { text: message } ] };
 	},
-	getEncounterMessage(encounter) {
-		return { speaker: constants.NARRATOR, line: encounter.description };
+	getEncounterMessage(NPC) {
+		return { speaker: constants.NARRATOR, line: NPC.description };
 	},
 	getPlayerRaceChoiceMessage(requestedRace) {
 		let prefix = ("AEIOU".indexOf(requestedRace.name.charAt(0).toUpperCase()) < 0) ? "A" : "An";
@@ -231,13 +237,13 @@ export default {
 	},
 	getRaceAreYouSureMessage(requestedRace) {
 		let prefix = ("AEIOU".indexOf(requestedRace.name.charAt(0).toUpperCase()) < 0) ? "A" : "An";
-		return { speaker: constants.WIZARD, line: [ { text: "Aha! " + prefix + " " }, { className: requestedRace.name, text: requestedRace.name }, { text: " eh? " + requestedRace.description + " Are you sure about this?" } ] }
+		return { speaker: constants.WIZARD, line: [ { text: "Aha! " + prefix + " " }, { className: requestedRace.name, text: requestedRace.name }, { text: " eh? " }, ...requestedRace.description, { text: " Are you sure about this?" } ] }
 	},
 	getPlayerWeaponSelectMessage(chosenWeapon) {
 		return { speaker: constants.PLAYER, line: [ { text: "I think I'll take the " + chosenWeapon.name + "." } ] };
 	},
 	getConfirmWeaponMessage(chosenWeapon) {
-		return { speaker: constants.WIZARD, line: [ { text: "A fine choice! " + chosenWeapon.description + " Is this what you really want?" } ] };
+		return { speaker: constants.WIZARD, line: [ { text: "A fine choice! " }, ...chosenWeapon.description, { text: " Is this what you really want?" } ] };
 	},
 	getStatusUpdatedMessage() {
 		return { speaker: constants.NARRATOR, line: [ { text: "Your status has been updated!" } ] };
@@ -271,12 +277,45 @@ export default {
 	getPlayerWantResetMessage() {
 		return { speaker: constants.PLAYER, line: [ { text: "I can't take this anymore..." } ] };
 	},
-	getEncounterTalkMessage(encounter) {
-		return { speaker: constants.NARRATOR, line: [ { text: "You attempt to strike up a conversation with the " }, { className: encounter.name, text: encounter.name }, { text: "." } ] };
+	getEncounterTalkMessage(NPC) {
+		return { speaker: constants.NARRATOR, line: [ { text: "You attempt to strike up a conversation with the " }, { className: NPC.name, text: NPC.name }, { text: "." } ] };
 	},
-	getEncounterRandomTalkMessage(encounter) {
-		let randomResponse = encounter.talk[Math.floor(Math.random() * encounter.talk.length)];
-		return { speaker: encounter.name, line: randomResponse };
+	getEncounterRandomTalkMessage(NPC) {
+		let randomResponse = NPC.talk[Math.floor(Math.random() * NPC.talk.length)];
+		return { speaker: NPC.name, line: randomResponse };
+	},
+	getEncounterAttackMessage(NPC, damage) {
+		let attackLines = [ //TODO: Vary these by player level to give illusion of improvement
+			"You launch a fierce attack on the ",
+			"You flail wildy in the direction of the "
+		];
+		return { speaker: constants.NARRATOR, line: [ { text: attackLines[Math.floor(Math.random() * attackLines.length)] }, { className: NPC.name, text: NPC.name }, { text: ", dealing " }, { className: "deny", text: damage + " damage" }, { text: "." } ] };
+	},
+	getEncounterEnemyAttackDamageMessage(NPC) {
+		let randomResponse = NPC.attackAction[Math.floor(Math.random() * NPC.attackAction.length)];
+		return { speaker: constants.NARRATOR, line: randomResponse };
+	},
+	getPlayerDamageTakenMessage(damage) {
+		return { speaker: constants.NARRATOR, line: [ { text: "You take " }, { className: "deny", text: damage + " damage" }, { text: "." } ] };
+	},
+	getEncounterDamageTakenMessage(NPC) {
+		let randomResponse = NPC.attacked[Math.floor(Math.random() * NPC.attacked.length)];
+		return { speaker: NPC.name, line: randomResponse };
+	},
+	getEncounterObserveMessage(encounter) {
+		return { speaker: constants.NARRATOR, line: [ { text: "HP: " + encounter.hp } ] }; //TODO: Include other stats
+	},
+	getEncounterWinMessage(NPC) {
+		return { speaker: constants.NARRATOR, line: [ { text: "You defeat the " }, { className: NPC.name, text: NPC.name }, { text: "!" } ] };
+	},
+	getPlayerDieMessage() {
+		let dieLines = [
+			"The mortal blow drives you to your knees. You can feel that the end is near."
+		];
+		return { speaker: constants.NARRATOR, line: [ { text: dieLines[Math.floor(Math.random() * dieLines.length)] } ] };
+	},
+	getGameOverMessage() {
+		return { speaker: constants.FINAL_BOSS, line: [ { text: "Oh dear, I guess this is Game Over then? Better luck next time!" } ] };
 	},
 	getOffWithYouMessage() {
 		return { speaker: constants.WIZARD, line: [ { text: "Oh, that's a pity... Well off with you then! Time to save the world or something!" } ] };

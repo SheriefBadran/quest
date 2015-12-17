@@ -2,6 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import constants from "../constants";
 import { Panel, Grid, Row, Col } from "react-bootstrap";
+import NPCs from "../data/npc";
 
 let proptypes = React.PropTypes;
 
@@ -57,7 +58,8 @@ let WorldMap = React.createClass({
 						continue;
 					}
 					if (this.props.map[y][x].encounter && this.props.map[y][x].encounter.seen) {
-						mapRow.push(<span key={x + "" + y}>{this.props.map[y][x].encounter.icon}</span>);
+						let NPC = NPCs.all[this.props.map[y][x].encounter.id];
+						mapRow.push(<span className={NPC.name} key={x + "" + y}>{NPC.icon}</span>);
 						continue;
 					}
 					switch (this.props.map[y][x].type) { // TODO: remove this switch statement and just use a map to get symbols with type as key

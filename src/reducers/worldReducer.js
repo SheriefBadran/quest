@@ -1,5 +1,6 @@
 import initialState from "./../initialstate";
 import constants from "./../constants";
+import NPCs from "./../data/npc";
 
 export default (state, action)=> {
 	let updateMapVisibility = (map, playerPos)=> {
@@ -14,6 +15,9 @@ export default (state, action)=> {
 		}
 		if (playerPos.y < map.length-1) {
 			map[playerPos.y+1][playerPos.x].seen = true;
+		}
+		if (map[playerPos.y][playerPos.x].encounter) {
+			map[playerPos.y][playerPos.x].encounter.seen = true;
 		}
 		return map;
 	};
@@ -39,6 +43,14 @@ export default (state, action)=> {
 			let newPosition = { x: newState.playerPos.x + action.movement.x, y: newState.playerPos.y + action.movement.y };
 			newState.playerPos = newPosition;
 			newState.map = updateMapVisibility(newState.map, newState.playerPos);
+			return newState;
+		case constants.DAMAGE_NPC:
+			let encounter = newState.map[newState.playerPos.y][newState.playerPos.x].encounter;
+			encounter.hp -= action.damage;
+			newState.map[newState.playerPos.y][newState.playerPos.x].encounter = encounter;
+			return newState;
+		case constants.DEFEAT_ENEMY:
+			delete newState.map[newState.playerPos.y][newState.playerPos.x].encounter;
 			return newState;
 		case constants.RESET:
 			return initialState().world;

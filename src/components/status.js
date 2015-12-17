@@ -42,7 +42,7 @@ let Status = React.createClass({
 						</Col>
 						<Col md={2} xs={2}>
 							{this.props.name}<br />
-							<span className={this.props.stats.race}>{this.props.stats.race}</span>
+							<span className={this.props.stats.race}>Lv{this.props.stats.level} {this.props.stats.race}</span>
 						</Col>
 						<Col md={1} xs={2}>
 							HP:<br />

@@ -68,5 +68,19 @@ export default {
 				dispatch({ type: constants.RESET });
 			}, timeout);
 		}
+	},
+	damageNPC(damage) {
+		return { type: constants.DAMAGE_NPC, damage: damage };
+	},
+	damagePlayer(damage, timeout) {
+		return (dispatch)=> {
+				dispatch({ type: constants.PREP_DAMAGE, damage: damage }); // dispatched for testing purposes - has no actual effect
+			setTimeout(()=> {
+				dispatch({ type: constants.DAMAGE_PLAYER });
+			}, timeout);
+		}
+	},
+	defeatEnemy(NPC) {
+		return { type: constants.DEFEAT_ENEMY, enemy: NPC };
 	}
 };

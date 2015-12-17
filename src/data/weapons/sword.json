@@ -1,6 +1,6 @@
 {
 	"name": "Sword",
-	"description": "SWORD DESC",
+	"description": [ { "text": "Who doesn't love a good "}, { "className": "Sword", "text": "sword" }, { "text": "? This blade is not exactly the legendary Excalibur, but it does provide slightly more of a strength boost than a simple stick."} ],
 	"isPlural": false,
 	"prefix": "rusty iron",
 	"stats": {

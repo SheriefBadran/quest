@@ -87,6 +87,22 @@ describe("actions", ()=> {
 		};
 		expect(actions.movePlayer(movement)).to.deep.equal(expectedAction);
 	});
+	it ("should create an action to damage an NPC", ()=> {
+		const damage = 10;
+		const expectedAction = {
+			type: constants.DAMAGE_NPC,
+			damage: damage
+		};
+		expect(actions.damageNPC(damage)).to.deep.equal(expectedAction);
+	});
+	it ("should create an action to defeat an NPC", ()=> {
+		const NPC = "Test";
+		const expectedAction = {
+			type: constants.DEFEAT_ENEMY,
+			enemy: NPC
+		};
+		expect(actions.defeatEnemy(NPC)).to.deep.equal(expectedAction);
+	});
 });
 
 describe("async actions", ()=> {
@@ -144,5 +160,13 @@ describe("async actions", ()=> {
 		const store = mockStore({}, expectedActions, done);
 		store.dispatch(actions.resetGame(0));
 	});
-
+	it("should dispatch a PREP_DAMAGE action followed by a DAMAGE_PLAYER action", (done)=> {
+		const damage = 10;
+		const expectedActions = [
+			{ type: constants.PREP_DAMAGE, damage: damage },
+			{ type: constants.DAMAGE_PLAYER }
+		];
+		const store = mockStore({}, expectedActions, done);
+		store.dispatch(actions.damagePlayer(damage));
+	});
 });

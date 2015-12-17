@@ -32,6 +32,11 @@ export default (storage) => {
 			delete state.world.prepMap;
 		}
 
+		if (state.player.stats && state.player.stats.takendamage) {
+			state.player.stats.currenthp -= state.player.stats.takendamage;
+			delete state.player.stats.takendamage;
+		}
+
 		// If the version is not correct, we remove the localStorage and return default state to ensure nothing is broken during development
 		//TODO: Make this unnecessary
 		if (state.world.version !== initialState().world.version) {

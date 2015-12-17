@@ -23,7 +23,8 @@ export default {
 		}
 
 		map[5][4] = { type: "Wizard", seen: true, obstacle: true, description: "the crumbling ruins of an old tower. You probably shouldn't go back there" };
-		map[0][2].encounter = NPCs.random.elf.id;
+		map[0][2].encounter = { id: NPCs.random.elf.id, hp: NPCs.random.elf.stats.hp };
+		map[0][3].encounter = { id: NPCs.random.goblin.id, hp: NPCs.random.goblin.stats.hp };
 
 		var playerPos = { x: 4, y: 4 };
 

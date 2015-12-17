@@ -1,6 +1,6 @@
 {
 	"name": "Dwarf",
-	"description": "You don't often see Dwarves these days - they tend to prefer remaining cloistered within the halls of their great mountain fortresses. Stout of build, and wide of girth, they are known for their defensive capabilities and raw strength. Their other attributes, however, are somewhat lacking.",
+	"description": [ { "text": "You don't often see " }, { "className": "Dwarf", "text": "Dwarves" }, { "text": " these days - they tend to prefer remaining cloistered within the halls of their great mountain fortresses. Stout of build, and wide of girth, they are known for their defensive capabilities and raw strength. Their other attributes, however, are somewhat lacking." } ],
 	"stats": {
 		"race": "Dwarf",
 		"hp": 20,

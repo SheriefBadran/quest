@@ -1,6 +1,6 @@
 {
 	"name": "Bow",
-	"description": "BOW DESC",
+	"description": [ { "text": "This timeworn yew " }, { "className": "Bow", "text": "bow" }, { "text": " provides a miniscule increase in dexterity, perfect for those who wish to barrage their foes from afar. Or perhaps it would serve you better as a makeshift club." } ],
 	"isPlural": false,
 	"prefix": "timeworn yew",
 	"stats": {

@@ -188,6 +188,34 @@ describe("savedstate", ()=> {
 		expect(storage.getItem.calledWith("Quest")).to.be.true;
 		expect(storage.getItem.calledOnce).to.be.true;
 	});
+	it("should update player hp based on damage taken if takendamage is set", ()=> {
+		let storedState = {
+			log: {},
+			player: {
+				stats: {
+					takendamage: 10,
+					currenthp: 20
+				}
+			},
+			world: {
+				version: initialstate().world.version,
+			}
+		};
+		sinon.stub(storage, "getItem").returns(JSON.stringify(storedState));
+		expect(savedstate(storage)).to.deep.equal({
+			log: {},
+			player: {
+				stats: {
+					currenthp: 10
+				}
+			},
+			world: {
+				version: initialstate().world.version,
+			}
+		});
+		expect(storage.getItem.calledWith("Quest")).to.be.true;
+		expect(storage.getItem.calledOnce).to.be.true;
+	});
 	it("should call removeItem('Quest') and return undefined if version does not match", ()=> {
 		let storedState = {
 			log: {},

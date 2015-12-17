@@ -1,0 +1,24 @@
+{
+	"name": "Goblin",
+	"description": [ { "text": "A comically fierce " }, { "className": "Goblin", "text": "Goblin" }, { "text": " bars your way." } ],
+	"icon": "G",
+	"hostile": true,
+	"stats": {
+		"level": 1,
+		"hp": 5,
+		"mp": 0,
+		"str": 3,
+		"dex": 5,
+		"mag": 4,
+		"def": 2
+	},
+	"attackAction": [
+		[ { "text": "The " }, { "className": "Goblin", "text": "Goblin" }, { "text": " swings a mighty club in your direction." } ]
+	],
+	"attacked": [ 
+		[ { "text": "..." } ]
+		],
+	"flee": [ 
+		[ { "text": "Rargh" } ]
+		]
+}

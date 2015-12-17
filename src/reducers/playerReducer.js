@@ -57,6 +57,15 @@ export default (state, action)=> {
 			newState.displayInventory = action.display;
 			delete newState.prepInvent;
 			return newState;
+		case constants.PREP_DAMAGE:
+			newState.stats.takendamage = action.damage;
+			return newState;
+		case constants.DAMAGE_PLAYER:
+			let stats = Object.assign({}, newState.stats);
+			stats.currenthp -= stats.takendamage;
+			delete stats.takendamage;
+			newState.stats = stats;
+			return newState;
 		case constants.RESET:
 			return initialState().player;
 		default:

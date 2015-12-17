@@ -100,7 +100,7 @@ function attemptLookAt(input, inventory) {
 function lookAround(playerPos, map) {
 	return (dispatch)=> {
 		if (map[playerPos.y][playerPos.x].encounter) {
-			let encounter = NPCs.all[map[playerPos.y][playerPos.x].encounter];
+			let encounter = NPCs.all[map[playerPos.y][playerPos.x].encounter.id];
 			dispatch(actions.showMessage(messageGen.getEncounterMessage(encounter), 0));
 		}
 
@@ -219,6 +219,7 @@ function checkAndValidateConfirmation(input, prevInput, name, inventory) {
 					dispatch(actions.setInputExpected(constants.EXPECTING_ANYTHING));
 					break;
 				case constants.EXPECTING_RESET:
+					dispatch(actions.setInputExpected(constants.DISABLED));
 					dispatch(actions.resetGame(5000));
 					break;
 				default:
@@ -256,7 +257,7 @@ function checkAndValidateConfirmation(input, prevInput, name, inventory) {
 	}
 };
 
-function checkAndMovePlayer(input, playerPos, map) { //TODO: Possibly remove the text saying which direction you moved
+function checkAndMovePlayer(input, playerPos, map, stats, armour) { //TODO: Possibly remove the text saying which direction you moved
 	let wrongWay = messageGen.getWrongWayMessage();
 
 	let movement = { x: 0, y: 0 };
@@ -297,17 +298,83 @@ function checkAndMovePlayer(input, playerPos, map) { //TODO: Possibly remove the
 			dispatch(actions.movePlayer(movement));
 
 			if (map[playerPos.y + movement.y][playerPos.x + movement.x].encounter) {
-				let encounter = NPCs.all[map[playerPos.y + movement.y][playerPos.x + movement.x].encounter];
-				dispatch(actions.showMessage(messageGen.getEncounterMessage(encounter), 0));
-				encounter.seen = true;
+				let NPC = NPCs.all[map[playerPos.y + movement.y][playerPos.x + movement.x].encounter.id];
+				dispatch(actions.showMessage(messageGen.getEncounterMessage(NPC), 0));
+				if (NPC.hostile) {
+					dispatch(actions.setInputExpected(constants.EXPECTING_BATTLE));
+					dispatch(doEnemyAttack(NPC, stats, armour));
+				}
 			}
 		}
 	};
 
-	// TODO: things like description when entering special new area
+	//TODO: things like description when entering special new area
 };
 
-export default (input, expectedInput, prevInput, name, playerPos, inventory, map)=> { //TODO: Break stuff up!
+function doEnemyAttack(NPC, stats, armour) {
+	let damage = 10; //TODO: Create a file with algorithms for damage etc
+	return (dispatch)=> {
+		dispatch(actions.showMessage(messageGen.getEncounterEnemyAttackDamageMessage(NPC), 1000));
+		dispatch(actions.showMessage(messageGen.getPlayerDamageTakenMessage(damage), 1000));
+		dispatch(actions.damagePlayer(damage, 1000));
+		if (stats.currenthp - damage <= 0) {
+			dispatch(actions.setInputExpected(constants.DISABLED));
+			dispatch(actions.showMessage(messageGen.getPlayerDieMessage(), 2000));
+			dispatch(actions.showMessage(messageGen.getGameOverMessage(), 3000));
+			dispatch(actions.resetGame(10000));
+		}
+	};
+};
+
+function doAttack(encounter, stats, weapon, armour) {
+	let damage = 10; //TODO: Create a file with algorithms for damage etc
+	let NPC = NPCs.all[encounter.id];
+	return (dispatch)=> {
+		dispatch(actions.showMessage(messageGen.getEncounterAttackMessage(NPC, damage), 0));
+		dispatch(actions.damageNPC(damage));
+		dispatch(actions.showMessage(messageGen.getEncounterDamageTakenMessage(NPC), 0));
+		if (encounter.hp - damage > 0) {
+			dispatch(doEnemyAttack(NPC, stats, armour));
+		} else {
+			dispatch(actions.showMessage(messageGen.getEncounterWinMessage(NPC), 1000));
+			dispatch(actions.defeatEnemy(NPC));
+			dispatch(actions.setInputExpected(constants.EXPECTING_MOVEMENT));
+			//TODO: reward exp
+		}
+	};
+};
+
+function observe(encounter) {
+	let NPC = NPCs.all[encounter.id];
+	return (dispatch)=> {
+		dispatch(actions.showMessage(messageGen.getEncounterMessage(NPC), 0));
+		dispatch(actions.showMessage(messageGen.getEncounterObserveMessage(encounter), 0));
+	};
+};
+
+function checkAndPerformBattleAction(input, encounter, stats, weapon, armour) {
+	if (input.toUpperCase().indexOf("OBSERVE") > -1) {
+		return (dispatch)=> {
+			dispatch(observe(encounter));
+		};
+	} else if (input.toUpperCase().indexOf("ATTACK") > -1) {
+		return (dispatch)=> {
+			dispatch(doAttack(encounter, stats, weapon, armour));
+		};
+	} else {
+		return (dispatch)=> {
+			dispatch(actions.showMessage(messageGen.getPlayerBattleFailMessage(), 0));
+		};
+	}
+	//TODO: Add flee, use item, etc
+};
+
+export default (input, expectedInput, prevInput, playerPos, player, map)=> {
+	let name = player.name,
+		inventory = player.inventory,
+		stats = player.stats,
+		weapon = player.weapon,
+		armour = player.armour;
 	if (input.split(" ")[0].toUpperCase() === "RESET") { // If they want to give up and reset the game
 		return (dispatch)=> {
 			dispatch(actions.showMessage(messageGen.getPlayerWantResetMessage(), 0));
@@ -327,12 +394,22 @@ export default (input, expectedInput, prevInput, name, playerPos, inventory, map
 		return (dispatch)=> {
 			dispatch(lookAround(playerPos, map));
 		};
-	} else if (map[0].length > 0 && map[playerPos.y][playerPos.x].encounter) {
-		let encounter = NPCs.all[map[playerPos.y][playerPos.x].encounter];
-		if (input.toUpperCase().indexOf("TALK") > -1) {
+	} else if (map[0].length > 0 && expectedInput !== constants.EXPECTING_BATTLE && map[playerPos.y][playerPos.x].encounter) {
+		let encounter = map[playerPos.y][playerPos.x].encounter,
+			NPC = NPCs.all[encounter.id];
+		if (input.toUpperCase().indexOf("TALK") > -1 && !NPC.hostile) {
 			return (dispatch)=> {
-				dispatch(actions.showMessage(messageGen.getEncounterTalkMessage(encounter), 0));
-				dispatch(actions.showMessage(messageGen.getEncounterRandomTalkMessage(encounter), 1000));
+				dispatch(actions.showMessage(messageGen.getEncounterTalkMessage(NPC), 0));
+				dispatch(actions.showMessage(messageGen.getEncounterRandomTalkMessage(NPC), 1000));
+			};
+		} else if (input.toUpperCase().indexOf("ATTACK") > -1) {
+			return (dispatch)=> {
+				dispatch(actions.setInputExpected(constants.EXPECTING_BATTLE)); // Set to battle mode
+				dispatch(doAttack(encounter, stats, weapon, armour)); // Make the first move
+			};
+		} else if (input.toUpperCase().indexOf("OBSERVE") > -1) {
+			return (dispatch)=> {
+				dispatch(observe(encounter));
 			};
 		}
 
@@ -375,7 +452,12 @@ export default (input, expectedInput, prevInput, name, playerPos, inventory, map
 			};
 		case constants.EXPECTING_MOVEMENT:
 			return (dispatch)=> {
-				dispatch(checkAndMovePlayer(input, playerPos, map));
+				dispatch(checkAndMovePlayer(input, playerPos, map, stats, armour));
+			};
+		case constants.EXPECTING_BATTLE:
+			let encounter = map[playerPos.y][playerPos.x].encounter;
+			return (dispatch)=> {
+				dispatch(checkAndPerformBattleAction(input, encounter, stats, weapon, armour));
 			};
 		default:
 			throw new Error("Missing input case for " + expectedInput);
