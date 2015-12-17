@@ -31,7 +31,7 @@ export default ()=> { // Returns a function so it can't be modified accidentally
 			armour: null
 		},
 		world: {
-			version: "0.1.3.56",
+			version: "0.1.3.60",
 			displayMap: false,
 			map: [[]],
 			playerPos: {
