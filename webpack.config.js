@@ -32,7 +32,8 @@ var config = {
             	loader: 'json-loader'
             }
         ]
-    }
+    },
+    plugins: []
 };
 
 if (process.env.NODE_ENV === 'production') {
