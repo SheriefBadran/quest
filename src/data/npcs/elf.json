@@ -15,15 +15,19 @@
 		[ { "text": "Ow! That hurts! Why would you do that?!" } ], 
 		[ { "text": "Hey! What are you doing?!" } ], 
 		[ { "text": "Why? *sniff*"  } ]
-		],
+	],
 	"attackAction": [
 		[ { "text": "The " }, { "className": "Elf", "text": "Elf" }, { "text": " fires off a rapid barrage of arrows." } ]
 	],
 	"talk": [ 
 		[ { "text": "You again? What do you want?" } ],
 		[ { "text": "I have no interest in talking with you." } ]
-		],
+	],
 	"flee": [ 
 		[ { "text": "That's right! You can't take me!" } ]
-		]
+	],
+	"defeated": [
+		[ { "text": "Giving you one last hate-filled look, the " }, { "className": "Elf", "text": "Elf" }, { "text": " collapses to the ground, defeated." } ]
+	]
+
 }

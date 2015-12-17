@@ -17,8 +17,11 @@
 	],
 	"attacked": [ 
 		[ { "text": "..." } ]
-		],
+	],
 	"flee": [ 
 		[ { "text": "Rargh" } ]
-		]
+	],
+	"defeated": [
+		[ { "text": "With a soft whimper, the " }, { "className": "Goblin", "text": "Goblin" }, { "text": " falls dead." } ]
+	]
 }
