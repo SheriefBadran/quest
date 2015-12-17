@@ -10,6 +10,8 @@ import { Provider } from "react-redux";
 import store from "./store";
 import routes from "./routes";
 
+const styles = require("./css/custom.css");
+
 ReactDOM.render(
 	<Provider store={store}>
 		<Router routes={routes}/>

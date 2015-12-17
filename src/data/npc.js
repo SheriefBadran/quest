@@ -10,7 +10,7 @@ let NPCs = {
 	}
 }
 
-NPCs.all = Object.assign(NPCs.random); // Copy all he NPCs to the all category
+NPCs.all = Object.assign(NPCs.random); // Copy all the NPCs to the all category
 
 NPCs.all = _.reduce(NPCs.all, (ret, data, id)=> {
 	ret[id].id = id; // Add an id corresponding to the key to each NPC
