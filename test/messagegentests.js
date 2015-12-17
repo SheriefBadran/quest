@@ -23,6 +23,7 @@ describe("messageGen", ()=> {
 		}
 
 		expect(stub.callCount).to.equal(3);
+		stub.restore();
 	});
 	it("should log to console and return a message when a confirm message case is missing", ()=> {
 		sinon.spy(console, "log");

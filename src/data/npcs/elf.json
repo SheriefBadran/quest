@@ -19,6 +19,9 @@
 	"attackAction": [
 		[ { "text": "The " }, { "className": "Elf", "text": "Elf" }, { "text": " fires off a rapid barrage of arrows." } ]
 	],
+	"miss": [
+		[ { "text": "The " }, { "className": "Elf", "text": "Elf" }, { "text": " feels a moment of pity for you and her barrage goes astray."} ]
+	],
 	"talk": [ 
 		[ { "text": "You again? What do you want?" } ],
 		[ { "text": "I have no interest in talking with you." } ]

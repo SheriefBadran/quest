@@ -8,6 +8,8 @@ import Weapons from "./data/weapon";
 import Items from "./data/item";
 import MapGen from "./components/mapgen";
 import NPCs from "./data/npc";
+import algorithms from "./algorithms";
+import _ from "lodash";
 
 function checkAndSetName(input) {
 	// Validate the length of the name
@@ -257,7 +259,7 @@ function checkAndValidateConfirmation(input, prevInput, name, inventory) {
 	}
 };
 
-function checkAndMovePlayer(input, playerPos, map, stats, armour) { //TODO: Possibly remove the text saying which direction you moved
+function checkAndMovePlayer(input, playerPos, map, stats, weapon, armour) { //TODO: Possibly remove the text saying which direction you moved
 	let wrongWay = messageGen.getWrongWayMessage();
 
 	let movement = { x: 0, y: 0 };
@@ -297,12 +299,14 @@ function checkAndMovePlayer(input, playerPos, map, stats, armour) { //TODO: Poss
 		if (movement.x !== 0 || movement.y !== 0 ) {
 			dispatch(actions.movePlayer(movement));
 
+			//TODO: Randomly spawn encounters on a tile if there isn't already an encounter
+
 			if (map[playerPos.y + movement.y][playerPos.x + movement.x].encounter) {
 				let NPC = NPCs.all[map[playerPos.y + movement.y][playerPos.x + movement.x].encounter.id];
 				dispatch(actions.showMessage(messageGen.getEncounterMessage(NPC), 0));
 				if (NPC.hostile) {
 					dispatch(actions.setInputExpected(constants.EXPECTING_BATTLE));
-					dispatch(doEnemyAttack(NPC, stats, armour));
+					dispatch(doEnemyAttack(NPC, stats, weapon, armour));
 				}
 			}
 		}
@@ -311,35 +315,74 @@ function checkAndMovePlayer(input, playerPos, map, stats, armour) { //TODO: Poss
 	//TODO: things like description when entering special new area
 };
 
-function doEnemyAttack(NPC, stats, armour) {
-	let damage = 10; //TODO: Create a file with algorithms for damage etc
+function doEnemyAttack(NPC, stats, weapon, armour) {
+	let augmentedStats = Object.assign({}, stats);
+	augmentedStats = _.reduce(augmentedStats, (ret, data, id)=> {
+		if (armour) {
+			if (armour.stats[id] > 0) {
+				ret[id] += armour.stats[id];
+			}
+		}
+		if (weapon) {
+			if (weapon.stats[id] > 0) {
+				ret[id] += weapon.stats[id];
+			}
+		}
+		return ret;
+	}, augmentedStats);
+	let damage = algorithms.calculatePhysicalDamage(NPC.stats, augmentedStats);
+	let playerKilled = (stats.currenthp - damage) <= 0;
 	return (dispatch)=> {
-		dispatch(actions.showMessage(messageGen.getEncounterEnemyAttackDamageMessage(NPC), 1000));
-		dispatch(actions.showMessage(messageGen.getPlayerDamageTakenMessage(damage), 1000));
-		dispatch(actions.damagePlayer(damage, 1000));
-		if (stats.currenthp - damage <= 0) {
-			dispatch(actions.setInputExpected(constants.DISABLED));
-			dispatch(actions.showMessage(messageGen.getPlayerDieMessage(), 2000));
-			dispatch(actions.showMessage(messageGen.getGameOverMessage(), 3000));
-			dispatch(actions.resetGame(10000));
+		if (damage >= 0) {
+			dispatch(actions.showMessage(messageGen.getEncounterEnemyAttackDamageMessage(NPC), 1000));
+			dispatch(actions.showMessage(messageGen.getPlayerDamageTakenMessage(damage), 1000));
+			dispatch(actions.damagePlayer(damage, 1000));
+			if (playerKilled) {
+				dispatch(actions.setInputExpected(constants.DISABLED));
+				dispatch(actions.showMessage(messageGen.getPlayerDieMessage(), 2000));
+				dispatch(actions.showMessage(messageGen.getGameOverMessage(), 3000));
+				dispatch(actions.resetGame(10000));
+			}
+		} else {
+			dispatch(actions.showMessage(messageGen.getEncounterMissMessage(NPC), 1000));
 		}
 	};
 };
 
 function doAttack(encounter, stats, weapon, armour) {
-	let damage = 10; //TODO: Create a file with algorithms for damage etc
 	let NPC = NPCs.all[encounter.id];
+	let augmentedStats = Object.assign({}, stats);
+	augmentedStats = _.reduce(augmentedStats, (ret, data, id)=> {
+		if (armour) {
+			if (armour.stats[id] > 0) {
+				ret[id] += armour.stats[id];
+			}
+		}
+		if (weapon) {
+			if (weapon.stats[id] > 0) {
+				ret[id] += weapon.stats[id];
+			}
+		}
+		return ret;
+	}, augmentedStats);
+	let damage = algorithms.calculatePhysicalDamage(augmentedStats, NPC.stats);
+
+	let enemyAlive = (encounter.hp - damage) > 0;
 	return (dispatch)=> {
-		dispatch(actions.showMessage(messageGen.getEncounterAttackMessage(NPC, damage), 0));
-		dispatch(actions.damageNPC(damage));
-		dispatch(actions.showMessage(messageGen.getEncounterDamageTakenMessage(NPC), 0));
-		if (encounter.hp - damage > 0) {
-			dispatch(doEnemyAttack(NPC, stats, armour));
+		if (damage >= 0) {
+			dispatch(actions.showMessage(messageGen.getEncounterAttackMessage(NPC, damage), 0));
+			dispatch(actions.damageNPC(damage));
+			dispatch(actions.showMessage(messageGen.getEncounterDamageTakenMessage(NPC), 0));
+		} else {
+			dispatch(actions.showMessage(messageGen.getPlayerMissMessage(), 0));
+		}
+		if (enemyAlive) {
+			dispatch(doEnemyAttack(NPC, stats, weapon, armour));
 		} else {
 			dispatch(actions.showMessage(messageGen.getEncounterWinMessage(NPC), 1000));
 			dispatch(actions.defeatEnemy(NPC));
 			dispatch(actions.setInputExpected(constants.EXPECTING_MOVEMENT));
-			//TODO: reward exp
+			//TODO: reward exp and items (possible items should be specified in the NPC json)
 		}
 	};
 };
@@ -452,7 +495,7 @@ export default (input, expectedInput, prevInput, playerPos, player, map)=> {
 			};
 		case constants.EXPECTING_MOVEMENT:
 			return (dispatch)=> {
-				dispatch(checkAndMovePlayer(input, playerPos, map, stats, armour));
+				dispatch(checkAndMovePlayer(input, playerPos, map, stats, weapon, armour));
 			};
 		case constants.EXPECTING_BATTLE:
 			let encounter = map[playerPos.y][playerPos.x].encounter;

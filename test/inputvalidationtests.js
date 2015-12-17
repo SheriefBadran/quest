@@ -13,6 +13,7 @@ import NPCs from "./../src/data/npc";
 import Weapons from "./../src/data/weapon";
 import Items from "./../src/data/item";
 import MapGen from "./../src/components/mapgen";
+import algorithms from "./../src/algorithms";
 import sinon from "sinon";
 
 function mockStore(getState, expectedActions, done) {
@@ -868,13 +869,15 @@ describe("input validation: move player", ()=> {
 		done();
 	});
 	it("should react correctly when moving to a tile with a hostile encounter", (done)=> {
-		const player = { name: "Test", inventory: [], stats: { hp: 100 }, weapon: null, armour: null };
+		const player = { name: "Test", inventory: [], stats: { hp: 100, str: 1, def: 1, mag: 1, dex: 1 }, weapon: null, armour: null };
 		const tile = { description: "Grassy" };
 		const encounter = { description: "Stony", encounter: { id: "goblin" } };
 		const playerPos = { x: 1, y: 2 };
 		const map = [ [ tile, tile, tile ], [ tile, encounter, tile ], [ tile, tile, tile ] ];
 		const movement = { x: 0, y: -1 };
-		const damage = 10; //TODO: This will not work with damage algorithms and will need a stub of Math.random
+		let stub = sinon.stub(algorithms, "calculatePhysicalDamage");
+		stub.returns(1);
+		const damage = algorithms.calculatePhysicalDamage(player.stats, NPCs.all[encounter.encounter.id].stats);
 		const expectedActions = [
 			{ type: constants.QUEUE_MESSAGE },
 			{ type: constants.MOVE, movement: movement },
@@ -889,10 +892,17 @@ describe("input validation: move player", ()=> {
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
+		stub.restore();
 		done();
 	});
 });
 describe("input validation: encounter", ()=> {
+	beforeEach(function() {
+		this.sinon = sinon.sandbox.create();
+	});
+	afterEach(function(){
+		this.sinon.restore();
+	});
 	it("should react correctly when using 'talk' in a tile with an encounter", (done)=> {
 		const player = { name: "Test", inventory: [], stats: {}, weapon: null, armour: null };
 		const tile = { description: "Grassy" };
@@ -954,12 +964,14 @@ describe("input validation: encounter", ()=> {
 		done();
 	});
 	it("should react correctly when using an initial 'attack' in a tile with a non hostile encounter", (done)=> {
-		const player = { name: "Test", inventory: [], stats: {}, weapon: null, armour: null };
+		const player = { name: "Test", inventory: [], stats: { str: 1, def: 1, mag: 1, dex: 1 }, weapon: null, armour: null };
 		const tile = { description: "Grassy" };
 		const encounter = { description: "Stony", encounter: { id: "elf", hp: 3000 } };
 		const playerPos = { x: 1, y: 1 };
 		const map = [ [ tile, tile, tile ], [ tile, encounter, tile ], [ tile, tile, tile ] ];
-		const damage = 10; //TODO: This will not work with damage algorithms and will need a stub of Math.random
+		let stub = sinon.stub(algorithms, "calculatePhysicalDamage");
+		stub.returns(1);
+		const damage = algorithms.calculatePhysicalDamage(player.stats, NPCs.all[encounter.encounter.id].stats);
 		const expectedActions = [
 			{ type: constants.SET_INPUT, input: constants.EXPECTING_BATTLE },
 			{ type: constants.QUEUE_MESSAGE },
@@ -974,6 +986,7 @@ describe("input validation: encounter", ()=> {
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
+		stub.restore();
 		done();
 	});
 	it("should react correctly when using 'attack' in a tile with no encounter", (done)=> {
@@ -991,13 +1004,18 @@ describe("input validation: encounter", ()=> {
 	});
 });
 describe("input validation: battle", ()=> {
+	beforeEach(function() {
+		this.sinon = sinon.sandbox.create();
+	});
+	afterEach(function(){
+		this.sinon.restore();
+	});
 	it("should react correctly to using 'observe' during a battle", (done)=> {
 		const player = { name: "Test", inventory: [], stats: {}, weapon: null, armour: null };
 		const tile = { description: "Grassy" };
 		const encounter = { description: "Stony", encounter: { id: "elf", hp: 3000 } };
 		const playerPos = { x: 1, y: 1 };
 		const map = [ [ tile, tile, tile ], [ tile, encounter, tile ], [ tile, tile, tile ] ];
-		const damage = 10; //TODO: This will not work with damage algorithms and will need a stub of Math.random
 		const expectedActions = [
 			{ type: constants.QUEUE_MESSAGE },
 			{ type: constants.QUEUE_MESSAGE }
@@ -1010,12 +1028,11 @@ describe("input validation: battle", ()=> {
 		done();
 	});
 	it("should react correctly to unexpected input during a battle", (done)=> {
-		const player = { name: "Test", inventory: [], stats: {}, weapon: null, armour: null };
+		const player = { name: "Test", inventory: [], stats: { }, weapon: null, armour: null };
 		const tile = { description: "Grassy" };
 		const encounter = { description: "Stony", encounter: { id: "elf", hp: 3000 } };
 		const playerPos = { x: 1, y: 1 };
 		const map = [ [ tile, tile, tile ], [ tile, encounter, tile ], [ tile, tile, tile ] ];
-		const damage = 10; //TODO: This will not work with damage algorithms and will need a stub of Math.random
 		const expectedActions = [
 			{ type: constants.QUEUE_MESSAGE }
 		];
@@ -1027,12 +1044,14 @@ describe("input validation: battle", ()=> {
 		done();
 	});
 	it("should react correctly when using a 'attack' during battle", (done)=> {
-		const player = { name: "Test", inventory: [], stats: {}, weapon: null, armour: null };
+		const player = { name: "Test", inventory: [], stats: { str: 1, def: 1, mag: 1, dex: 1 }, weapon: { stats: { str: 4, dex: 3 } }, armour: { stats: { def: 4 } } };
 		const tile = { description: "Grassy" };
 		const encounter = { description: "Stony", encounter: { id: "elf", hp: 3000 } };
 		const playerPos = { x: 1, y: 1 };
 		const map = [ [ tile, tile, tile ], [ tile, encounter, tile ], [ tile, tile, tile ] ];
-		const damage = 10; //TODO: This will not work with damage algorithms and will need a stub of Math.random
+		let stub = sinon.stub(algorithms, "calculatePhysicalDamage");
+		stub.returns(1);
+		const damage = algorithms.calculatePhysicalDamage(player.stats, NPCs.all[encounter.encounter.id].stats);
 		const expectedActions = [
 			{ type: constants.QUEUE_MESSAGE },
 			{ type: constants.DAMAGE_NPC, damage: damage },
@@ -1046,16 +1065,19 @@ describe("input validation: battle", ()=> {
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
+		stub.restore();
 		done();
 	});
 	it("should react correctly when dealing a killing blow to an NPC", (done)=> {
-		const player = { name: "Test", inventory: [], stats: {}, weapon: null, armour: null };
+		const player = { name: "Test", inventory: [], stats: { str: 1, def: 1, mag: 1, dex: 1 }, weapon: { stats: { str: 4, dex: 3 } }, armour: null };
 		const tile = { description: "Grassy" };
 		const encounter = { description: "Stony", encounter: { id: "elf", hp: 5 } };
 		const NPC = NPCs.all[encounter.encounter.id];
 		const playerPos = { x: 1, y: 1 };
 		const map = [ [ tile, tile, tile ], [ tile, encounter, tile ], [ tile, tile, tile ] ];
-		const damage = 10; //TODO: This will not work with damage algorithms and will need a stub of Math.random
+		let stub = sinon.stub(algorithms, "calculatePhysicalDamage");
+		stub.returns(5);
+		const damage = algorithms.calculatePhysicalDamage(player.stats, NPCs.all[encounter.encounter.id].stats);
 		const expectedActions = [
 			{ type: constants.QUEUE_MESSAGE },
 			{ type: constants.DAMAGE_NPC, damage: damage },
@@ -1069,15 +1091,18 @@ describe("input validation: battle", ()=> {
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
+		stub.restore();
 		done();
 	});
 	it("should react correctly when an NPC deals a killing blow to the player", (done)=> {
-		const player = { name: "Test", inventory: [], stats: { currenthp: 5 }, weapon: null, armour: null };
+		const player = { name: "Test", inventory: [], stats: { currenthp: 5, str: 1, def: 1, mag: 1, dex: 1 }, weapon: { stats: { str: 5 } }, armour: null };
 		const tile = { description: "Grassy" };
 		const encounter = { description: "Stony", encounter: { id: "elf", hp: 3000 } };
 		const playerPos = { x: 1, y: 1 };
 		const map = [ [ tile, tile, tile ], [ tile, encounter, tile ], [ tile, tile, tile ] ];
-		const damage = 10; //TODO: This will not work with damage algorithms and will need a stub of Math.random
+		let stub = sinon.stub(algorithms, "calculatePhysicalDamage");
+		stub.returns(5);
+		const damage = algorithms.calculatePhysicalDamage(player.stats, NPCs.all[encounter.encounter.id].stats);
 		const expectedActions = [
 			{ type: constants.QUEUE_MESSAGE },
 			{ type: constants.DAMAGE_NPC, damage: damage },
@@ -1095,6 +1120,28 @@ describe("input validation: battle", ()=> {
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
+		stub.restore();
+		done();
+	});
+	it("should react correctly if attacks miss", (done)=> {
+		const player = { name: "Test", inventory: [], stats: { str: 1, def: 1, mag: 1, dex: 1 }, weapon: null, armour: null };
+		const tile = { description: "Grassy" };
+		const encounter = { description: "Stony", encounter: { id: "elf", hp: 3000 } };
+		const playerPos = { x: 1, y: 1 };
+		const map = [ [ tile, tile, tile ], [ tile, encounter, tile ], [ tile, tile, tile ] ];
+		let stub = sinon.stub(algorithms, "calculatePhysicalDamage");
+		stub.returns(-1);
+		const damage = algorithms.calculatePhysicalDamage(player.stats, NPCs.all[encounter.encounter.id].stats);
+		const expectedActions = [
+			{ type: constants.QUEUE_MESSAGE },
+			{ type: constants.QUEUE_MESSAGE }
+		];
+		const store = mockStore({}, expectedActions, done);
+		store.dispatch(inputvalidation("attack", constants.EXPECTING_BATTLE, constants.EXPECTING_MOVEMENT, playerPos, player, map));
+		if (expectedActions.length > 0) {
+			throw new Error("Last " + expectedActions.length + " actions not dispatched");
+		}
+		stub.restore();
 		done();
 	});
 });
