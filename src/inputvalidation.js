@@ -9,7 +9,9 @@ import Items from "./data/item";
 import MapGen from "./components/mapgen";
 import NPCs from "./data/npc";
 import algorithms from "./algorithms";
+import {readInputAndGetRequestedItemFrom} from "./utils/inputValidationHelpers";
 import _ from "lodash";
+import R from "ramda";
 
 function checkAndSetName(input) {
 	// Validate the length of the name
@@ -30,46 +32,17 @@ function checkAndSetName(input) {
 	}
 };
 
-function getRequestedItem(itemName, inventory) {
-	let requestedItem = null;
-	inventory.forEach(function(item) {
-		if (item.name.toUpperCase() === itemName.toUpperCase()) {
-			requestedItem = item;
-		}
-	}.bind(this));
-	return requestedItem;
+const getRequestedItem = (itemName, inventory) => {
+	return inventory.find(item => item.name.toUpperCase() === itemName.toUpperCase());
 };
 
 function attemptEquip(input, inventory) {
-	input = input.split(" ");
-
-	if (input.length > 1) {
-
-		let itemName = input[1];
-		for (let i = 2; i < input.length; ++i) {
-			itemName += " " + input[i];
-		}
-
-		let requestedItem = getRequestedItem(itemName, inventory);
-
-		if (requestedItem) {
-			if (requestedItem.equippable) {
-				return (dispatch)=> {
-					dispatch(actions.equipItem(requestedItem));
-					dispatch(actions.showMessage(messageGen.getEquipMessage(requestedItem), 0));
-				};
-			} else {
-				return (dispatch)=> {
-					dispatch(actions.showMessage(messageGen.getCannotBeEquippedMessage(requestedItem), 0));
-				};
-			}
-		} else {
-			return (dispatch)=> {
-				dispatch(actions.showMessage(messageGen.getNoSuchItemMessage(itemName), 0));
-			};
-		}
+	if (input.split(' ').length > 1) {
+		const getRequestedItem = readInputAndGetRequestedItemFrom(inventory, actions, messageGen);
+		const dispatchable = getRequestedItem(input);
+		return dispatchable;
 	}
-	return (dispatch)=> {};
+	return (dispatch) => {};
 };
 
 function attemptLookAt(input, inventory) {
