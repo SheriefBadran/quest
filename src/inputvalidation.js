@@ -1,6 +1,7 @@
 // Used by playerbar.js for input validation and mapping to action dispatch
 
 import constants from "./constants";
+import {attemptTypes} from "./utils/enum";
 import actions from "./actions";
 import messageGen from "./components/messagegen";
 import Classes from "./data/class";
@@ -9,7 +10,7 @@ import Items from "./data/item";
 import MapGen from "./components/mapgen";
 import NPCs from "./data/npc";
 import algorithms from "./algorithms";
-import {readInputAndGetRequestedItemFrom} from "./utils/inputValidationHelpers";
+import {readInputAndCreateDispatchable} from "./utils/inputValidationHelpers";
 import _ from "lodash";
 import R from "ramda";
 
@@ -32,44 +33,10 @@ function checkAndSetName(input) {
 	}
 };
 
-const getRequestedItem = (itemName, inventory) => {
-	return inventory.find(item => item.name.toUpperCase() === itemName.toUpperCase());
-};
-
-function attemptEquip(input, inventory) {
-	if (input.split(' ').length > 1) {
-		const getRequestedItem = readInputAndGetRequestedItemFrom(inventory, actions, messageGen);
+function runAttempt(input, inventory, attemptType) {
+		const getRequestedItem = readInputAndCreateDispatchable(inventory, attemptTypes, attemptType, actions, messageGen);
 		const dispatchable = getRequestedItem(input);
 		return dispatchable;
-	}
-	return (dispatch) => {};
-};
-
-function attemptLookAt(input, inventory) {
-	input = input.split(" ");
-
-	if (input.length > 2) {
-		let itemName = input[2];
-		for (let i = 3; i < input.length; ++i) {
-			itemName += " " + input[i];
-		}
-
-		let requestedItem = getRequestedItem(itemName, inventory);
-
-		if (requestedItem) {
-			return (dispatch)=> {
-				dispatch(actions.showMessage(messageGen.getLookAtItemMessage(requestedItem), 0));
-				if (requestedItem.equippable) {
-					dispatch(actions.showMessage(messageGen.getItemStatsMessage(requestedItem), 0));
-				}
-			};
-		} else {
-			return (dispatch)=> {
-				dispatch(actions.showMessage(messageGen.getNoSuchItemMessage(itemName), 0));
-			}
-		}
-	}
-	return (dispatch)=> {};
 };
 
 function lookAround(playerPos, map) {
@@ -400,11 +367,11 @@ export default (input, expectedInput, prevInput, playerPos, player, map)=> {
 		};
 	} else if (input.split(" ")[0].toUpperCase() === "EQUIP" && inventory.length > 0) {	// If they're looking to equip and have an inventory
 		return (dispatch)=> {
-			dispatch(attemptEquip(input, inventory));
+			dispatch(runAttempt(input, inventory, attemptTypes.equip));
 		};
 	} else if (input.toUpperCase().indexOf("LOOK AT") > -1 && inventory.length > 0) { // If they want to look at an item and have an inventory
 		return (dispatch)=> {
-			dispatch(attemptLookAt(input, inventory));
+			dispatch(runAttempt(input, inventory, attemptTypes.lookAt));
 		};
 	} else if (input.toUpperCase().indexOf("LOOK AROUND") > -1 && expectedInput === constants.EXPECTING_MOVEMENT) { // If they want to look around
 		return (dispatch)=> {
