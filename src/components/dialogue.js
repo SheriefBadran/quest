@@ -15,7 +15,7 @@ let Dialogue = (props)=> {
 
 	// Build the line out of the provided parts in order to allow for word-specific styling
 	let line = props.line.map(
-		(part,id)=> <span className={part.className} key={id}>{part.text}</span>
+		(part,id)=> <span className={part.className} key={id}>{(part.text) ? part.text : part}</span>
 	);
 
 	// Return a row with displayname and the built line

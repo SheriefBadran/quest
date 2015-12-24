@@ -8,7 +8,8 @@ let HelpList = [
 	require("./helpitems/east.json"),
 	require("./helpitems/south.json"),
 	require("./helpitems/west.json"),
-	require("./helpitems/lookaround.json")
+	require("./helpitems/lookaround.json"),
+	require("./helpitems/observe.json")
 	];
 
 
