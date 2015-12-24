@@ -1,4 +1,4 @@
-import constants from "./../constants";
+import constants from "./../constants"; //TODO: Allow display to accept strings so that entire with just "text": "stuff" can be string instead.
 
 export default {
 	getErrorOccurredMessage() {

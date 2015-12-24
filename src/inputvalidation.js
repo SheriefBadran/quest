@@ -1,4 +1,6 @@
 // Used by playerbar.js for input validation and mapping to action dispatch
+//TODO: Add actions to item/weapons so that you can use bash/whirl/etc for a mace (or other weapon) instead of just "attack" - i.e. abilities tied to weapons instead
+//TODO: Refactor main export so that the switch and if are less clash-y
 
 import constants from "./constants";
 import actions from "./actions";
