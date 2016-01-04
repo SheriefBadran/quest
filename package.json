@@ -52,6 +52,7 @@
     "url": "git+https://github.com/MoombaDS/quest.git"
   },
   "dependencies": {
-    "ramda": "^0.18.0"
+    "ramda": "^0.18.0",
+    "rx": "^4.0.7"
   }
 }

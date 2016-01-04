@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import constants from "./../constants";
 import { Input } from "react-bootstrap";
 import inputvalidation from "./../inputvalidation";
+import Rx from "rx";
 
 let proptypes = React.PropTypes;
 
@@ -33,14 +34,14 @@ let PlayerBar = React.createClass({
 	},
 	render() {
 		return (
-			<Input 
-				disabled={this.props.input === constants.DISABLED} 
-				onChange={this.handleChange} 
-				onKeyDown={this.handleSubmit} 
-				placeholder="Type here!" 
-				ref="input" 
+			<Input
+				disabled={this.props.input === constants.DISABLED}
+				onChange={this.handleChange}
+				onKeyDown={this.handleSubmit}
+				placeholder="Type here!"
+				ref="input"
 				type="text"
-				value={this.state.text} 
+				value={this.state.text}
 				/>
 		);
 	}
