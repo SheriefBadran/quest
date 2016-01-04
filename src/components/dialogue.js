@@ -8,14 +8,16 @@ let proptypes = React.PropTypes;
 let Dialogue = (props)=> {
 
 	// Figure out what name to display, if any
-	let displayname = 
+	let displayname =
 		props.speaker === "Player" ? props.playername + ": "
 		: props.speaker === "Narrator" ? ""
 		: props.speaker + ": ";
 
 	// Build the line out of the provided parts in order to allow for word-specific styling
-	let line = props.line.map(
-		(part,id)=> <span className={part.className} key={id}>{(part.text) ? part.text : part}</span>
+	let line = props.line.map((part,id) =>
+		part.hasOwnProperty("className") ?
+			<span className={part.className} key={id}>{(part.hasOwnProperty("text")) ? part.text : part}</span> :
+			<span key={id}>{(part.hasOwnProperty("text")) ? part.text : part}</span>
 	);
 
 	// Return a row with displayname and the built line
