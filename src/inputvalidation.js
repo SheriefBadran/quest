@@ -12,7 +12,14 @@ import Items from "./data/item";
 import MapGen from "./components/mapgen";
 import NPCs from "./data/npc";
 import algorithms from "./algorithms";
-import {readInputAndCreateDispatchable} from "./utils/inputValidationHelpers";
+import {
+	readInputAndCreateDispatchable,
+	observeEquip,
+	observeReset,
+	observeLookAt,
+	observeLookAround
+} from "./utils/inputValidationHelpers";
+import Rx from 'rx';
 import _ from "lodash";
 import R from "ramda";
 
@@ -35,11 +42,11 @@ function checkAndSetName(input) {
 	}
 };
 
-function runAttempt(input, inventory, attemptType) {
+const runAttempt = R.curry((attemptType, inventory, attemptTypes, actions, messageGen, input) => {
 		const getRequestedItem = readInputAndCreateDispatchable(inventory, attemptTypes, attemptType, actions, messageGen);
 		const dispatchable = getRequestedItem(input);
 		return dispatchable;
-};
+});
 
 function lookAround(playerPos, map) {
 	return (dispatch)=> {
@@ -354,32 +361,30 @@ function checkAndPerformBattleAction(input, encounter, stats, weapon, armour) {
 	//TODO: Add flee, use item, etc
 };
 
-export default (input, expectedInput, prevInput, playerPos, player, map)=> {
+export default (input, expectedInput, prevInput, playerPos, player, map, dispatch)=> {
+	const attemptEquip = runAttempt(attemptTypes.equip, player.inventory, attemptTypes, actions, messageGen);
+	const attemptLookAt = runAttempt(attemptTypes.lookAt, player.inventory, attemptTypes, actions, messageGen);
+
+	let submitObservable = Rx.Observable.create(observer => {
+		observer.onNext(input);
+	});
+
+	let equipObservable = observeEquip(player.inventory, attemptEquip, submitObservable);
+	let resetObservable = observeReset(constants, actions, messageGen, submitObservable);
+	let lookAtObservable = observeLookAt(player.inventory, attemptLookAt, submitObservable);
+	let lookAroundObservable = observeLookAround(constants, expectedInput, playerPos, map, lookAround, submitObservable);
+
+	// Omit the subscribe here and return the merged streams to playerbar.js, subscribe over there and dispatch.
+	Rx.Observable
+		.merge(equipObservable, resetObservable, lookAtObservable, lookAroundObservable)
+		.subscribe(dispatchable => dispatch(dispatchable));
+
 	let name = player.name,
 		inventory = player.inventory,
 		stats = player.stats,
 		weapon = player.weapon,
 		armour = player.armour;
-	if (input.split(" ")[0].toUpperCase() === "RESET") { // If they want to give up and reset the game
-		return (dispatch)=> {
-			dispatch(actions.showMessage(messageGen.getPlayerWantResetMessage(), 0));
-			dispatch(actions.showMessage(messageGen.getResetMessage(name), 1000));
-			dispatch(actions.setInputExpected(constants.EXPECTING_RESET));
-			dispatch(actions.setInputExpected(constants.EXPECTING_CONF));
-		};
-	} else if (input.split(" ")[0].toUpperCase() === "EQUIP" && inventory.length > 0) {	// If they're looking to equip and have an inventory
-		return (dispatch)=> {
-			dispatch(runAttempt(input, inventory, attemptTypes.equip));
-		};
-	} else if (input.toUpperCase().indexOf("LOOK AT") > -1 && inventory.length > 0) { // If they want to look at an item and have an inventory
-		return (dispatch)=> {
-			dispatch(runAttempt(input, inventory, attemptTypes.lookAt));
-		};
-	} else if (input.toUpperCase().indexOf("LOOK AROUND") > -1 && expectedInput === constants.EXPECTING_MOVEMENT) { // If they want to look around
-		return (dispatch)=> {
-			dispatch(lookAround(playerPos, map));
-		};
-	} else if (map[0].length > 0 && expectedInput !== constants.EXPECTING_BATTLE && map[playerPos.y][playerPos.x].encounter) {
+	if (map[0].length > 0 && expectedInput !== constants.EXPECTING_BATTLE && map[playerPos.y][playerPos.x].encounter) {
 		let encounter = map[playerPos.y][playerPos.x].encounter,
 			NPC = NPCs.all[encounter.id];
 		if (input.toUpperCase().indexOf("TALK") > -1 && !NPC.hostile) {
@@ -397,8 +402,6 @@ export default (input, expectedInput, prevInput, playerPos, player, map)=> {
 				dispatch(observe(encounter));
 			};
 		}
-
-
 		//TODO: Encounter stuff!
 	}
 	switch (expectedInput) {

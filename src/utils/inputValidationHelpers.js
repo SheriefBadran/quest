@@ -60,3 +60,55 @@ export const readInputAndCreateDispatchable = (list, attemptTypes, attemptType, 
         refineInput(attemptType)
     );
 };
+
+const firstWordOf = (string) => R.compose(R.head, R.split(' '))(string);
+
+// TODO: Make those funcs into one, also taking a predicates object containing the predicates and a collection of dispatchables.
+// Also send along an enum with types (e.g. 'equip', 'lookAt') so the function knows who it is and what dispatch to return.
+export const observeEquip = (inventory, f, observable) => {
+	const filterEquips = string => firstWordOf(string).toUpperCase() === 'EQUIP' && inventory.length > 0;
+	const equipFilter = R.filter(filterEquips);
+	return equipFilter(observable)
+		.map(input => {
+			return (dispatch) => {
+				dispatch(f(input));
+			};
+		});
+};
+
+export const observeLookAt = (inventory, f, observable) => {
+	const filterLookAt = string => string.toUpperCase().includes('LOOK AT') && inventory.length > 0;
+	const lookAtFilter = R.filter(filterLookAt);
+	return lookAtFilter(observable)
+		.map(input => {
+			return (dispatch) => {
+				dispatch(f(input));
+			};
+		});
+};
+
+export const observeLookAround = (constants, expectedInput, playerPos, map, f, observable) => {
+	const filterLookAround = string => string.toUpperCase().includes('LOOK AROUND')
+										&& expectedInput === constants.EXPECTING_MOVEMENT;
+	const lookAroundFilter = R.filter(filterLookAround);
+	return lookAroundFilter(observable)
+		.map(_ => {
+			return (dispatch)=> {
+				dispatch(f(playerPos, map));
+			};
+		});
+};
+
+export const observeReset = (constants, actions, messageGen, observable) => {
+	const filterResets = string => firstWordOf(string).toUpperCase() === 'RESET';
+	const resetFilter = R.filter(filterResets);
+	return resetFilter(observable)
+		.map(input => {
+			return (dispatch) => {
+				dispatch(actions.showMessage(messageGen.getPlayerWantResetMessage(), 0));
+				dispatch(actions.showMessage(messageGen.getResetMessage(name), 1000));
+				dispatch(actions.setInputExpected(constants.EXPECTING_RESET));
+				dispatch(actions.setInputExpected(constants.EXPECTING_CONF));
+			};
+		});
+};

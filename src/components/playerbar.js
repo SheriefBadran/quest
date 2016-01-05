@@ -4,7 +4,6 @@ import { connect } from "react-redux";
 import constants from "./../constants";
 import { Input } from "react-bootstrap";
 import inputvalidation from "./../inputvalidation";
-import Rx from "rx";
 
 let proptypes = React.PropTypes;
 
@@ -55,7 +54,7 @@ let mapStateToProps = (state)=> {
 let mapDispatchToProps = (dispatch)=> {
 	return {
 		validateInput(input, expectedInput, prevInput, playerPos, player, map) {
-			dispatch(inputvalidation(input, expectedInput, prevInput, playerPos, player, map));
+			dispatch(inputvalidation(input, expectedInput, prevInput, playerPos, player, map, dispatch));
 		}
 	};
 };
