@@ -63,52 +63,62 @@ export const readInputAndCreateDispatchable = (list, attemptTypes, attemptType, 
 
 const firstWordOf = (string) => R.compose(R.head, R.split(' '))(string);
 
-// TODO: Make those funcs into one, also taking a predicates object containing the predicates and a collection of dispatchables.
-// Also send along an enum with types (e.g. 'equip', 'lookAt') so the function knows who it is and what dispatch to return.
-export const observeEquip = (inventory, f, observable) => {
-	const filterEquips = string => firstWordOf(string).toUpperCase() === 'EQUIP' && inventory.length > 0;
-	const equipFilter = R.filter(filterEquips);
-	return equipFilter(observable)
+export const observeCommand = R.curry((commandType, f, predicateFunction, getDispatchableFor, observable) => {
+	const filter = R.filter(predicateFunction);
+	return filter(observable)
 		.map(input => {
+			let dispatchables = getDispatchableFor(f, input);
+			return dispatchables[commandType]();
+		});
+});
+
+export const generateDispatchable = R.curry((constants, actions, messageGen, player,
+	playerPos, map, encounter, NPC, f, input = R.empty('')) => {
+	const {
+		EQUIP:equip,
+		LOOK_AT:lookAt,
+		LOOK_AROUND:lookAround,
+		RESET:reset, TALK:talk,
+		ATTACK:attack,
+		OBSERVE:observe,
+		EXPECTING_BATTLE
+	} = constants;
+
+	return Object.freeze({
+		[equip]: () => {
 			return (dispatch) => {
 				dispatch(f(input));
 			};
-		});
-};
-
-export const observeLookAt = (inventory, f, observable) => {
-	const filterLookAt = string => string.toUpperCase().includes('LOOK AT') && inventory.length > 0;
-	const lookAtFilter = R.filter(filterLookAt);
-	return lookAtFilter(observable)
-		.map(input => {
-			return (dispatch) => {
-				dispatch(f(input));
-			};
-		});
-};
-
-export const observeLookAround = (constants, expectedInput, playerPos, map, f, observable) => {
-	const filterLookAround = string => string.toUpperCase().includes('LOOK AROUND')
-										&& expectedInput === constants.EXPECTING_MOVEMENT;
-	const lookAroundFilter = R.filter(filterLookAround);
-	return lookAroundFilter(observable)
-		.map(_ => {
+		},
+		[lookAround]: () => {
 			return (dispatch)=> {
 				dispatch(f(playerPos, map));
 			};
-		});
-};
-
-export const observeReset = (constants, actions, messageGen, observable) => {
-	const filterResets = string => firstWordOf(string).toUpperCase() === 'RESET';
-	const resetFilter = R.filter(filterResets);
-	return resetFilter(observable)
-		.map(input => {
+		},
+		[reset]: () => {
 			return (dispatch) => {
 				dispatch(actions.showMessage(messageGen.getPlayerWantResetMessage(), 0));
 				dispatch(actions.showMessage(messageGen.getResetMessage(name), 1000));
-				dispatch(actions.setInputExpected(constants.EXPECTING_RESET));
-				dispatch(actions.setInputExpected(constants.EXPECTING_CONF));
+				dispatch(f(constants.EXPECTING_RESET));
+				dispatch(f(constants.EXPECTING_CONF));
 			};
-		});
-};
+		},
+		[talk]: () => {
+			return (dispatch) => {
+				dispatch(f(messageGen.getEncounterTalkMessage(NPC), 0));
+				dispatch(f(messageGen.getEncounterRandomTalkMessage(NPC), 1000));
+			};
+		},
+		[attack]: () => {
+			return (dispatch)=> {
+				dispatch(actions.setInputExpected(EXPECTING_BATTLE)); // Set to battle mode
+				dispatch(f(player)); // Make the first move
+			};
+		},
+		[observe]: () => {
+			return (dispatch)=> {
+				dispatch(f(encounter));
+			};
+		}
+	});
+});
