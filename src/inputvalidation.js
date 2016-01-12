@@ -1,6 +1,7 @@
 // Used by playerbar.js for input validation and mapping to action dispatch
 //TODO: Add actions to item/weapons so that you can use bash/whirl/etc for a mace (or other weapon) instead of just "attack" - i.e. abilities tied to weapons instead
 
+import { runPolyfills } from "./utils/polyfills";
 import constants from "./constants";
 import {attemptTypes} from "./utils/enum";
 import actions from "./actions";
@@ -18,6 +19,7 @@ import { firstWordOf, firstElementIsEmpty } from "./utils/helperFunctions";
 import Rx from 'rx';
 import _ from "lodash";
 import R from "ramda";
+runPolyfills();
 
 const runAttempt = R.curry((attemptType, inventory, attemptTypes, actions, messageGen, input) => {
 		const getRequestedItem = readInputAndCreateDispatchable(inventory, attemptTypes, attemptType, actions, messageGen);
