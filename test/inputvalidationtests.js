@@ -62,6 +62,9 @@ function mockStore(getState, expectedActions, done) {
 describe("input validation: 'reset'", ()=> {
 	it("should react correctly when input is 'reset'", (done)=> {
 		const player = { name: "Test", inventory: [], stats: {}, weapon: null, armour: null };
+		const playerPos = { x: 1, y: 1 };
+		const tile = { description: "Grassy" };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.QUEUE_MESSAGE },
 			{ type: constants.QUEUE_MESSAGE },
@@ -69,7 +72,7 @@ describe("input validation: 'reset'", ()=> {
 			{ type: constants.SET_INPUT, input: constants.EXPECTING_CONF }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("reset", null, null, null, player));
+		store.dispatch(inputvalidation("reset", constants.EXPECTING_MOVEMENT, constants.EXPECTING_CONF, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -77,12 +80,15 @@ describe("input validation: 'reset'", ()=> {
 	});
 	it("should react correctly on invalid input during reset confirmation", (done)=> {
 		const player = { name: "Test", inventory: [], stats: {}, weapon: null, armour: null };
+		const playerPos = { x: 1, y: 1 };
+		const tile = { description: "Grassy" };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.QUEUE_MESSAGE },
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("asfasf", constants.EXPECTING_CONF, constants.EXPECTING_RESET, null, player, [[]]));
+		store.dispatch(inputvalidation("asfasf", constants.EXPECTING_CONF, constants.EXPECTING_RESET, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -90,6 +96,9 @@ describe("input validation: 'reset'", ()=> {
 	});
 	it("should react correctly when input is 'yes' during reset confirmation", (done)=> {
 		const player = { name: "Test", inventory: [], stats: {}, weapon: null, armour: null };
+		const playerPos = { x: 1, y: 1 };
+		const tile = { description: "Grassy" };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.QUEUE_MESSAGE },
 			{ type: constants.QUEUE_MESSAGE },
@@ -97,7 +106,7 @@ describe("input validation: 'reset'", ()=> {
 			{ type: constants.DUMMY_RESET }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("Yes", constants.EXPECTING_CONF, constants.EXPECTING_RESET, null, player, [[]]));
+		store.dispatch(inputvalidation("Yes", constants.EXPECTING_CONF, constants.EXPECTING_RESET, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -105,13 +114,16 @@ describe("input validation: 'reset'", ()=> {
 	});
 	it("should react correctly when input is 'no' during reset confirmation", (done)=> {
 		const player = { name: "Test", inventory: [], stats: {}, weapon: null, armour: null };
+		const playerPos = { x: 1, y: 1 };
+		const tile = { description: "Grassy" };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.SET_INPUT, input: constants.EXPECTING_RESET },
 			{ type: constants.QUEUE_MESSAGE },
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("No", constants.EXPECTING_CONF, constants.EXPECTING_RESET, null, player, [[]]));
+		store.dispatch(inputvalidation("No", constants.EXPECTING_CONF, constants.EXPECTING_RESET, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -122,12 +134,15 @@ describe("input validation: 'equip'", ()=> {
 	it("should react correctly when equipping an equippable item", (done)=> {
 		const item = { name: "Test", equippable: true, prefix: "Test" };
 		const player = { name: "Test", inventory: [ item ], stats: {}, weapon: null, armour: null };
+		const playerPos = { x: 1, y: 1 };
+		const tile = { description: "Grassy" };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.EQUIP_ITEM, item: item },
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("equip test", null, null, null, player, [[]]));
+		store.dispatch(inputvalidation("equip test", constants.EXPECTING_MOVEMENT, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -136,12 +151,15 @@ describe("input validation: 'equip'", ()=> {
 	it("should react correctly when equipping an item with a multi-word name", (done)=> {
 		const item = { name: "Test Hat Multi", equippable: true, prefix: "Test" };
 		const player = { name: "Test", inventory: [ item ], stats: {}, weapon: null, armour: null };
+		const playerPos = { x: 1, y: 1 };
+		const tile = { description: "Grassy" };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.EQUIP_ITEM, item: item },
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("equip test hat multi", null, null, null, player, [[]]));
+		store.dispatch(inputvalidation("equip test hat multi", constants.EXPECTING_MOVEMENT, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -150,11 +168,14 @@ describe("input validation: 'equip'", ()=> {
 	it("should react correctly when trying to equip something that cannot be equipped", (done)=> {
 		const item = { name: "Test", equippable: false, prefix: "Test" };
 		const player = { name: "Test", inventory: [ item ], stats: {}, weapon: null, armour: null };
+		const playerPos = { x: 1, y: 1 };
+		const tile = { description: "Grassy" };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("equip test", null, null, null, player, [[]]));
+		store.dispatch(inputvalidation("equip test", constants.EXPECTING_MOVEMENT, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -164,11 +185,14 @@ describe("input validation: 'equip'", ()=> {
 		const item = { name: "Test", equippable: true, prefix: "Test" };
 		const item2 = { name: "Test2", equippable: true, prefix: "Test2" };
 		const player = { name: "Test", inventory: [ item2 ], stats: {}, weapon: null, armour: null };
+		const playerPos = { x: 1, y: 1 };
+		const tile = { description: "Grassy" };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("equip test", null, null, null, player, [[]]));
+		store.dispatch(inputvalidation("equip test", constants.EXPECTING_MOVEMENT, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -177,9 +201,12 @@ describe("input validation: 'equip'", ()=> {
 	it("should react correctly if player enters only the word 'equip'", (done)=> {
 		const item = { name: "Test", equippable: true, prefix: "Test" };
 		const player = { name: "Test", inventory: [ item ], stats: {}, weapon: null, armour: null };
+		const playerPos = { x: 1, y: 1 };
+		const tile = { description: "Grassy" };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("equip", null, null, null, player, [[]]));
+		store.dispatch(inputvalidation("equip", constants.EXPECTING_MOVEMENT, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -187,9 +214,12 @@ describe("input validation: 'equip'", ()=> {
 	});
 	it("should react correctly if the player attempts to equip with an empty inventory", (done)=> {
 		const player = { name: "Test", inventory: [], stats: {}, weapon: null, armour: null };
+		const playerPos = { x: 1, y: 1 };
+		const tile = { description: "Grassy" };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("equip test", constants.EXPECTING_MOVEMENT, null, null, player, [[]]));
+		store.dispatch(inputvalidation("equip test", constants.EXPECTING_MOVEMENT, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -200,11 +230,14 @@ describe("input validation: 'look at'", ()=> {
 	it("should react correctly when looking at an item", (done)=> {
 		const item = { name: "Test", equippable: false, prefix: "Test", description: [] };
 		const player = { name: "Test", inventory: [ item ], stats: {}, weapon: null, armour: null };
+		const playerPos = { x: 1, y: 1 };
+		const tile = { description: "Grassy" };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("look at test", null, null, null, player, [[]]));
+		store.dispatch(inputvalidation("look at test", constants.EXPECTING_MOVEMENT, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -213,11 +246,14 @@ describe("input validation: 'look at'", ()=> {
 	it("should react correctly when looking at an item with a multi-word name", (done)=> {
 		const item = { name: "Test Hat Multi", equippable: false, prefix: "Test", description: [] };
 		const player = { name: "Test", inventory: [ item ], stats: {}, weapon: null, armour: null };
+		const playerPos = { x: 1, y: 1 };
+		const tile = { description: "Grassy" };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("look at test hat multi", null, null, null, player, [[]]));
+		store.dispatch(inputvalidation("look at test hat multi", constants.EXPECTING_MOVEMENT, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -226,12 +262,15 @@ describe("input validation: 'look at'", ()=> {
 	it("should react correctly when looking at an equippable item", (done)=> {
 		const item = { name: "Test", equippable: true, stats: { hp: 0, mp: 0, str: 0, mag: 0, dex: 0, def: 0 }, prefix: "est", description: [] };
 		const player = { name: "Test", inventory: [ item ], stats: {}, weapon: null, armour: null };
+		const playerPos = { x: 1, y: 1 };
+		const tile = { description: "Grassy" };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.QUEUE_MESSAGE },
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("look at test", null, null, null, player, [[]]));
+		store.dispatch(inputvalidation("look at test", constants.EXPECTING_MOVEMENT, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -240,11 +279,14 @@ describe("input validation: 'look at'", ()=> {
 	it("should react correctly when trying to look at something not in the player's inventory", (done)=> {
 		const item = { name: "Test", equippable: true, prefix: "Test" };
 		const player = { name: "Test", inventory: [ item ], stats: {}, weapon: null, armour: null };
+		const playerPos = { x: 1, y: 1 };
+		const tile = { description: "Grassy" };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("look at house", null, null, null, player, [[]]));
+		store.dispatch(inputvalidation("look at house", constants.EXPECTING_MOVEMENT, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -253,9 +295,12 @@ describe("input validation: 'look at'", ()=> {
 	it("should react correctly if player enters only the words 'look at'", (done)=> {
 		const item = { name: "Test", equippable: true, prefix: "Test" };
 		const player = { name: "Test", inventory: [ item ], stats: {}, weapon: null, armour: null };
+		const playerPos = { x: 1, y: 1 };
+		const tile = { description: "Grassy" };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("look at", null, null, null, player, [[]]));
+		store.dispatch(inputvalidation("look at", constants.EXPECTING_MOVEMENT, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -263,9 +308,12 @@ describe("input validation: 'look at'", ()=> {
 	});
 	it("should react correctly if the player attempts to look at something with an empty inventory", (done)=> {
 		const player = { name: "Test", inventory: [], stats: {}, weapon: null, armour: null };
+		const playerPos = { x: 1, y: 1 };
+		const tile = { description: "Grassy" };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("look at test", constants.EXPECTING_MOVEMENT, null, null, player, [[]]));
+		store.dispatch(inputvalidation("look at test", constants.EXPECTING_MOVEMENT, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -282,7 +330,7 @@ describe("input validation: 'look around'", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("look around", constants.EXPECTING_MOVEMENT, null, playerPos, player, map));
+		store.dispatch(inputvalidation("look around", constants.EXPECTING_MOVEMENT, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -299,7 +347,7 @@ describe("input validation: 'look around'", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("look around", constants.EXPECTING_MOVEMENT, null, playerPos, player, map));
+		store.dispatch(inputvalidation("look around", constants.EXPECTING_MOVEMENT, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -314,7 +362,7 @@ describe("input validation: 'look around'", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("look around", constants.EXPECTING_MOVEMENT, null, playerPos, player, map));
+		store.dispatch(inputvalidation("look around", constants.EXPECTING_MOVEMENT, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -329,7 +377,7 @@ describe("input validation: 'look around'", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("look around", constants.EXPECTING_MOVEMENT, null, playerPos, player, map));
+		store.dispatch(inputvalidation("look around", constants.EXPECTING_MOVEMENT, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -340,6 +388,9 @@ describe("input validation: race selection", ()=> {
 	it("should react correctly if the player selects a valid race", (done)=> {
 		const player = { name: "Test", inventory: [], stats: {}, weapon: null, armour: null };
 		const race = Classes["Elf"];
+		const tile = { description: "Grassy" };
+		const playerPos = { x: 1, y: 1 };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.SET_STATS, stats: race.stats },
 			{ type: constants.SET_INPUT, input: constants.EXPECTING_CONF },
@@ -347,7 +398,7 @@ describe("input validation: race selection", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("elf", constants.EXPECTING_RACE, null, null, player, [[]]));
+		store.dispatch(inputvalidation("elf", constants.EXPECTING_RACE, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -356,6 +407,9 @@ describe("input validation: race selection", ()=> {
 	it("should react correctly if the race name begins with a consonant", (done)=> {
 		const player = { name: "Test", inventory: [], stats: {}, weapon: null, armour: null };
 		const race = Classes["Human"];
+		const tile = { description: "Grassy" };
+		const playerPos = { x: 1, y: 1 };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.SET_STATS, stats: race.stats },
 			{ type: constants.SET_INPUT, input: constants.EXPECTING_CONF },
@@ -363,7 +417,7 @@ describe("input validation: race selection", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("human", constants.EXPECTING_RACE, null, null, player, [[]]));
+		store.dispatch(inputvalidation("human", constants.EXPECTING_RACE, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -371,12 +425,15 @@ describe("input validation: race selection", ()=> {
 	});
 	it("should react correctly if the player selects an invalid race", (done)=> {
 		const player = { name: "Test", inventory: [], stats: {}, weapon: null, armour: null };
+		const tile = { description: "Grassy" };
+		const playerPos = { x: 1, y: 1 };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.QUEUE_MESSAGE },
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("fakerace", constants.EXPECTING_RACE, null, null, player, [[]]));
+		store.dispatch(inputvalidation("fakerace", constants.EXPECTING_RACE, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -384,12 +441,15 @@ describe("input validation: race selection", ()=> {
 	});
 	it("should react correctly to invalid input during race confirmation", (done)=> {
 		const player = { name: "Test", inventory: [], stats: {}, weapon: null, armour: null };
+		const tile = { description: "Grassy" };
+		const playerPos = { x: 1, y: 1 };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.QUEUE_MESSAGE },
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("asd", constants.EXPECTING_CONF, constants.EXPECTING_RACE, null, player, [[]]));
+		store.dispatch(inputvalidation("asd", constants.EXPECTING_CONF, constants.EXPECTING_RACE, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -397,13 +457,16 @@ describe("input validation: race selection", ()=> {
 	});
 	it("should react correctly to 'no' during race confirmation", (done)=> {
 		const player = { name: "Test", inventory: [], stats: {}, weapon: null, armour: null };
+		const tile = { description: "Grassy" };
+		const playerPos = { x: 1, y: 1 };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.SET_INPUT, input: constants.EXPECTING_RACE },
 			{ type: constants.QUEUE_MESSAGE },
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("no", constants.EXPECTING_CONF, constants.EXPECTING_RACE, null, player, [[]]));
+		store.dispatch(inputvalidation("no", constants.EXPECTING_CONF, constants.EXPECTING_RACE, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -411,6 +474,9 @@ describe("input validation: race selection", ()=> {
 	});
 	it("should react correctly to 'yes' during race confirmation", (done)=> {
 		const player = { name: "Test", inventory: [], stats: {}, weapon: null, armour: null };
+		const tile = { description: "Grassy" };
+		const playerPos = { x: 1, y: 1 };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.QUEUE_MESSAGE },
 			{ type: constants.QUEUE_MESSAGE },
@@ -420,7 +486,7 @@ describe("input validation: race selection", ()=> {
 			{ type: constants.SET_INPUT, input: constants.EXPECTING_WEAPON }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("yes", constants.EXPECTING_CONF, constants.EXPECTING_RACE, null, player, [[]]));
+		store.dispatch(inputvalidation("yes", constants.EXPECTING_CONF, constants.EXPECTING_RACE, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -430,6 +496,9 @@ describe("input validation: race selection", ()=> {
 describe("input validation: weapon selection", ()=> {
 	it("should react correctly if the player selects a valid weapon initially", (done)=> {
 		const player = { name: "Test", inventory: [], stats: {}, weapon: null, armour: null };
+		const tile = { description: "Grassy" };
+		const playerPos = { x: 1, y: 1 };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const weapon = Weapons.all["Sword"];
 		const expectedActions = [
 			{ type: constants.QUEUE_ITEM, item: weapon },
@@ -438,7 +507,7 @@ describe("input validation: weapon selection", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("sword", constants.EXPECTING_WEAPON, null, null, player, [[]]));
+		store.dispatch(inputvalidation("sword", constants.EXPECTING_WEAPON, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -448,6 +517,9 @@ describe("input validation: weapon selection", ()=> {
 		const weapon1 = Weapons.all["Sword"];
 		const weapon2 = Weapons.all["Bow"];
 		const player = { name: "Test", inventory: [ weapon1 ], stats: {}, weapon: null, armour: null };
+		const tile = { description: "Grassy" };
+		const playerPos = { x: 1, y: 1 };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.REMOVE_ITEM, item: weapon1 },
 			{ type: constants.QUEUE_ITEM, item: weapon2 },
@@ -456,7 +528,7 @@ describe("input validation: weapon selection", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("bow", constants.EXPECTING_WEAPON, null, null, player, [[]]));
+		store.dispatch(inputvalidation("bow", constants.EXPECTING_WEAPON, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -464,12 +536,15 @@ describe("input validation: weapon selection", ()=> {
 	});
 	it("should react correctly if the player selects an invalid weapon", (done)=> {
 		const player = { name: "Test", inventory: [], stats: {}, weapon: null, armour: null };
+		const tile = { description: "Grassy" };
+		const playerPos = { x: 1, y: 1 };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.QUEUE_MESSAGE },
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("fakeweapon", constants.EXPECTING_WEAPON, null, null, player, [[]]));
+		store.dispatch(inputvalidation("fakeweapon", constants.EXPECTING_WEAPON, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -478,12 +553,15 @@ describe("input validation: weapon selection", ()=> {
 	it("should react correctly to invalid input during weapon confirmation", (done)=> {
 		const weapon = Weapons.all["Sword"];
 		const player = { name: "Test", inventory: [ weapon ], stats: {}, weapon: null, armour: null };
+		const tile = { description: "Grassy" };
+		const playerPos = { x: 1, y: 1 };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.QUEUE_MESSAGE },
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("asd", constants.EXPECTING_CONF, constants.EXPECTING_WEAPON, null, player, [[]]));
+		store.dispatch(inputvalidation("asd", constants.EXPECTING_CONF, constants.EXPECTING_WEAPON, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -492,13 +570,16 @@ describe("input validation: weapon selection", ()=> {
 	it("should react correctly to 'no' during weapon confirmation", (done)=> {
 		const weapon = Weapons.all["Sword"];
 		const player = { name: "Test", inventory: [ weapon ], stats: {}, weapon: null, armour: null };
+		const tile = { description: "Grassy" };
+		const playerPos = { x: 1, y: 1 };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.SET_INPUT, input: constants.EXPECTING_WEAPON },
 			{ type: constants.QUEUE_MESSAGE },
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("no", constants.EXPECTING_CONF, constants.EXPECTING_WEAPON, null, player, [[]]));
+		store.dispatch(inputvalidation("no", constants.EXPECTING_CONF, constants.EXPECTING_WEAPON, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -507,6 +588,9 @@ describe("input validation: weapon selection", ()=> {
 	it("should react correctly to 'yes' during weapon confirmation", (done)=> {
 		const weapon = Weapons.all["Sword"];
 		const player = { name: "Test", inventory: [ weapon ], stats: {}, weapon: null, armour: null };
+		const tile = { description: "Grassy" };
+		const playerPos = { x: 1, y: 1 };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.QUEUE_MESSAGE },
 			{ type: constants.QUEUE_MESSAGE },
@@ -517,7 +601,7 @@ describe("input validation: weapon selection", ()=> {
 			{ type: constants.SET_INPUT, input: constants.EXPECTING_ANYTHING }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("yes", constants.EXPECTING_CONF, constants.EXPECTING_WEAPON, null, player, [[]]));
+		store.dispatch(inputvalidation("yes", constants.EXPECTING_CONF, constants.EXPECTING_WEAPON, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -527,6 +611,9 @@ describe("input validation: weapon selection", ()=> {
 describe("input validation: set name", ()=> {
 	it("should react correctly to a name with valid length", (done)=> {
 		const player = { name: "???", inventory: [], stats: {}, weapon: null, armour: null };
+		const tile = { description: "Grassy" };
+		const playerPos = { x: 1, y: 1 };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const name = "Test"
 		const expectedActions = [
 			{ type: constants.SET_NAME, name: name },
@@ -535,7 +622,7 @@ describe("input validation: set name", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation(name, constants.EXPECTING_NAME, null, null, player, [[]]));
+		store.dispatch(inputvalidation(name, constants.EXPECTING_NAME, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -543,6 +630,9 @@ describe("input validation: set name", ()=> {
 	});
 	it("should react correctly to a name with minimum length", (done)=> {
 		const player = { name: "???", inventory: [], stats: {}, weapon: null, armour: null };
+		const tile = { description: "Grassy" };
+		const playerPos = { x: 1, y: 1 };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		let name = "";
 		for (let i = 0; i < constants.MIN_NAME_LENGTH; ++i) {
 			name += "a";
@@ -554,7 +644,7 @@ describe("input validation: set name", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation(name, constants.EXPECTING_NAME, null, null, player, [[]]));
+		store.dispatch(inputvalidation(name, constants.EXPECTING_NAME, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -562,6 +652,9 @@ describe("input validation: set name", ()=> {
 	});
 	it("should react correctly to a name with maximum length", (done)=> {
 		const player = { name: "???", inventory: [], stats: {}, weapon: null, armour: null };
+		const tile = { description: "Grassy" };
+		const playerPos = { x: 1, y: 1 };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		let name = "";
 		for (let i = 0; i < constants.MAX_NAME_LENGTH; ++i) {
 			name += "a";
@@ -573,7 +666,7 @@ describe("input validation: set name", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation(name, constants.EXPECTING_NAME, null, null, player, [[]]));
+		store.dispatch(inputvalidation(name, constants.EXPECTING_NAME, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -581,6 +674,9 @@ describe("input validation: set name", ()=> {
 	});
 	it("should react correctly to a name that is too short", (done)=> {
 		const player = { name: "???", inventory: [], stats: {}, weapon: null, armour: null };
+		const tile = { description: "Grassy" };
+		const playerPos = { x: 1, y: 1 };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		let name = "";
 		for (let i = 0; i < constants.MIN_NAME_LENGTH - 1; ++i) {
 			name += "a";
@@ -590,7 +686,7 @@ describe("input validation: set name", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation(name, constants.EXPECTING_NAME, null, null, player, [[]]));
+		store.dispatch(inputvalidation(name, constants.EXPECTING_NAME, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -598,6 +694,9 @@ describe("input validation: set name", ()=> {
 	});
 	it("should react correctly to a name that is too long", (done)=> {
 		const player = { name: "???", inventory: [], stats: {}, weapon: null, armour: null };
+		const tile = { description: "Grassy" };
+		const playerPos = { x: 1, y: 1 };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		let name = "";
 		for (let i = 0; i <= constants.MAX_NAME_LENGTH; ++i) {
 			name += "a";
@@ -607,7 +706,7 @@ describe("input validation: set name", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation(name, constants.EXPECTING_NAME, null, null, player, [[]]));
+		store.dispatch(inputvalidation(name, constants.EXPECTING_NAME, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -615,12 +714,15 @@ describe("input validation: set name", ()=> {
 	});
 	it("should react correctly to invalid input during name confirmation", (done)=> {
 		const player = { name: "???", inventory: [], stats: {}, weapon: null, armour: null };
+		const tile = { description: "Grassy" };
+		const playerPos = { x: 1, y: 1 };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.QUEUE_MESSAGE },
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("asd", constants.EXPECTING_CONF, constants.EXPECTING_NAME, null, player, [[]]));
+		store.dispatch(inputvalidation("asd", constants.EXPECTING_CONF, constants.EXPECTING_NAME, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -628,13 +730,16 @@ describe("input validation: set name", ()=> {
 	});
 	it("should react correctly to 'no' during name confirmation", (done)=> {
 		const player = { name: "???", inventory: [], stats: {}, weapon: null, armour: null };
+		const tile = { description: "Grassy" };
+		const playerPos = { x: 1, y: 1 };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.SET_INPUT, input: constants.EXPECTING_NAME },
 			{ type: constants.QUEUE_MESSAGE },
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("no", constants.EXPECTING_CONF, constants.EXPECTING_NAME, null, player, [[]]));
+		store.dispatch(inputvalidation("no", constants.EXPECTING_CONF, constants.EXPECTING_NAME, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -642,6 +747,9 @@ describe("input validation: set name", ()=> {
 	});
 	it("should react correctly to 'yes' during name confirmation", (done)=> {
 		const player = { name: "???", inventory: [], stats: {}, weapon: null, armour: null };
+		const tile = { description: "Grassy" };
+		const playerPos = { x: 1, y: 1 };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [
 			{ type: constants.QUEUE_MESSAGE },
 			{ type: constants.QUEUE_MESSAGE },
@@ -649,7 +757,7 @@ describe("input validation: set name", ()=> {
 			{ type: constants.SET_INPUT, input: constants.EXPECTING_RACE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("yes", constants.EXPECTING_CONF, constants.EXPECTING_NAME, null, player, [[]]));
+		store.dispatch(inputvalidation("yes", constants.EXPECTING_CONF, constants.EXPECTING_NAME, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -668,7 +776,7 @@ describe("input validation: move player", ()=> {
 			{ type: constants.MOVE, movement: movement }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("north", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map));
+		store.dispatch(inputvalidation("north", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -685,7 +793,7 @@ describe("input validation: move player", ()=> {
 			{ type: constants.MOVE, movement: movement }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("east", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map));
+		store.dispatch(inputvalidation("east", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -702,7 +810,7 @@ describe("input validation: move player", ()=> {
 			{ type: constants.MOVE, movement: movement }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("south", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map));
+		store.dispatch(inputvalidation("south", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -719,7 +827,7 @@ describe("input validation: move player", ()=> {
 			{ type: constants.MOVE, movement: movement }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("west", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map));
+		store.dispatch(inputvalidation("west", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -734,7 +842,7 @@ describe("input validation: move player", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("north", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map));
+		store.dispatch(inputvalidation("north", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -749,7 +857,7 @@ describe("input validation: move player", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("east", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map));
+		store.dispatch(inputvalidation("east", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -764,7 +872,7 @@ describe("input validation: move player", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("south", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map));
+		store.dispatch(inputvalidation("south", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -779,7 +887,7 @@ describe("input validation: move player", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("west", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map));
+		store.dispatch(inputvalidation("west", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -795,7 +903,7 @@ describe("input validation: move player", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("north", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map));
+		store.dispatch(inputvalidation("north", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -811,7 +919,7 @@ describe("input validation: move player", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("east", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map));
+		store.dispatch(inputvalidation("east", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -827,7 +935,7 @@ describe("input validation: move player", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("south", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map));
+		store.dispatch(inputvalidation("south", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -843,7 +951,7 @@ describe("input validation: move player", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("west", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map));
+		store.dispatch(inputvalidation("west", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -862,7 +970,7 @@ describe("input validation: move player", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("north", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map));
+		store.dispatch(inputvalidation("north", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -888,7 +996,7 @@ describe("input validation: move player", ()=> {
 			{ type: constants.PREP_DAMAGE, damage: damage }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("north", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map));
+		store.dispatch(inputvalidation("north", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -914,7 +1022,7 @@ describe("input validation: encounter", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("talk", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map));
+		store.dispatch(inputvalidation("talk", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -927,7 +1035,7 @@ describe("input validation: encounter", ()=> {
 		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("talk", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map));
+		store.dispatch(inputvalidation("talk", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -944,7 +1052,7 @@ describe("input validation: encounter", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("observe", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map));
+		store.dispatch(inputvalidation("observe", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -957,7 +1065,7 @@ describe("input validation: encounter", ()=> {
 		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("observe", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map));
+		store.dispatch(inputvalidation("observe", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -982,7 +1090,7 @@ describe("input validation: encounter", ()=> {
 			{ type: constants.PREP_DAMAGE, damage: damage }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("attack", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map));
+		store.dispatch(inputvalidation("attack", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -996,7 +1104,7 @@ describe("input validation: encounter", ()=> {
 		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		const expectedActions = [];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("attack", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map));
+		store.dispatch(inputvalidation("attack", constants.EXPECTING_MOVEMENT, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -1021,7 +1129,7 @@ describe("input validation: battle", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("observe", constants.EXPECTING_BATTLE, constants.EXPECTING_MOVEMENT, playerPos, player, map));
+		store.dispatch(inputvalidation("observe", constants.EXPECTING_BATTLE, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -1037,7 +1145,7 @@ describe("input validation: battle", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("north", constants.EXPECTING_BATTLE, constants.EXPECTING_MOVEMENT, playerPos, player, map));
+		store.dispatch(inputvalidation("north", constants.EXPECTING_BATTLE, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -1061,7 +1169,7 @@ describe("input validation: battle", ()=> {
 			{ type: constants.PREP_DAMAGE, damage: damage }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("attack", constants.EXPECTING_BATTLE, constants.EXPECTING_MOVEMENT, playerPos, player, map));
+		store.dispatch(inputvalidation("attack", constants.EXPECTING_BATTLE, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -1087,7 +1195,7 @@ describe("input validation: battle", ()=> {
 			{ type: constants.SET_INPUT, input: constants.EXPECTING_MOVEMENT }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("attack", constants.EXPECTING_BATTLE, constants.EXPECTING_MOVEMENT, playerPos, player, map));
+		store.dispatch(inputvalidation("attack", constants.EXPECTING_BATTLE, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -1116,7 +1224,7 @@ describe("input validation: battle", ()=> {
 			{ type: constants.DUMMY_RESET }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("attack", constants.EXPECTING_BATTLE, constants.EXPECTING_MOVEMENT, playerPos, player, map));
+		store.dispatch(inputvalidation("attack", constants.EXPECTING_BATTLE, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -1137,7 +1245,7 @@ describe("input validation: battle", ()=> {
 			{ type: constants.QUEUE_MESSAGE }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("attack", constants.EXPECTING_BATTLE, constants.EXPECTING_MOVEMENT, playerPos, player, map));
+		store.dispatch(inputvalidation("attack", constants.EXPECTING_BATTLE, constants.EXPECTING_MOVEMENT, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
@@ -1172,22 +1280,35 @@ describe("input validation: misc", ()=> {
 			{ type: constants.SET_INPUT, input: constants.EXPECTING_MOVEMENT }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("asgasg", constants.EXPECTING_ANYTHING, constants.EXPECTING_CONF, null, player, [[]]));
+		store.dispatch(inputvalidation("asgasg", constants.EXPECTING_ANYTHING, constants.EXPECTING_CONF, playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
 		done();
 	});
-	it("should throw an exception if receiving input while input is disabled", ()=> {
+	it("should throw an exception if receiving input while input is disabled", (done)=> {
 		const player = { name: "Test", inventory: [], stats: {}, weapon: null, armour: null };
-		expect(inputvalidation.bind(inputvalidation, "asga", constants.DISABLED, null, null, player, [[]])).to.throw(/input was disabled/);
+		const tile = { description: "Grassy" };
+		const playerPos = { x: 1, y: 1 };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
+		const store = mockStore({}, [], done);
+		expect(inputvalidation.bind(inputvalidation, "asga", constants.DISABLED, constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch)).to.throw(/input was disabled/);
+		done();
 	});
-	it("should throw an exception if receiving a missing input case for expectedInput", ()=> {
+	it("should throw an exception if receiving a missing input case for expectedInput", (done)=> {
 		const player = { name: "Test", inventory: [], stats: {}, weapon: null, armour: null };
-		expect(inputvalidation.bind(inputvalidation, "gasg", "FakeInput", null, null, player, [[]])).to.throw(/Missing input case/);
+		const tile = { description: "Grassy" };
+		const playerPos = { x: 1, y: 1 };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
+		const store = mockStore({}, [], done);
+		expect(inputvalidation.bind(inputvalidation, "gasg", "FakeInput", constants.EXPECTING_ANYTHING, playerPos, player, map, store.dispatch)).to.throw(/Missing input case/);
+		done();
 	});
 	it("should react correctly if receiving a missing input case for previousInput during confirmation", (done)=> {
 		const player = { name: "Test", inventory: [], stats: {}, weapon: null, armour: null };
+		const tile = { description: "Grassy" };
+		const playerPos = { x: 1, y: 1 };
+		const map = [ [ tile, tile, tile ], [ tile, tile, tile ], [ tile, tile, tile ] ];
 		sinon.spy(console, "log");
 		const expectedActions = [
 			{ type: constants.QUEUE_MESSAGE },
@@ -1195,7 +1316,7 @@ describe("input validation: misc", ()=> {
 			{ type: constants.SET_INPUT, input: constants.DISABLED }
 		];
 		const store = mockStore({}, expectedActions, done);
-		store.dispatch(inputvalidation("yes", constants.EXPECTING_CONF, "FakeInput", null, player, [[]]));
+		store.dispatch(inputvalidation("yes", constants.EXPECTING_CONF, "FakeInput", playerPos, player, map, store.dispatch));
 		if (expectedActions.length > 0) {
 			throw new Error("Last " + expectedActions.length + " actions not dispatched");
 		}
